@@ -62,9 +62,17 @@ TIMESTAMP = re.compile(r"\b\d{1,2}:\d{2}\b")
 def fetch_json(url, tries=3):
     for attempt in range(tries):
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "echolog-collector/1.0"})
+            req = urllib.request.Request(url, headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36",
+                "Accept": "application/json, text/plain, */*",
+                "Accept-Language": "en-US,en;q=0.9",
+            })
             with urllib.request.urlopen(req, timeout=30) as r:
-                return json.loads(r.read().decode("utf-8"))
+                body = r.read().decode("utf-8", errors="replace")
+            try:
+                return json.loads(body)
+            except ValueError:
+                raise ValueError(f"not JSON, got: {body[:150]!r}")
         except Exception as e:  # noqa: BLE001
             if attempt == tries - 1:
                 raise
