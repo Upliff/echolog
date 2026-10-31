@@ -16,7 +16,8 @@ An import file adds games and songs in bulk. Mohad drops it into the **Import** 
           "title": "Dearly Beloved",
           "composer": "Yoko Shimomura",
           "scenes": [
-            { "video": "https://www.youtube.com/watch?v=VIDEOID", "start": "0:42", "end": "2:10", "label": "Title screen" }
+            { "video": "https://www.youtube.com/watch?v=VIDEOID", "start": "0:42.250", "end": "2:10", "label": "Title screen",
+              "commentVideos": ["https://youtu.be/VIDEOID"] }
           ],
           "music": { "video": "https://youtu.be/VIDEOID", "start": "0:00", "end": "2:35" },
           "commentVideos": ["https://youtu.be/VIDEOID", "https://youtu.be/VIDEOID"],
@@ -31,8 +32,8 @@ An import file adds games and songs in bulk. Mohad drops it into the **Import** 
 
 - **Required:** `games[].title` and, for each song, `title`. Everything else is optional.
 - **`video`** can be a full YouTube link (`watch?v=`, `youtu.be/`, `shorts/`, `embed/`) or just the 11-character id. A link with `?t=` sets the start time if `start` isn't given.
-- **Times** can be `"1:35"`, `"95"`, `95` or `"1m35s"`. `end` is optional.
-- **`scenes`** are the moments the song plays in the game, in the order they happen, so the first one is when it first plays. Each scene can have its own `music`. `label` is short and plain ("Opening", "Ending").
+- **Times** can be `"1:35"`, `"1:35.250"`, `"95"`, `95.25` or `"1m35s"`, to the millisecond. `end` is optional.
+- **`scenes`** are the moments the song plays in the game, in the order they happen, so the first one is when it first plays. Each scene can have its own `music`, and its own `commentVideos` (left out = the scene uses the song's comments). `label` is short and plain ("Opening", "Ending").
 - **`music`** (optional) is a clean soundtrack upload, played over a scene that has talking over the song.
 - **`commentVideos`**: 2 to 4 popular uploads of the song (official soundtrack uploads, well known fan uploads) with lots of comments.
 - **`volume`** (optional) is 0 to 100. Leave it out to use the site default.
