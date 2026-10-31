@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-31T22:50:14Z",
+  "updated": "2026-10-31T23:04:31Z",
   "settings": {},
   "games": [
     {
@@ -649,18 +649,6 @@
               "score": 6.24
             },
             {
-              "id": "yt:Ugza_VhChWtuoCYm6et4AaABAg",
-              "source": "youtube",
-              "author": "@spirityuuki3290",
-              "authorUrl": "http://www.youtube.com/@spirityuuki3290",
-              "text": "Nineteen years and this song still kills me every time. Even from the first moment, before I knew just how powerful the song really was when you know the story, and I have never been able to hear it without crying ever since. It manages to carry the weight of every decision, every cut scene, and every battle fought throughout the game and pack all of the emotions you felt while playing it. The music in this game was fantastic, but this song was a beautiful masterpiece.",
-              "likes": 0,
-              "date": "2020-08-29",
-              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugza_VhChWtuoCYm6et4AaABAg",
-              "videoId": "PSjTN8WSGNk",
-              "score": 6.18
-            },
-            {
               "id": "yt:UgyGVJdYLhgXj44gudR4AaABAg",
               "source": "youtube",
               "author": "@jombloambyar2994",
@@ -755,6 +743,18 @@
               "url": "https://www.youtube.com/watch?v=sy-nrLiAwZI&lc=UgwNEdr86h5Lm2euHMZ4AaABAg",
               "videoId": "sy-nrLiAwZI",
               "score": 5.79
+            },
+            {
+              "id": "yt:UgyNQiROvD1wm9iiseZ4AaABAg",
+              "source": "youtube",
+              "author": "@CuddleBear0310",
+              "authorUrl": "http://www.youtube.com/@CuddleBear0310",
+              "text": "This is my most favourite game ever like I’m 19 and watched my mom play and I tried to play when I was younger and played as I got older",
+              "likes": 0,
+              "date": "2020-08-18",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgyNQiROvD1wm9iiseZ4AaABAg",
+              "videoId": "PSjTN8WSGNk",
+              "score": 5.65
             }
           ]
         },
@@ -1931,7 +1931,7 @@
       "id": "kingdom-hearts-2",
       "title": "Kingdom Hearts II",
       "year": 2005,
-      "cover": null,
+      "cover": "covers/kingdom-hearts-2.jpg",
       "sounds": [],
       "steamAppId": null,
       "songs": [
@@ -2684,23 +2684,23 @@
           "title": "The Other Promise",
           "composer": "Yoko Shimomura",
           "volume": null,
-          "length": 277,
+          "length": 278,
           "moment": {
             "videoId": "y4yQioUhk9E",
-            "start": 0,
-            "end": null,
+            "start": 27,
+            "end": 335,
             "label": "Sora vs Roxas"
           },
           "moments": [
             {
               "videoId": "y4yQioUhk9E",
-              "start": 0,
-              "end": null,
+              "start": 27,
+              "end": 335,
               "label": "Sora vs Roxas"
             }
           ],
           "audio": {
-            "videoId": "vU78E7S0fgs",
+            "videoId": "KyrWRgg_6KE",
             "start": 0,
             "end": null
           },
@@ -2848,18 +2848,6 @@
               "url": "https://www.youtube.com/watch?v=s9XljBWGrRQ&lc=UgyP4-Ucd3winTf2tBR4AaABAg",
               "videoId": "s9XljBWGrRQ",
               "score": 7.0
-            },
-            {
-              "id": "yt:Ugza1tymLMiCTDqMS3h4AaABAg",
-              "source": "youtube",
-              "author": "@sora4967",
-              "authorUrl": "http://www.youtube.com/@sora4967",
-              "text": "Oh my . I just beated kh2 in 30 hours.  And this bloody bastard made me sweat thou. realised something not right during the battle we had . So the theme made me feel a bit \" weird \" \nI have been playing games all of my life since ps1 but this game is even on beginner mode pain in the arse!. Also its quite hard to believe that game released 16 years ago. Still great. But its too hard. Tooo hard. Even harder than souls games. There is no bloody checkpoint system and if you made an mistake , you will have some pain....",
-              "likes": 0,
-              "date": "2021-03-05",
-              "url": "https://www.youtube.com/watch?v=s9XljBWGrRQ&lc=Ugza1tymLMiCTDqMS3h4AaABAg",
-              "videoId": "s9XljBWGrRQ",
-              "score": 6.94
             },
             {
               "id": "yt:Ugxb_1Bk1SXXXX7ujaB4AaABAg",
@@ -3282,6 +3270,18 @@
               "score": 4.11
             },
             {
+              "id": "yt:UgxJ98721k5Vzkk9TU14AaABAg",
+              "source": "youtube",
+              "author": "@Cheesy_Danish",
+              "authorUrl": "http://www.youtube.com/@Cheesy_Danish",
+              "text": "My first time going up against him he kicked my ass multiple times because I was under leveled and didn’t have the proper abilities to fight him\nHowever I persevered and eventually beat him despite my handicap\nAnd then immediately felt horrible",
+              "likes": 1,
+              "date": "2020-11-13",
+              "url": "https://www.youtube.com/watch?v=s9XljBWGrRQ&lc=UgxJ98721k5Vzkk9TU14AaABAg",
+              "videoId": "s9XljBWGrRQ",
+              "score": 4.11
+            },
+            {
               "id": "yt:Ugz2NRK4wtyD-Ohf7Wh4AaABAg",
               "source": "youtube",
               "author": "@samapak7",
@@ -3622,18 +3622,6 @@
               "score": 9.48
             },
             {
-              "id": "yt:Ugz0oksKuBuDh0hibyZ4AaABAg",
-              "source": "youtube",
-              "author": "@Guppyta16",
-              "authorUrl": "http://www.youtube.com/@Guppyta16",
-              "text": "The last time I heard this song is when I was 11... now I'm 21. The feels, the memories when I play this game alone in my childhood, cozy room.",
-              "likes": 0,
-              "date": "2018-05-19",
-              "url": "https://www.youtube.com/watch?v=CSdNxXGUaRU&lc=Ugz0oksKuBuDh0hibyZ4AaABAg",
-              "videoId": "CSdNxXGUaRU",
-              "score": 9.48
-            },
-            {
               "id": "yt:Ugx08XhjxPtuZODDnt14AaABAg",
               "source": "youtube",
               "author": "@sauneor1807",
@@ -3898,6 +3886,18 @@
               "score": 7.91
             },
             {
+              "id": "yt:UgyQ64jK9T_V1pUCNzp4AaABAg",
+              "source": "youtube",
+              "author": "@djoloflevidenis1738",
+              "authorUrl": "http://www.youtube.com/@djoloflevidenis1738",
+              "text": "Ya know i loved the times when i used to see my brother playing kingdom hearts and I'm like can i play and hes like okay just wait a little longer and then it was like 2 hours later and then he hops off and then I get on siton the comfy chair best day ever I'll never get that day back if I could go back in time I would but I cant I kinda wanna Invent somthing that could get us back in time but I'm too stupid what good am i",
+              "likes": 2,
+              "date": "2023-04-23",
+              "url": "https://www.youtube.com/watch?v=CSdNxXGUaRU&lc=UgyQ64jK9T_V1pUCNzp4AaABAg",
+              "videoId": "CSdNxXGUaRU",
+              "score": 7.9
+            },
+            {
               "id": "yt:Ugyaj7F6KsbNPSuu3Gd4AaABAg",
               "source": "youtube",
               "author": "@Stevezftw",
@@ -3982,18 +3982,6 @@
               "score": 7.53
             },
             {
-              "id": "yt:UgycgnoxfLhFMgtfZUR4AaABAg",
-              "source": "youtube",
-              "author": "@SpikyAd",
-              "authorUrl": "http://www.youtube.com/@SpikyAd",
-              "text": "I remember when I used to live with my parents back at home and I was playing kingdom hearts 2. I was at this part in the game and I loved it, it was sunny weather back then and I remember playing this game while drinking lemonade. I am looking forward to Sep the 13th for KH1.5 HD remix because I am going to be playing all the kingdom hearts games I own again. My advice in life is to make these moments count as they don't always come around the corner.",
-              "likes": 0,
-              "date": "2013-09-06",
-              "url": "https://www.youtube.com/watch?v=CSdNxXGUaRU&lc=UgycgnoxfLhFMgtfZUR4AaABAg",
-              "videoId": "CSdNxXGUaRU",
-              "score": 7.52
-            },
-            {
               "id": "yt:UgzTCq0m9BXnXBasFSJ4AaABAg",
               "source": "youtube",
               "author": "@jaku9329",
@@ -4064,6 +4052,18 @@
               "url": "https://www.youtube.com/watch?v=73ZjSYHRdkA&lc=UgyAtLfQYMF0mYVtuBF4AaABAg",
               "videoId": "73ZjSYHRdkA",
               "score": 7.26
+            },
+            {
+              "id": "yt:Ugw2W9Lo5_2KKMQxIe54AaABAg",
+              "source": "youtube",
+              "author": "@jungledyret100",
+              "authorUrl": "http://www.youtube.com/@jungledyret100",
+              "text": "I remember playing Kindom Hearts 2 just before my teenage years started. This song truly is the swan song of my childhood.\n\nWhen I moved from my hometown to go to university, I listened this song while waiting train to arrive. Silent railway station was saturated by orange sunset. That was something else. I shred a tear.",
+              "likes": 5,
+              "date": "2022-04-23",
+              "url": "https://www.youtube.com/watch?v=CSdNxXGUaRU&lc=Ugw2W9Lo5_2KKMQxIe54AaABAg",
+              "videoId": "CSdNxXGUaRU",
+              "score": 7.25
             }
           ]
         }
