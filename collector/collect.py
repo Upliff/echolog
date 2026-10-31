@@ -134,6 +134,34 @@ def load_hidden():
 
 # ---------- YouTube ----------
 
+ISO_DURATION = re.compile(r"P(?:(\d+)D)?T?(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?")
+
+
+def video_durations(ids, key):
+    """Length in seconds of each YouTube video, 50 per request (1 quota unit each)."""
+    out, ids = {}, sorted(set(i for i in ids if i))
+    for n in range(0, len(ids), 50):
+        q = urllib.parse.urlencode({"part": "contentDetails", "id": ",".join(ids[n:n + 50]), "key": key})
+        data = fetch_json(f"https://www.googleapis.com/youtube/v3/videos?{q}")
+        for item in data.get("items", []):
+            m = ISO_DURATION.fullmatch(item.get("contentDetails", {}).get("duration", "") or "")
+            if m:
+                d, h, mi, se = (int(x or 0) for x in m.groups())
+                out[item["id"]] = d * 86400 + h * 3600 + mi * 60 + se
+    return out
+
+
+def song_length(song, durations):
+    """How long the song plays on the site: its music track if it has one, else its first scene."""
+    moments = song.get("moments") or ([song["moment"]] if song.get("moment") else [])
+    spec = song.get("audio") or (moments[0] if moments else None)
+    if not spec or not spec.get("videoId"):
+        return None
+    start = spec.get("start") or 0
+    end = spec.get("end") or durations.get(spec["videoId"])
+    return max(0, int(end - start)) if end else None
+
+
 def youtube_comments(video_id, key):
     out, token = [], None
     for _ in range(YT_PAGES_PER_VIDEO):
@@ -240,6 +268,22 @@ def main():
 
     games_out = []
     log = []
+    durations = {}
+    if key:
+        ids = []
+        for game in config["games"]:
+            for song in game.get("songs", []):
+                for m in (song.get("moments") or ([song["moment"]] if song.get("moment") else [])):
+                    ids.append(m.get("videoId"))
+                    if m.get("audio"):
+                        ids.append(m["audio"].get("videoId"))
+                if song.get("audio"):
+                    ids.append(song["audio"].get("videoId"))
+        try:
+            durations = video_durations(ids, key)
+            log.append(f"durations: {len(durations)} videos")
+        except Exception as e:  # noqa: BLE001
+            log.append(f"durations: failed ({e})")
     for game in config["games"]:
         print(f"{game['title']}")
         prev = prev_games.get(game["id"], {})
@@ -272,6 +316,7 @@ def main():
                 "title": song["title"],
                 "composer": song.get("composer", ""),
                 "volume": song.get("volume"),
+                "length": song_length(song, durations) or prev_songs.get(song["id"], {}).get("length"),
                 "moment": song.get("moment") or (moments[0] if moments else None),
                 "moments": moments,
                 "audio": song.get("audio"),

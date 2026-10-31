@@ -113,7 +113,7 @@ Other chats add what they need from the admin page here. The admin chat builds i
 }
 ```
 
-The collector drops comments whose text is the same as one already kept (people often paste the same lyrics). Song `stories` come from YouTube, with approved own comments (`source: "echolog"`) first. Game-level `stories` are for Steam reviews, which are empty while Steam is off. `audio` is passed straight through from `config/games.json`.
+Each song also gets `length` (seconds): its music track's end minus start, or its first scene's if there's no music track. Missing ends use the YouTube video's length, which the collector fetches each run (`videos?part=contentDetails`, 1 quota unit per 50 videos). The collector drops comments whose text is the same as one already kept (people often paste the same lyrics). Song `stories` come from YouTube, with approved own comments (`source: "echolog"`) first. Game-level `stories` are for Steam reviews, which are empty while Steam is off. `audio` is passed straight through from `config/games.json`.
 
 ## FFX songs to check
 
@@ -136,13 +136,18 @@ preview.bat + .ps1       local preview server for Windows without Python
 ```
 
 - Routes use the hash: `#/` home, `#/ffx` game, `#/ffx/to-zanarkand` song, `#/ffx/otherworld/2` second scene.
-- **Song lists on hover:** on the home page, hovering (or tabbing to) a game's name shows its songs under it. On song pages, hovering the game name in the top bar does the same, with the current song in gold.
+- **Song list on hover:** on song pages, hovering the game name in the top bar shows its songs, with the current song in gold. (The home page used to do this too; Mohad had it removed on 1 Nov 2026.)
+- **Game page:** the line under the title shows the year and number of songs (no comment total). Each song shows its length instead of a comment count: the collector's `length`, or end minus start if the clip has one.
 - Look: dark, Cormorant Garamond (titles, comments) and Karla (labels), gold accent `#e8c27a`. The game's cover sits blurred behind every page. No cover image means a plain dark background.
 - **Speed rules (keep these):** no `backdrop-filter` and no live CSS blur anywhere. The cover is drawn once into a small canvas (`BG_DETAIL`, 32 x 32; bigger is sharper, 24 was the old softer look) and stretched, which blurs it for free; it never moves, it only fades when the game changes. Anything that animates only uses opacity or transform. The video changes size once and the move is animated with transform. Comments off screen aren't drawn (`content-visibility`). Fonts load without holding up the page.
 - All comment text goes in through `textContent` (never `innerHTML`), with `white-space: pre-wrap` so line breaks stay.
 - "Show more" is decided from the text (over 650 characters or 9 lines), so nothing is measured on screen. Shorter comments are never cut.
-- `index.html` loads `style.css?v=8` and `app.js?v=9`. Bump the number after changes so browsers don't use old copies.
-- Song page: the clip fills the screen apart from a strip at the bottom with the title, our own controls (play, sound, repeat, time, seek bar) and the comment count. The volume slider pops up above the sound button on hover or keyboard focus. **Volume** starts at, in order: the visitor's own choice for that song (saved in the browser as `echolog.volume:<game>/<song>`), the song's `volume`, the site default (`settings.volume`). Changing the slider only saves for the song playing. Repeat is remembered in the browser. Phones hide the volume slider (they use their own buttons) and the seek bar. YouTube's control bar is hidden (`controls: 0`).
+- `index.html` loads `style.css?v=10` and `app.js?v=11`. Bump the number after changes so browsers don't use old copies.
+- Song page: the clip fills the screen apart from a strip at the bottom with the title, our own controls (play, sound, repeat, scrub bars) and the comment count. The volume slider pops up above the sound button on hover or keyboard focus. **Volume** starts at, in order: the visitor's own choice for that song (saved in the browser as `echolog.volume:<game>/<song>`), the song's `volume`, the site default (`settings.volume`). Changing the slider only saves for the song playing. Repeat is remembered in the browser. Phones hide the volume slider (they use their own buttons) and the scrub bars. YouTube's control bar is hidden (`controls: 0`). The strip is lifted above the video (`z-index: 12`) while hovered so the volume pop-up isn't hidden; `.view` must not keep its fade animation (no fill-mode), or the strip gets trapped under the video again.
+- **Scrub bars**, measured from the clip's start, not from the start of the YouTube video. With a separate music track there are two that look different on purpose: **Music** (gold, thicker, note icon) moves the song; **Scene** (white, thin, film icon) moves only the picture and the song keeps going. Without a separate track there's one plain bar. A scene with no end runs to the end of its YouTube video, so its bar can be long; give scenes an end in the admin page.
+- **Loading:** while a song loads, the video area says "Loading..." and the video, controls, scene bar and side buttons are hidden; when it starts playing, they fade in together. Swapping scenes only covers the video. It gives up after 12 seconds so people can press play.
+- **Captions:** turned off where possible (`cc_load_policy: 0`, and the captions module is unloaded on ready and on play). YouTube has no official switch, so a video may still show them.
+- **Comments:** one list, most liked first, under a "60 comments" line. No sort buttons.
 - **Taps on the video** go to our own tap layer, not YouTube, so the scene and the music always pause and play together (letting YouTube take taps made it play then pause straight away). The bottom-right corner of the big video is left open so YouTube's "Skip ad" button still works. Tap the small player to make it big again. Space or K also plays/pauses.
 - **Previous / next song:** big round buttons either side of the big video (inside its edges when there's no room beside it, e.g. on phones). They hide with the small player. Songs with nothing to play are skipped, and both wrap round.
 - **Scene bar:** when a song has more than one scene, a bar of big buttons sits right above the video, the same width as it. The video moves down to make room. The current scene is underlined in gold.
@@ -150,7 +155,7 @@ preview.bat + .ps1       local preview server for Windows without Python
 - The players stay alive between songs, so the next song loads into the same player and starts quickly.
 - **Auto next:** "Next: (song) in 8" appears that many seconds before the song ends, with "Play now" and "Stay", and the next song starts as soon as this one finishes. The number is `upNextSeconds` from the Site tab (0 turns it off). Seeking back hides it again. If a clip ends early or fails, a 5-second countdown shows instead. Songs with no clip are skipped. After the last song it goes back to the first.
 - **Repeat:** the repeat button (gold with a dot when on) plays the same scene again when it ends, and stops "Next" showing.
-- **Music over the scene:** two players. The scene is on top and always muted; the music player sits under it at 200 x 200 (YouTube's minimum). **Starting together:** both load muted at the same time. Whichever can play first is held at its start until the other can too, then both start from their start times together and the music is unmuted (gives up waiting after 6 seconds). The scene pauses while the music buffers and only plays while the music does. Play/pause and the seek bar control the music, and the scene follows. If the music video fails, the scene's own sound comes back.
+- **Music over the scene:** two players. The scene is on top and always muted; the music player sits under it at 200 x 200 (YouTube's minimum). **Starting together:** both load muted at the same time. Whichever can play first is held at its start until the other can too, then both start from their start times together and the music is unmuted. If the music isn't ready after 15 seconds (`MUSIC_WAIT_MS`), the music player is dropped and the scene plays with its own sound; if only the scene is late, the music starts and the picture joins when it's ready. The scene only plays while the music is actually playing (not while it's loading or buffering). **Locked together:** until the scene first loops, the picture is kept within 0.8 seconds of where it should be for the music; dragging the Scene bar turns this off. Play/pause and the seek bar control the music, and the scene follows. If the music video fails, the scene's own sound comes back.
 - **Swapping scenes** keeps the music playing when the new scene uses the same music track; only the picture changes. A scene with its own music loads both again.
 - Clouds: while the big video is playing, short comments (200 characters or less, best 30 by score, shuffled) fade in one at a time in the corners and sides of the video, never the middle. Every one shows once before any comes round again, and the last few shown are put at the back when the list starts over, so nothing repeats back to back. They alternate left and right, stay up for reading time (about 16 characters a second, 6.5 to 14 seconds), drift slightly, then fade out. They stop when the video is paused, small, or the tab is hidden. On phones there's one at a time, just under the video. Settings at the top of `app.js`.
 - **Known rule breaks (Mohad's choice):** YouTube's embed rules don't allow anything on top of the player, and don't allow separating a video's audio from its picture or hiding a player. Clouds over the video break the first; the music track under a muted scene breaks the other two. The risk is YouTube suspending the API key the collector uses. Clouds can be moved beside the video with `CLOUDS_OVER_VIDEO = false`. To drop the music overlay, remove `audio` from the songs.
@@ -169,7 +174,7 @@ preview.bat + .ps1       local preview server for Windows without Python
 - The start time backup jump only fires if the player really ignored `start`, so the clip shouldn't jump twice. Worth a check on real YouTube.
 - Auto next onto a new song after the page has been idle may start muted if the browser blocks sound. The gold sound button shows when that happens.
 - Mini player is 356x200 on desktop because of YouTube's 200x200 minimum.
-- Otherworld starting late: the first fix (scene waits for the music) still left the scene a second or two behind while it buffered. Now both players buffer first and start together (see "Starting together"). Mohad set Otherworld's music start to 0:01 while testing; set it back to 0:00 if the start of the song is cut off.
+- Otherworld and To Zanarkand: music starting after the video. Likely cause: the scene was allowed to play while the music was still loading, and the old 6-second give-up started the scene alone. Fixed 1 Nov 2026 (scene waits for the music to really play, 15-second wait, picture locked to the music). Not tested on real YouTube yet. If the music still comes in late, check for an ad on the music video (it plays hidden under the scene), or silence at the start of the music upload. Mohad set Otherworld's music start to 0:01 while testing; set it back to 0:00 if the start of the song is cut off.
 - **Ads:** YouTube can show ads in the embedded player on any video that's monetised, by the uploader or by a Content ID claim (Square Enix claims are likely on custom uploads). The site can't turn them off and earns nothing from them. Autoplayed embeds tend to get fewer ads, but there's no guarantee. Clouds and the seek bar don't know when an ad is playing.
 
 ## Own comments, requests and hiding names (planned)
@@ -218,11 +223,11 @@ accepted request  ->  opens the game/song editor filled in  ->  normal save
 - `data/submitted.json` in `Upliff/echolog`: `{ "comments": [{ "id": "user:12", "game": "ffx", "song": "to-zanarkand", "author": "name" | null, "text": "...", "date": "2026-10-31" }] }`. The number is the inbox issue number.
 - The collector merges these into each song's `stories` with `"source": "echolog"`, `"likes": 0`, no `authorUrl` and no `url`. `hidden.txt` still applies, so `user:12` there hides it.
 - They aren't YouTube data, so the 30-day rule doesn't apply. They stay until removed.
-- Front end: author shows the name, or "Anonymous" if none. No author link. Instead of "View on YouTube", show nothing (or "Posted on Echolog"). They can show up as clouds like any other short comment. Sorting by "Most liked" puts them last for now.
+- Front end: author shows the name, or "Anonymous" if none. No author link. Instead of "View on YouTube", show nothing (or "Posted on Echolog"). They can show up as clouds like any other short comment. The list is sorted by likes, so they come last for now.
 
 ### Hide names (site)
 
-- A "Hide names" switch in the sort row on song pages (and above Steam reviews on the game page if those ever show).
+- A "Hide names" switch in the comments heading row on song pages (and above Steam reviews on the game page if those ever show).
 - When on, the author name is hidden on every comment, in the list and in the clouds. Likes, date and the "View on YouTube" link stay.
 - Off by default. Remembered in that browser (localStorage, wrapped in try/catch).
 - This is a viewer setting only. The data and the admin page still have the names.
@@ -242,22 +247,9 @@ Mohad asked for this on 31 Oct 2026: a song can have several scenes (it often pl
 - **Admin page:** in the song editor, "Scene" is a list with "Add scene", remove and reorder. Each scene has a link (with `?t=` start), end and label, and an optional music track (built).
 - **Labels** are short and plain, written by Mohad ("Opening", "Ending", "Macalania").
 
-## Front end to do (31 Oct 2026, not started or not finished)
-
-Mohad's latest list. Unfinished work from the last chat is on branch `wip/scrub-bars-loading` (not merged, doesn't work yet): it removes the sort buttons, starts the two scrub bars, and adds the "Loading..." text to `index.html`. Finish it there or redo it, then merge.
-
-1. **Volume slider hidden under the video:** the pop-up above the sound button sits under the video. Fix: `.peek { position: relative }` and raise it (`z-index: 12`) on `:hover` / `:focus-within`.
-2. **Turn off captions on the videos** if possible: `cc_load_policy: 0` in playerVars, and on ready and on each PLAYING call `player.unloadModule('captions')` and `unloadModule('cc')` (unofficial but usually works).
-3. **Comments: remove "Most liked" and "Newest".** Just one list (most liked first) under a "60 comments" line.
-4. **Our own scrubbing, measured from the clip's start**, not YouTube's bar (scenes can sit inside 20-minute videos). With a separate music track, show two bars that look clearly different: **Music** (gold, note icon) moves the song; **Scene** (white, film icon) moves only the picture while the song keeps going. Without a separate track, one plain bar. A scene with no end runs to the end of the YouTube video, so give scenes an end in the admin page.
-5. **Loading state:** while a song's players load, the video area shows "Loading..." and the video, controls, scene bar and side buttons are hidden; once it's ready to play, everything fades in. Swapping scenes shows it on the video only. Give up after about 12 seconds so people can press play.
-6. **To Zanarkand: the music started well after the video.** Investigate like Otherworld. The "start together" gate (both load muted, wait for both, then start) should cover it; check whether it's opening early (the 6-second give-up), whether a reused player skips the gate, or whether the music upload has silence at the start. Test on real YouTube.
-7. **Home page:** remove the song list that pops up when hovering a game's name.
-8. **Game page:** remove the total comment count from the line under the title (it shows "150 comments"), and remove the comment count on each song. Show each song's length instead (from the music track's start/end, or the scene's if there's no music track). Lengths without an end need the video duration, which the page doesn't know until a player loads; either have the collector store durations (YouTube API `contentDetails.duration`, 1 unit per 50 videos) or show nothing for those.
-
 ## Next steps
 
-1. Check the rebuilt site against real YouTube (start times, auto next, sound).
+1. Check the site against real YouTube: start times, auto next, sound, To Zanarkand and Otherworld starting together, captions off, loading screen.
 2. Pick `audio` tracks for songs where the scene has talking over the music (Suteki da Ne first), and add them to `config/games.json`.
 3. Read through the results. Add bad ones to `hidden.txt`, and tweak `STORY_PHRASES` and `MIN_SCORE` in `collect.py` if needed.
 4. Turn on GitHub Pages: Settings, then Pages, then Deploy from a branch, main, / (root). The site will be at https://upliff.github.io/echolog/.

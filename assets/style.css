@@ -113,7 +113,7 @@ body.on-song .bd-vignette { background: radial-gradient(ellipse 85% 75% at 50% 4
 .sound:active { background: rgba(232, 194, 122, 0.2); border-color: var(--acc); }
 
 /* ---------- views ---------- */
-.view { animation: fade 0.22s ease both; }
+.view { animation: fade 0.22s ease; } /* no fill-mode: a lingering animation would trap the strip under the video */
 @keyframes fade { from { opacity: 0; } }
 .rise { animation: rise 0.45s var(--ease) both; animation-delay: calc(var(--i, 0) * 40ms); }
 @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
@@ -157,7 +157,10 @@ body.on-song .bd-vignette { background: radial-gradient(ellipse 85% 75% at 50% 4
 
 /* ---------- song ---------- */
 .hero-space { height: calc(100svh - var(--peek)); }
+/* Lift the strip above the video while it's in use, so the volume pop-up isn't hidden under it. */
+.peek:hover, .peek:focus-within { z-index: 12; }
 .peek {
+  position: relative;
   height: var(--peek);
   max-width: 1100px; margin: 0 auto; padding: 0 24px;
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
@@ -282,11 +285,11 @@ a.c-author:hover { text-decoration: underline; }
   -webkit-appearance: none; appearance: none;
   --p: 0%;
 }
-.seek::-webkit-slider-runnable-track, .vol::-webkit-slider-runnable-track { height: 2px; border-radius: 2px; background: linear-gradient(var(--ink), var(--ink)) 0 0 / var(--p) 100% no-repeat, rgba(255, 255, 255, 0.18); }
-.seek::-moz-range-track, .vol::-moz-range-track { height: 2px; border-radius: 2px; background: rgba(255, 255, 255, 0.18); }
-.seek::-moz-range-progress, .vol::-moz-range-progress { height: 2px; background: var(--ink); }
-.seek::-webkit-slider-thumb, .vol::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; margin-top: -4px; border-radius: 50%; background: var(--ink); opacity: 0; }
-.seek::-moz-range-thumb, .vol::-moz-range-thumb { width: 10px; height: 10px; border: 0; border-radius: 50%; background: var(--ink); opacity: 0; }
+.seek::-webkit-slider-runnable-track, .vol::-webkit-slider-runnable-track { height: var(--th, 2px); border-radius: 2px; background: linear-gradient(var(--fill, var(--ink)), var(--fill, var(--ink))) 0 0 / var(--p) 100% no-repeat, rgba(255, 255, 255, 0.18); }
+.seek::-moz-range-track, .vol::-moz-range-track { height: var(--th, 2px); border-radius: 2px; background: rgba(255, 255, 255, 0.18); }
+.seek::-moz-range-progress, .vol::-moz-range-progress { height: var(--th, 2px); background: var(--fill, var(--ink)); }
+.seek::-webkit-slider-thumb, .vol::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; margin-top: calc((var(--th, 2px) - 12px) / 2); border-radius: 50%; background: var(--fill, var(--ink)); opacity: 0; }
+.seek::-moz-range-thumb, .vol::-moz-range-thumb { width: 12px; height: 12px; border: 0; border-radius: 50%; background: var(--fill, var(--ink)); opacity: 0; }
 .seek:hover::-webkit-slider-thumb, .seek:focus-visible::-webkit-slider-thumb,
 .vol:hover::-webkit-slider-thumb, .vol:focus-visible::-webkit-slider-thumb { opacity: 1; }
 .seek:hover::-moz-range-thumb, .seek:focus-visible::-moz-range-thumb,
@@ -325,7 +328,7 @@ body.mini .upnext { left: auto; right: 20px; transform: none; bottom: 300px; }
 @media (max-width: 639px) {
   .dock { left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); }
   /* Phones use their own volume buttons. */
-  .controls .seek, .controls .ctl-time, .vol-pop { display: none; }
+  .controls .bars, .vol-pop { display: none; }
   .scene-btn { font-size: 17px; padding: 0 8px; }
   .side-btn { width: 44px; height: 44px; }
   .sounds { grid-template-columns: 1fr 1fr; left: 12px; right: 12px; }
@@ -381,3 +384,32 @@ body.mini .upnext { left: auto; right: 20px; transform: none; bottom: 300px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition-duration: 0.01ms !important; }
 }
+
+/* ---------- scrub bars ----------
+   Music: gold, thicker, note icon. Scene: white, thin, film icon. One plain bar when there's no separate music. */
+.bars { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 2px; margin-left: 8px; }
+.scrub { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.scrub .seek { flex: 1; height: 20px; }
+.scrub-label {
+  flex: none; width: 66px; display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.bar-time { flex: none; min-width: 84px; text-align: right; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.scrub-music .scrub-label, .scrub-music .bar-time { color: var(--acc); }
+.scrub-music .seek { --fill: var(--acc); --th: 4px; }
+.scrub-scene .scrub-label { color: var(--ink); }
+.scrub-scene .seek { --fill: var(--ink); --th: 2px; }
+
+/* ---------- loading ---------- */
+.stage-loading {
+  position: absolute; inset: 0; z-index: 4; margin: 0;
+  display: grid; place-items: center; pointer-events: none;
+  color: var(--muted); font-size: 15px; letter-spacing: 0.04em;
+  opacity: 0; transition: opacity 0.3s ease;
+}
+.stage.loading .stage-loading { opacity: 1; }
+.layer-scene { transition: opacity 0.6s ease; }
+.stage.loading .layer-scene { opacity: 0; }
+.peek .controls, .peek-more { transition: opacity 0.6s ease; }
+body.media-loading .peek .controls, body.media-loading .peek-more,
+body.media-loading .scenebar, body.media-loading .side-btn { opacity: 0; pointer-events: none; }
