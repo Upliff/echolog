@@ -59,12 +59,13 @@ data/hidden.txt          ids of stories to never show
 - `steamAppId` is the number in the game's Steam store URL. Leave it out if the game isn't on Steam.
 
 **Admin page:** `echolog-admin.html` in the local EchoLog folder (deliberately not in the repo or on the site). Mohad opens it straight from disk in his browser.
-- **Before editing it, read the current file from the EchoLog folder.** Never write back an older copy: on 31 Oct 2026 a stale copy overwrote the per-song volume slider and the Site tab. If a chat has changes that aren't in the folder copy (for example the Sounds editor), merge them into the folder copy rather than replacing it.
+- **Only one chat edits the admin page: the admin chat** (Mohad's chat for the admin page, which also built the collector). Every other chat must not write `echolog-admin.html`, not even a small fix. If another chat's work needs something in the admin page (a new field, a new setting), it adds a line to "Admin page requests" below and tells Mohad to take it to the admin chat.
+- The admin chat reads the current file from the EchoLog folder before every edit, and never writes back an older copy. On 31 Oct 2026 a stale copy from another chat overwrote the volume slider and the Site tab.
 - Lists games. You can add, edit or delete a game: name, year, cover art, and songs (name, composer, scenes, optional music track, comment videos). It can also reorder songs.
 - **Scenes:** each song has a list of scenes (link, start, end, label), which you can add, remove and reorder. Each scene can have its own music under "Different music for this scene". It saves `moments` and also writes `moment` as a copy of the first scene, so the site works before it supports `moments`.
 - **Music track:** a link, a start and an **end**. The end cuts off dead air at the end of a song (added 31 Oct 2026). The site already passes `end` to YouTube as `endSeconds`.
 - An end time before its start is caught before saving.
-- **Sounds (game editor), not in the folder copy as of 31 Oct 2026 22:40, needs merging back in:** a list of sounds per game: a name (shown on the button) and an audio file (mp3, ogg, wav or m4a, up to 1.5 MB). Saving uploads new files to `sounds/<game id>/<name>.<ext>` and saves `sounds: [{ "label", "file" }]` on the game. Each row has Play, Replace and Remove.
+- **Sounds (game editor), NOT BUILT in the admin page (another chat's version was lost). Listed in "Admin page requests":** a list of sounds per game: a name (shown on the button) and an audio file (mp3, ogg, wav or m4a, up to 1.5 MB). Saving uploads new files to `sounds/<game id>/<name>.<ext>` and saves `sounds: [{ "label", "file" }]` on the game. Each row has Play, Replace and Remove.
 - **Song volume (song editor):** "Starting volume" slider per song, saved as `volume` (0 to 100) on the song. "Use site default" removes it. Added 31 Oct 2026.
 - **Site tab:** settings for everyone who visits, saved as `settings` in `config/games.json`: default starting volume for songs without their own (0 to 100, default 80) and how many seconds before the end "Next" shows (default 8, 0 turns auto next off). Saving starts the collector, which copies `settings` into `stories.json`.
 - Pasting a YouTube link with `?t=` fills in the start time.
@@ -76,6 +77,12 @@ data/hidden.txt          ids of stories to never show
   - **Requests:** Accept (game or song) opens the editor filled in from the request, with a banner. Saving labels the issue `accepted` and closes it. Fix requests get "Mark done". Decline labels the issue `declined` and closes it.
   - The token needs **Issues: Read and write** on the inbox repo too.
 - The collector passes `cover`, `sounds` and each song's `volume` through to `stories.json`. The front end already uses `game.cover` when it's set, and otherwise falls back to `covers/<id>.jpg|jpeg|png|webp`.
+
+### Admin page requests
+
+Other chats add what they need from the admin page here. The admin chat builds it and then removes the line.
+
+- Sounds editor in the game editor (see the Sounds line above). The site and collector already support `sounds`.
 
 **Quota:** YouTube allows 10,000 units a day, and each page of 100 comments costs 1 unit. At 5 pages per video, that's roughly 5 units per video per run, so there's plenty of room.
 
