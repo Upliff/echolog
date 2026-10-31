@@ -259,6 +259,25 @@ a.c-author:hover { text-decoration: underline; }
 }
 .side-btn:hover { color: var(--ink); background: rgba(14, 16, 20, 0.85); }
 .side-btn.inside { background: rgba(5, 7, 11, 0.5); }
+/* Hover preview of the song the arrow goes to. Only on screens with a mouse. */
+.side-card {
+  position: absolute; top: 50%; width: 220px; z-index: 1;
+  border-radius: 10px; overflow: hidden; pointer-events: none;
+  background: rgba(14, 16, 20, 0.96); box-shadow: 0 0 0 1px var(--line), 0 14px 34px rgba(0, 0, 0, 0.55);
+  opacity: 0; transform: translateY(-50%) scale(0.96);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  display: none;
+}
+#prevBtn .side-card { left: calc(100% + 12px); transform-origin: left center; }
+#nextBtn .side-card { right: calc(100% + 12px); transform-origin: right center; }
+.side-card img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #000; }
+.side-card-text { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px 11px; text-align: left; }
+.side-card-text small { font-size: 12px; color: var(--muted); }
+.side-card-text strong { font-family: var(--serif); font-weight: 400; font-size: 20px; line-height: 1.15; color: var(--ink); }
+@media (hover: hover) and (pointer: fine) {
+  .side-card { display: block; }
+  .side-btn:hover .side-card, .side-btn:focus-visible .side-card { opacity: 1; transform: translateY(-50%) scale(1); }
+}
 
 .stage-msg {
   position: absolute; inset: 0; z-index: 3; margin: 0;
@@ -339,7 +358,7 @@ body.mini .upnext { left: auto; right: 20px; transform: none; bottom: 300px; }
 @media (max-width: 639px) {
   .dock { left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); }
   /* Phones use their own volume buttons. */
-  .controls .bars, .vol-pop { display: none; }
+  .vol-pop { display: none; }
   .scene-btn { font-size: 17px; padding: 0 8px; }
   .side-btn { width: 44px; height: 44px; }
   .sounds { grid-template-columns: 1fr 1fr; left: 12px; right: 12px; }
@@ -382,6 +401,8 @@ body.mini .upnext { left: auto; right: 20px; transform: none; bottom: 300px; }
 
 @media (max-width: 639px) {
   :root { --peek: 96px; }
+  :root.bars-one { --peek: 132px; }
+  :root.bars-two { --peek: 164px; }
   .peek { padding: 0 12px 0 20px; gap: 8px; }
   .peek-title { flex: 1; }
   .peek h1 { font-size: 26px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -413,15 +434,61 @@ body.mini .upnext { left: auto; right: 20px; transform: none; bottom: 300px; }
 
 /* ---------- loading ---------- */
 .stage-loading {
-  position: absolute; inset: 0; z-index: 4; margin: 0;
-  display: grid; place-items: center; pointer-events: none;
-  color: var(--muted); font-size: 15px; letter-spacing: 0.04em;
-  opacity: 0; transition: opacity 0.3s ease;
+  position: absolute; inset: 0; z-index: 4; overflow: hidden; pointer-events: none;
+  display: grid; place-items: center; background: #05070b;
+  opacity: 0; transition: opacity 0.45s ease;
 }
+/* A still from the scene, dimmed, slowly drifting closer while it loads. */
+.sl-still {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  opacity: 0; transform: scale(1.04);
+  transition: opacity 0.8s ease;
+}
+.sl-still.ok { opacity: 0.32; }
+.stage.loading .sl-still { animation: sl-drift 14s ease-out both; }
+@keyframes sl-drift { from { transform: scale(1.04); } to { transform: scale(1.14); } }
+.sl-mid { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 0 24px; text-align: center; }
+.sl-title {
+  margin: 0; font-family: var(--serif); font-style: italic; font-size: clamp(22px, 3vw, 34px); line-height: 1.15;
+  color: var(--ink); text-shadow: 0 2px 18px rgba(0, 0, 0, 0.7);
+}
+.sl-title:empty { display: none; }
+/* A thin line with a gold piece gliding along it. */
+.sl-line { position: relative; width: 140px; height: 2px; border-radius: 2px; overflow: hidden; background: rgba(255, 255, 255, 0.12); }
+.sl-line span {
+  position: absolute; left: 0; top: 0; width: 46px; height: 100%; border-radius: 2px; background: var(--acc);
+  transform: translateX(-46px);
+}
+.stage.loading .sl-line span { animation: sl-glide 1.5s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
+@keyframes sl-glide { from { transform: translateX(-46px); } to { transform: translateX(140px); } }
+.sl-word { font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+.stage.mini .sl-title, .stage.mini .sl-word { display: none; }
+/* Short note at the bottom of the video, e.g. when the music track couldn't play. */
+.stage-note {
+  position: absolute; left: 12px; bottom: 12px; z-index: 5; margin: 0; max-width: calc(100% - 24px);
+  padding: 8px 12px; border-radius: 8px; background: rgba(5, 7, 11, 0.85);
+  font-size: 13px; color: var(--muted); pointer-events: none;
+  opacity: 0; transition: opacity 0.4s ease;
+}
+.stage-note.on { opacity: 1; }
 .stage.loading .stage-loading { opacity: 1; }
 .layer-scene { transition: opacity 0.6s ease; }
 /* Both players stay hidden while loading; otherwise the music player's YouTube title shows through. */
 .stage.loading .layer-scene, .stage.loading .layer-music { opacity: 0; }
-.peek .controls, .peek-more { transition: opacity 0.6s ease; }
-body.media-loading .peek .controls, body.media-loading .peek-more,
+.peek .controls, .peek .controls > *, .peek-more { transition: opacity 0.6s ease; }
+body.media-loading .peek .controls, body.media-loading .peek .controls > *, body.media-loading .peek-more,
 body.media-loading .scenebar, body.media-loading .side-btn { opacity: 0; pointer-events: none; }
+
+/* Phones: scrub bars on their own row. */
+@media (max-width: 639px) {
+  /* The scrub bars get their own full-width row under the title and buttons. */
+  .peek { flex-wrap: wrap; align-content: center; row-gap: 4px; }
+  .peek .controls { display: contents; }
+  .peek .bars { order: 5; flex: 0 0 100%; margin: 0; gap: 0; }
+  .scrub { gap: 8px; }
+  .scrub .seek { height: 30px; }
+  .scrub-label { width: auto; font-size: 0; gap: 0; }
+  .bar-time { min-width: 76px; }
+  .seek::-webkit-slider-thumb { width: 18px; height: 18px; margin-top: calc((var(--th, 2px) - 18px) / 2); opacity: 1; }
+  .seek::-moz-range-thumb { width: 18px; height: 18px; opacity: 1; }
+}

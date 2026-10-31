@@ -170,6 +170,45 @@
     return p;
   }
 
+  // Blur, saturate and darken the small canvas by hand (three box blurs look like one soft blur).
+  // Only used where the canvas has no blur of its own. It runs once per game on a tiny image.
+  function handBlur(ctx, w, hgt, blur) {
+    let data;
+    try { data = ctx.getImageData(0, 0, w, hgt); } catch (e) {
+      ctx.fillStyle = 'rgba(5,7,11,0.4)'; ctx.fillRect(0, 0, w, hgt); return;
+    }
+    const px = data.data;
+    const r = Math.max(1, Math.round(blur * 0.8));
+    const tmp = new Float32Array(px.length);
+    const pass = (src, dst, len, count, step, lineStep) => {
+      for (let line = 0; line < count; line++) {
+        const base = line * lineStep;
+        for (let c = 0; c < 3; c++) {
+          let sum = 0;
+          for (let k = -r; k <= r; k++) sum += src[base + Math.min(len - 1, Math.max(0, k)) * step + c];
+          for (let i = 0; i < len; i++) {
+            dst[base + i * step + c] = sum / (r * 2 + 1);
+            sum += src[base + Math.min(len - 1, i + r + 1) * step + c] - src[base + Math.max(0, i - r) * step + c];
+          }
+        }
+      }
+    };
+    const buf = Float32Array.from(px);
+    for (let n = 0; n < 3; n++) {
+      pass(buf, tmp, w, hgt, 4, w * 4);   // across
+      pass(tmp, buf, hgt, w, w * 4, 4);   // down
+    }
+    for (let i = 0; i < px.length; i += 4) {
+      const R = buf[i], G = buf[i + 1], B = buf[i + 2];
+      const lum = 0.2126 * R + 0.7152 * G + 0.0722 * B;
+      px[i] = (lum + (R - lum) * 1.3) * 0.62;
+      px[i + 1] = (lum + (G - lum) * 1.3) * 0.62;
+      px[i + 2] = (lum + (B - lum) * 1.3) * 0.62;
+      px[i + 3] = 255;
+    }
+    ctx.putImageData(data, 0, 0);
+  }
+
   const layers = [...document.querySelectorAll('.bd-layer')];
   let activeLayer = 0;
   let coverKey = null;
@@ -182,21 +221,24 @@
     const next = layers[1 - activeLayer];
     if (img) {
       const ctx = next.getContext('2d');
-      // Browsers without canvas blur (older Safari) get a smaller canvas, which blurs when stretched.
+      // Safari (so every iPhone browser) has no canvas blur, so there the blur is done by hand
+      // on the small canvas instead. It used to fall back to a 40-pixel canvas, which looked smeared.
       const canBlur = typeof ctx.filter === 'string';
-      const w = canBlur ? BG_DETAIL : 40;
+      const w = BG_DETAIL;
+      // Phones show only a narrow slice of the cover, so they get a lighter blur.
+      const blur = window.innerWidth < 640 ? BG_BLUR * 0.6 : BG_BLUR;
       const hgt = Math.max(1, Math.round(w * window.innerHeight / Math.max(1, window.innerWidth)));
       next.width = w;
       next.height = hgt;
       ctx.clearRect(0, 0, w, hgt);
-      if (canBlur) ctx.filter = `blur(${BG_BLUR}px) saturate(1.3) brightness(0.62)`;
+      if (canBlur) ctx.filter = `blur(${blur}px) saturate(1.3) brightness(0.62)`;
       // Crop the cover to fill the screen's shape, drawing a little past the edges so the blur doesn't leave dark borders.
-      const pad = canBlur ? BG_BLUR * 3 : 2;
+      const pad = blur * 3;
       const scale = Math.max((w + pad * 2) / img.naturalWidth, (hgt + pad * 2) / img.naturalHeight);
       const dw = img.naturalWidth * scale;
       const dh = img.naturalHeight * scale;
       ctx.drawImage(img, (w - dw) / 2, (hgt - dh) / 2, dw, dh);
-      if (!canBlur) { ctx.fillStyle = 'rgba(5,7,11,0.4)'; ctx.fillRect(0, 0, w, hgt); }
+      if (!canBlur) handBlur(ctx, w, hgt, blur);
       next.classList.add('on');
     } else {
       next.classList.remove('on');
@@ -480,6 +522,7 @@
     const scenes = scenesOf(song);
     const view = h('section', { class: 'view song' });
     songState = { game, song, plan, next, prev, scenes, stories, ui: {}, ended: false, stayed: false };
+    setBarRows(plan ? (plan.music ? 2 : 1) : 0);
 
     if (plan) {
       const ui = songState.ui;
@@ -573,8 +616,18 @@
     btn.hidden = false;
     btn.href = songHref(st.game, song);
     btn.setAttribute('aria-label', `${label}: ${song.title}`);
-    btn.title = song.title;
-    btn.replaceChildren(svg(icon, 28));
+    btn.removeAttribute('title');
+    // Hover preview: a still from the song's scene, with its name and length.
+    const plan = playable(song, false, 0);
+    const vid = plan && (plan.scene || plan.music || {}).videoId;
+    const len = songLength(song);
+    const card = h('span', { class: 'side-card', 'aria-hidden': 'true' },
+      vid ? h('img', { src: `https://i.ytimg.com/vi/${vid}/mqdefault.jpg`, alt: '', decoding: 'async' }) : null,
+      h('span', { class: 'side-card-text' },
+        h('small', null, label),
+        h('strong', null, song.title),
+        len ? h('small', null, fmtTime(len)) : null));
+    btn.replaceChildren(svg(icon, 28), card);
   }
 
   // Swap to another scene of the song that's already open.
@@ -610,6 +663,7 @@
     if (!st) return;
     stopClouds(true);
     songState = null;
+    setBarRows(0);
     if (!keepStage) closeStage();
     else { sceneBar.replaceChildren(); prevBtn.hidden = nextBtn.hidden = true; }
   }
@@ -758,6 +812,17 @@
     dock.classList.remove('show');
   }
 
+  // A short line at the bottom of the video that fades after a few seconds.
+  let noteTimer = null;
+  function stageNote(text) {
+    let el = stage.querySelector('.stage-note');
+    if (!el) { el = h('p', { class: 'stage-note', role: 'status' }); stage.append(el); }
+    el.textContent = text;
+    el.classList.add('on');
+    clearTimeout(noteTimer);
+    noteTimer = setTimeout(() => el.classList.remove('on'), 7000);
+  }
+
   function showStageMsg(text) {
     setLoading(false);
     stageMsg.textContent = text;
@@ -811,6 +876,21 @@
      While a song loads, the video area shows "Loading..." and the video, controls, scene bar and
      side buttons stay hidden. When it starts playing, they fade in together.
      Swapping scenes only covers the video. Gives up after 12 seconds so people can press play. */
+  // What the loading screen shows: a still from the scene and the song's name.
+  function fillLoading(plan, title) {
+    const img = $('slStill');
+    const vid = plan && (plan.scene || plan.music || {}).videoId;
+    const src = vid ? `https://i.ytimg.com/vi/${vid}/hqdefault.jpg` : '';
+    if (img.dataset.src !== src) {
+      img.dataset.src = src;
+      img.classList.remove('ok');
+      img.onload = () => { if (img.naturalWidth > 120) img.classList.add('ok'); }; // YouTube's "no picture" image is 120 wide
+      img.onerror = () => img.classList.remove('ok');
+      if (src) img.src = src; else img.removeAttribute('src');
+    }
+    if (title != null) $('slTitle').textContent = title;
+  }
+
   function setLoading(on, videoOnly) {
     clearTimeout(media.loadTimer);
     stage.classList.toggle('loading', on);
@@ -885,7 +965,7 @@
     media.lock = false;
     if (!opts.keepExtra) media.extra = 0;
     stageMsg.hidden = true;
-    if (!opts.quiet) setLoading(true);
+    if (!opts.quiet) { fillLoading(plan, songState ? songState.song.title : ''); setLoading(true); }
     refreshBars();
     const elapsed = opts.elapsed || 0;
     if (plan.music) {
@@ -928,12 +1008,16 @@
   }
 
   // Waited too long. Music not there: play the scene with its own sound. Otherwise go with what's ready.
+  // If the music player has loaded but just hasn't started (often an ad playing on it, on a phone
+  // that isn't signed in to YouTube Premium), keep it: the picture waits for the music and joins it.
+  // Only a music player that never loaded at all is dropped.
   function gateTimeout(token) {
     if (token !== media.token || !media.gate) return;
-    if (!media.gate.music && media.plan.music) {
+    if (!media.gate.music && media.plan.music && !media.ready.music) {
       dropPlayer('music');
       media.plan.music = null;
       refreshBars();
+      stageNote("The music didn't load, so this is the scene's own sound.");
     }
     openGate(token);
   }
@@ -959,6 +1043,7 @@
   function swapScene(plan) {
     media.plan = plan;
     media.lock = true;
+    fillLoading(plan);
     setLoading(true, true);
     const mt = safe(() => media.music.getCurrentTime()) || 0;
     const at = sceneAt(plan.scene, mt - (plan.music.start || 0) + media.extra);
@@ -1085,11 +1170,14 @@
     }
   }
 
-  function onError(role) {
+  function onError(role, code) {
     const plan = media.plan;
     if (!plan) return;
     if (role === 'music') {
-      // Music track gone: fall back to the scene's own sound.
+      // Music track gone: fall back to the scene's own sound, and say why.
+      stageNote(code === 101 || code === 150
+        ? "The music video can't be played on other sites, so this is the scene's own sound."
+        : "The music video couldn't be played, so this is the scene's own sound.");
       clearGate();
       dropPlayer('music');
       plan.music = null;
@@ -1217,6 +1305,17 @@
     st.ui.bars = kinds.map(makeBar);
     st.ui.barsBox.classList.toggle('two', kinds.length > 1);
     st.ui.barsBox.replaceChildren(...st.ui.bars.map((b) => b.row));
+    if (setBarRows(kinds.length)) placeStage(false);
+  }
+
+  // Phones give the scrub bars their own rows under the title, so the strip grows to fit them.
+  // Returns true if that changed.
+  function setBarRows(n) {
+    const root = document.documentElement;
+    const was = root.classList.contains('bars-one') ? 1 : root.classList.contains('bars-two') ? 2 : 0;
+    root.classList.toggle('bars-one', n === 1);
+    root.classList.toggle('bars-two', n === 2);
+    return was !== n;
   }
 
   // Where a player is within its clip: { pos, len } in seconds.
@@ -1259,6 +1358,12 @@
   function tick() {
     if (document.hidden) return;
     const plan = media.plan;
+    // Same for the music track (YouTube can start it from 0:00 after an ad).
+    if (plan && !media.gate && sep() && media.ready.music && plan.music.start
+        && safe(() => media.music.getPlayerState()) === YT_STATE.PLAYING
+        && (safe(() => media.music.getCurrentTime()) || 0) < plan.music.start - 1) {
+      safe(() => media.music.seekTo(plan.music.start, true));
+    }
     // Safety net: if the scene is playing from before its start (YouTube ignored the start time,
     // e.g. after an ad, or a phone that wouldn't jump until tapped), put it where it should be.
     if (plan && !media.gate && media.scene && media.ready.scene && plan.scene.start
