@@ -20,7 +20,7 @@ Owner: Mohad. Repo: https://github.com/Upliff/echolog (public).
 - **Sources:** YouTube comments on soundtrack videos. Reddit is out: Reddit stopped taking new API requests on 31 Oct 2026. Steam is off for now: Steam shut its public review endpoint in Oct 2026, and the replacement needs a publisher key. The Steam code stays in `collect.py` behind `STEAM_ENABLED = False`. People can also send their own comments (see below).
 - **No home server, no local AI model.** Everything runs on GitHub: a GitHub Actions job runs nightly, and the site will be hosted on GitHub Pages.
 - **Filtering:** a free keyword and score filter (`collector/collect.py`). There's no AI scoring for now; paid AI could be added later if needed. To remove a bad comment, add its id to `data/hidden.txt`.
-- **Front end:** plain HTML/CSS/JS in the local `site/` folder for now (see "Front end" below). Reads `data/stories.json`.
+- **Front end:** plain HTML/CSS/JS at the repo root (see "Front end" below). Reads `data/stories.json`.
 - **First game:** Final Fantasy X, with 5 songs (see `config/games.json`).
 - **Feel:** snappy and quiet. Only the video and the comments. No heavy effects.
 - **Auto next:** when a song ends, the next song in the game starts after a short countdown (wraps to the first song after the last).
@@ -36,8 +36,7 @@ Owner: Mohad. Repo: https://github.com/Upliff/echolog (public).
 - Google Cloud project "Game Stories" (id `leafy-tenure-513307-e2`), with YouTube Data API v3 enabled. The API key is restricted to that API.
 - GitHub repo secret `YOUTUBE_API_KEY` is added. Never put the key in code, chat or the site.
 - Done: repo created, secret added, Claude GitHub App installed on the repo (Claude can push), and the first runs completed (31 Oct 2026). 196 stories across the 5 FFX songs.
-- Done: front end rebuilt for speed (31 Oct 2026), in the local `site/` folder.
-- Not done yet: front end moved into the repo.
+- Done: front end rebuilt for speed and moved into the repo root (31 Oct 2026). The `site/` folder in the local EchoLog folder is now an old copy. Edit the repo, not that folder.
 - Not done yet: GitHub Pages turned on.
 - Not done yet: private repo `Upliff/echolog-inbox`, Cloudflare account and Worker, Turnstile site key (all for own comments and requests).
 
@@ -102,15 +101,15 @@ Song `stories` come from YouTube. Game-level `stories` are for Steam reviews, wh
 
 ## Front end
 
-Plain HTML, CSS and JS, no build step. It lives in the local `site/` folder for now (not in the repo yet):
+Plain HTML, CSS and JS, no build step. It lives at the repo root, so GitHub Pages serves it as-is:
 
 ```
-site/index.html          page shell: backdrop, top bar, video stage (scene + music players), dock, up-next bar, clouds layer, About dialog
-site/assets/style.css    all styles
-site/assets/app.js       everything else; all the settings are at the top
-site/covers/             one cover image per game (README.txt inside explains naming)
-site/data/stories.json   a copy for local preview only; the repo's data/stories.json is the real one
-site/preview.bat + .ps1  local preview server for Windows without Python
+index.html               page shell: backdrop, top bar, video stage (scene + music players), dock, up-next bar, clouds layer, About dialog
+assets/style.css    all styles
+assets/app.js       everything else; all the settings are at the top
+covers/                  one cover image per game (README.txt inside explains naming); the admin page uploads here
+preview.bat + .ps1       local preview server for Windows without Python
+.nojekyll                tells GitHub Pages to serve files as-is
 ```
 
 - Routes use the hash: `#/` home, `#/ffx` game, `#/ffx/to-zanarkand` song.
@@ -132,7 +131,7 @@ site/preview.bat + .ps1  local preview server for Windows without Python
   - `?t=1:35` scene start, e.g. `http://localhost:8000/?t=1:35#/ffx/suteki-da-ne`
   - `?audio=VIDEOID` music track to lay over the scene, `?at=0:12` music start
   - The real values go in `config/games.json`.
-- Local preview: in the `site` folder run `python -m http.server 8000` and open `http://localhost:8000`. `preview.bat` also works. Opening `index.html` straight from disk won't load the data.
+- Local preview: in the repo folder run `python -m http.server 8000` and open `http://localhost:8000`. `preview.bat` also works. Opening `index.html` straight from disk won't load the data.
 - Tested in headless Chromium at 1280x800 and 390x844 with a fake YouTube player. Not tested against real YouTube from Claude's side.
 
 ## Known issues (front end)
@@ -217,7 +216,6 @@ Mohad asked for this on 31 Oct 2026: a song can have several scenes (it often pl
 1. Check the rebuilt site against real YouTube (start times, auto next, sound).
 2. Pick `audio` tracks for songs where the scene has talking over the music (Suteki da Ne first), and add them to `config/games.json`.
 3. Read through the results. Add bad ones to `hidden.txt`, and tweak `STORY_PHRASES` and `MIN_SCORE` in `collect.py` if needed.
-4. Move the front end into the repo root (`index.html`, `assets/`, `covers/`). The admin page uploads covers to the repo's `covers/` folder, so move the site's `covers/ffx.jpg` there too.
-5. Turn on GitHub Pages (Settings, then Pages, deploy from the main branch).
+4. Turn on GitHub Pages: Settings, then Pages, then Deploy from a branch, main, / (root). The site will be at https://upliff.github.io/echolog/.
 6. Own comments, requests and hide names (admin-page chat): create the private inbox repo, write the Worker, add the site forms and the switch, add the Inbox tab, and teach the collector to merge `data/submitted.json`. Mohad: make a Cloudflare account and get a Turnstile site key.
 7. More than one scene per song: `moments` in the collector, the scene buttons on the song page, and the scene list in the admin song editor.

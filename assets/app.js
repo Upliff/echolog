@@ -1,0 +1,1031 @@
+/* Echolog front end. Plain JS, no build step. Reads data/stories.json. */
+(() => {
+  'use strict';
+
+  /* ---------- settings ---------- */
+
+  const DATA_URL = 'data/stories.json';
+  const COVER_DIR = 'covers/';
+  const COVER_EXTS = ['jpg', 'jpeg', 'png', 'webp'];
+
+  // Clouds drift over the video itself. YouTube's embed rules don't allow anything on top of the
+  // player, so this breaks them. Set to false to keep clouds beside the video instead
+  // (the video then settles back a little on desktop to make room).
+  const CLOUDS_OVER_VIDEO = true;
+
+  // Clouds only show while the clip is playing and the video is big.
+  const CLOUD_FIRST_MS = 6000;   // wait this long after the clip starts before the first one
+  const CLOUD_GAP_MS = 1500;     // pause between one cloud starting to fade and the next one
+  const CLOUD_MAX_CHARS = 200;   // longer comments stay in the list, where they get "Show more"
+  const CLOUD_MAX = 2;           // at most this many on screen at once (phones: 1)
+
+  // When a song ends, the next one in the game starts after this many seconds. 0 turns it off.
+  const AUTO_NEXT_SECONDS = 6;
+
+  // Comments longer than this get cut off with "Show more".
+  const LONG_CHARS = 650;
+  const LONG_LINES = 9;
+
+  /* ---------- shared bits ---------- */
+
+  const $ = (id) => document.getElementById(id);
+  const app = $('app');
+  const crumb = $('crumb');
+  const stage = $('stage');
+  const sceneWrap = $('sceneWrap');
+  const musicWrap = $('musicWrap');
+  const stageMsg = $('stageMsg');
+  const dock = $('dock');
+  const dockTitle = $('dockTitle');
+  const dockPlay = $('dockPlay');
+  const cloudsEl = $('clouds');
+  const upnext = $('upnext');
+  const topBar = $('top');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isPhone = () => window.innerWidth < 640;
+
+  let DATA = null;
+
+  function h(tag, attrs, ...kids) {
+    const el = document.createElement(tag);
+    if (attrs) {
+      for (const [k, v] of Object.entries(attrs)) {
+        if (v == null || v === false) continue;
+        if (k === 'class') el.className = v;
+        else if (k === 'style') el.style.cssText = v;
+        else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+        else el.setAttribute(k, v === true ? '' : v);
+      }
+    }
+    for (const kid of kids.flat()) {
+      if (kid == null || kid === false) continue;
+      el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+    }
+    return el;
+  }
+
+  const ICON = {
+    play: 'M8 5l11 7-11 7z',
+    pause: 'M9 5v14M15 5v14',
+    sound: 'M4 9v6h4l5 4V5L8 9H4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11',
+    muted: 'M4 9v6h4l5 4V5L8 9H4zM17 9l5 6M22 9l-5 6',
+    next: 'M6 5l9 7-9 7zM18 5v14',
+    down: 'M12 5v14M6 13l6 6 6-6',
+  };
+  function svg(name, size = 18) {
+    const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    s.setAttribute('viewBox', '0 0 24 24');
+    s.setAttribute('width', size);
+    s.setAttribute('height', size);
+    s.setAttribute('aria-hidden', 'true');
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', ICON[name]);
+    p.setAttribute('fill', 'none');
+    p.setAttribute('stroke', 'currentColor');
+    p.setAttribute('stroke-width', '1.8');
+    p.setAttribute('stroke-linecap', 'round');
+    p.setAttribute('stroke-linejoin', 'round');
+    s.append(p);
+    return s;
+  }
+  // Only redraws an icon button when its icon actually changes.
+  function setIcon(btn, name, label) {
+    if (!btn || btn.dataset.icon === name) return;
+    btn.dataset.icon = name;
+    btn.replaceChildren(svg(name));
+    btn.setAttribute('aria-label', label);
+  }
+  function iconBtn(cls, name, label) {
+    const b = h('button', { class: cls, type: 'button' });
+    setIcon(b, name, label);
+    return b;
+  }
+
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const plural = (n, one, many) => `${(n || 0).toLocaleString('en')} ${n === 1 ? one : many}`;
+  const fmtTime = (s) => { s = Math.max(0, Math.floor(s || 0)); return `${Math.floor(s / 60)}:${pad2(s % 60)}`; };
+  const fmtDate = (iso) => {
+    if (!iso) return '';
+    const d = new Date(iso + (iso.length === 10 ? 'T00:00:00Z' : ''));
+    if (isNaN(d)) return iso;
+    return d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+  };
+  const shuffle = (a) => {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+  const scrollBehavior = reduced ? 'auto' : 'smooth';
+
+  /* ---------- backdrop: blurred cover ----------
+     The cover is drawn once into a 24 x 24 canvas and stretched to fill the screen.
+     Stretching a tiny image gives the blur for free, and nothing is redrawn after that. */
+
+  const coverCache = new Map();
+  function loadCover(game) {
+    if (coverCache.has(game.id)) return coverCache.get(game.id);
+    const tries = game.cover ? [game.cover] : COVER_EXTS.map((e) => `${COVER_DIR}${encodeURIComponent(game.id)}.${e}`);
+    const p = (async () => {
+      for (const src of tries) {
+        const img = await new Promise((res) => {
+          const i = new Image();
+          i.decoding = 'async';
+          i.onload = () => res(i);
+          i.onerror = () => res(null);
+          i.src = src;
+        });
+        if (img) return img;
+      }
+      return null;
+    })();
+    coverCache.set(game.id, p);
+    return p;
+  }
+
+  const layers = [...document.querySelectorAll('.bd-layer')];
+  let activeLayer = 0;
+  let coverKey = null;
+  async function setCover(game) {
+    const key = game ? game.id : '';
+    if (key === coverKey) return;
+    coverKey = key;
+    const img = game ? await loadCover(game) : null;
+    if (key !== coverKey) return; // a newer request won
+    const next = layers[1 - activeLayer];
+    if (img) {
+      const ctx = next.getContext('2d');
+      const n = next.width;
+      ctx.clearRect(0, 0, n, n);
+      if ('filter' in ctx) ctx.filter = 'blur(1px) saturate(1.35) brightness(0.62)';
+      // Draw a little past the edges so the blur doesn't leave dark borders.
+      ctx.drawImage(img, -2, -2, n + 4, n + 4);
+      if (!('filter' in ctx)) { ctx.fillStyle = 'rgba(5,7,11,0.4)'; ctx.fillRect(0, 0, n, n); }
+      next.classList.add('on');
+    } else {
+      next.classList.remove('on');
+    }
+    layers[activeLayer].classList.remove('on');
+    activeLayer = 1 - activeLayer;
+  }
+
+  /* ---------- routing ---------- */
+
+  const firstHash = location.hash;
+
+  function parseHash() {
+    const parts = location.hash.replace(/^#\/?/, '').split('?')[0].split('/').filter(Boolean);
+    const dec = (s) => { try { return decodeURIComponent(s); } catch (_) { return s; } };
+    return { gameId: parts[0] ? dec(parts[0]) : null, songId: parts[1] ? dec(parts[1]) : null };
+  }
+
+  function route() {
+    const { gameId, songId } = parseHash();
+    const game = gameId ? DATA.games.find((g) => g.id === gameId) : null;
+    const song = game && songId ? (game.songs || []).find((s) => s.id === songId) : null;
+
+    hideUpNext();
+    leaveSong(!!song);
+    app.replaceChildren();
+    window.scrollTo(0, 0);
+
+    if (song) renderSong(game, song);
+    else if (game && !songId) renderGame(game);
+    else {
+      if (gameId) history.replaceState(null, '', '#/');
+      renderHome();
+    }
+    app.focus({ preventScroll: true });
+    onPageScroll();
+  }
+
+  /* ---------- home ---------- */
+
+  function renderHome() {
+    document.title = 'Echolog';
+    document.body.classList.remove('on-song');
+    crumb.replaceChildren();
+    const games = [...DATA.games].sort((a, b) => String(a.title).localeCompare(String(b.title)));
+    setCover(games[0] || null);
+
+    const list = h('ul', { class: 'games' },
+      games.map((g, i) => h('li', { class: 'rise', style: `--i:${i + 1}` },
+        h('a', {
+          href: `#/${encodeURIComponent(g.id)}`,
+          onmouseenter: () => setCover(g),
+          onfocus: () => setCover(g),
+        }, g.title))));
+
+    app.append(h('section', { class: 'view home' },
+      h('div', { class: 'rise', style: '--i:0' }, h('span', { class: 'placeholder' }, '[TAGLINE]')),
+      games.length ? list : h('p', { class: 'empty' }, 'No games yet.')));
+  }
+
+  /* ---------- game ---------- */
+
+  function renderGame(game) {
+    document.title = `${game.title} · Echolog`;
+    document.body.classList.remove('on-song');
+    crumb.replaceChildren();
+    setCover(game);
+
+    const songsData = game.songs || [];
+    const total = songsData.reduce((n, s) => n + (s.stories || []).length, 0);
+    const songs = h('ol', { class: 'songs' },
+      songsData.map((s, i) => h('li', { class: 'rise', style: `--i:${Math.min(i + 2, 12)}` },
+        h('a', { href: songHref(game, s) },
+          h('span', { class: 'n' }, pad2(i + 1)),
+          h('span', { class: 't' }, s.title),
+          h('span', { class: 'cnt' }, plural((s.stories || []).length, 'comment', 'comments'))))));
+
+    const view = h('section', { class: 'view game' },
+      h('h1', { class: 'game-title rise', style: '--i:0' }, game.title),
+      h('p', { class: 'game-meta rise', style: '--i:1' },
+        [game.year, plural(songsData.length, 'song', 'songs'), plural(total, 'comment', 'comments')].filter(Boolean).join(' · ')),
+      songsData.length ? songs : h('p', { class: 'empty' }, 'No songs yet.'));
+
+    // Steam reviews are game-wide. Only shown if the collector has any.
+    if (game.stories && game.stories.length) {
+      view.append(h('h2', { class: 'section-label' }, 'Steam reviews'), commentList(game.stories));
+    }
+    app.append(view);
+  }
+
+  const songHref = (game, s) => `#/${encodeURIComponent(game.id)}/${encodeURIComponent(s.id)}`;
+
+  /* ---------- comments ---------- */
+
+  // Decided from the text itself, so nothing has to be measured on screen.
+  const isLong = (t) => t.length > LONG_CHARS || t.split('\n').length > LONG_LINES;
+
+  function linkOrText(cls, href, text, tab) {
+    return href
+      ? h('a', { class: cls, href, target: '_blank', rel: 'noopener', tabindex: tab }, text)
+      : h('span', { class: cls }, text);
+  }
+
+  function metaEl(c, inCloud) {
+    const tab = inCloud ? '-1' : null;
+    return h('div', { class: 'c-meta' },
+      linkOrText('c-author', c.authorUrl, c.author || 'Unknown', tab),
+      inCloud ? null : h('span', null, plural(c.likes || 0, 'like', 'likes')),
+      inCloud ? null : h('span', null, fmtDate(c.date)),
+      c.hoursPlayed != null ? h('span', null, `${Number(c.hoursPlayed).toLocaleString('en')} hrs played`) : null,
+      c.url ? h('a', { class: 'c-link', href: c.url, target: '_blank', rel: 'noopener', tabindex: tab },
+        c.source === 'steam' ? 'View on Steam' : 'View on YouTube') : null);
+  }
+
+  function commentEl(c) {
+    const text = String(c.text || '');
+    const p = h('p', { class: 'c-text' }, text);
+    let more = null;
+    if (isLong(text)) {
+      p.classList.add('clamped');
+      p.id = `t-${Math.random().toString(36).slice(2, 9)}`;
+      more = h('button', { class: 'c-more', type: 'button', 'aria-expanded': 'false', 'aria-controls': p.id }, 'Show more');
+      more.addEventListener('click', () => {
+        const open = p.classList.toggle('clamped') === false;
+        more.textContent = open ? 'Show less' : 'Show more';
+        more.setAttribute('aria-expanded', String(open));
+      });
+    }
+    return h('article', { class: 'c' }, p, more, metaEl(c));
+  }
+
+  function commentList(stories) {
+    const wrap = h('div', { class: 'list' });
+    wrap.append(...stories.map(commentEl));
+    return wrap;
+  }
+
+  function commentsSection(stories) {
+    let mode = 'liked';
+    const listHolder = h('div');
+    const btnLiked = h('button', { type: 'button', 'aria-pressed': 'true' }, 'Most liked');
+    const btnNew = h('button', { type: 'button', 'aria-pressed': 'false' }, 'Newest');
+    const draw = () => {
+      btnLiked.setAttribute('aria-pressed', String(mode === 'liked'));
+      btnNew.setAttribute('aria-pressed', String(mode === 'new'));
+      const sorted = [...stories].sort(mode === 'liked'
+        ? (a, b) => (b.likes || 0) - (a.likes || 0)
+        : (a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+      listHolder.replaceChildren(stories.length ? commentList(sorted) : h('p', { class: 'empty' }, 'No comments yet.'));
+    };
+    btnLiked.addEventListener('click', () => { if (mode !== 'liked') { mode = 'liked'; draw(); } });
+    btnNew.addEventListener('click', () => { if (mode !== 'new') { mode = 'new'; draw(); } });
+    const section = h('section', { class: 'comments', id: 'comments', 'aria-label': 'Comments' },
+      h('div', { class: 'sort' },
+        h('span', null, plural(stories.length, 'comment', 'comments')),
+        stories.length > 1 ? h('div', null, btnLiked, btnNew) : null),
+      listHolder);
+    draw();
+    return section;
+  }
+
+  /* ---------- what to play for a song ----------
+     moment = the scene that plays on screen.
+     audio  = a separate music track (optional). When set, the scene plays muted and the music
+              plays over it, so you hear the song without the characters talking.
+     A song with only audio shows that video as the scene. */
+
+  // For testing without editing the data, add these before the #:
+  //   ?t=1:35         scene start
+  //   ?audio=VIDEOID  music track to lay over the scene
+  //   ?at=0:12        music start
+  // They only apply to the song the page was opened on.
+  function readTime(t) {
+    if (!t) return null;
+    const parts = t.split(':').map(Number);
+    if (parts.some(isNaN)) return null;
+    return parts.reduce((acc, n) => acc * 60 + n, 0);
+  }
+  function testParams() {
+    const inHash = location.hash.includes('?') ? location.hash.slice(location.hash.indexOf('?')) : '';
+    const a = new URLSearchParams(location.search);
+    const b = new URLSearchParams(inHash);
+    const get = (k) => a.get(k) || b.get(k);
+    return { t: readTime(get('t')), audio: get('audio'), at: readTime(get('at')) };
+  }
+
+  function playable(song, useTest) {
+    let scene = song.moment && song.moment.videoId ? Object.assign({}, song.moment) : null;
+    let music = song.audio && song.audio.videoId ? Object.assign({}, song.audio) : null;
+    if (useTest) {
+      const p = testParams();
+      if (p.audio) music = { videoId: p.audio, start: 0, end: null };
+      if (music && p.at != null) { music.start = p.at; music.end = null; }
+      if (scene && p.t != null) { scene.start = p.t; scene.end = null; }
+    }
+    if (!scene && music) { scene = music; music = null; }
+    return scene ? { scene, music } : null;
+  }
+
+  function nextSong(game, song) {
+    const list = game.songs || [];
+    const i = list.indexOf(song);
+    for (let k = 1; k < list.length; k++) {
+      const s = list[(i + k) % list.length];
+      if (playable(s, false)) return s;
+    }
+    return null;
+  }
+
+  /* ---------- song page ---------- */
+
+  let songState = null;
+
+  function renderSong(game, song) {
+    document.title = `${song.title} · ${game.title} · Echolog`;
+    document.body.classList.add('on-song');
+    setCover(game);
+    crumb.replaceChildren(h('a', { href: `#/${encodeURIComponent(game.id)}` }, game.title));
+
+    const stories = song.stories || [];
+    const n = stories.length;
+    const plan = playable(song, location.hash === firstHash);
+    const next = plan ? nextSong(game, song) : null;
+    const view = h('section', { class: 'view song' });
+    songState = { game, song, plan, next, ui: {}, ended: false };
+
+    if (plan) {
+      const ui = songState.ui;
+      ui.play = iconBtn('ctl', 'pause', 'Pause');
+      ui.sound = iconBtn('ctl', 'sound', 'Mute');
+      ui.time = h('span', { class: 'ctl-time' }, '0:00');
+      ui.seek = h('input', { class: 'seek', type: 'range', min: '0', max: '100', step: '1', value: '0', 'aria-label': 'Seek' });
+      ui.play.addEventListener('click', togglePlay);
+      ui.sound.addEventListener('click', toggleSound);
+      ui.seek.addEventListener('input', () => { ui.seeking = true; seekTo(Number(ui.seek.value)); });
+      ui.seek.addEventListener('change', () => { ui.seeking = false; });
+      const controls = h('div', { class: 'controls' }, ui.play, ui.sound);
+      if (next && next !== song) {
+        const nb = iconBtn('ctl', 'next', `Next song: ${next.title}`);
+        nb.addEventListener('click', () => { location.hash = songHref(game, next); });
+        controls.append(nb);
+      }
+      controls.append(ui.time, ui.seek);
+      const sub = [song.composer, song.moment && song.moment.label].filter(Boolean).join(' · ');
+      view.append(
+        h('div', { class: 'hero-space' }),
+        h('div', { class: 'peek rise', style: '--i:2' },
+          h('h1', null, song.title, sub ? h('small', null, sub) : null),
+          controls,
+          h('button', {
+            class: 'peek-more', type: 'button', 'aria-label': `${plural(n, 'comment', 'comments')}, scroll down`,
+            onclick: () => $('comments').scrollIntoView({ behavior: scrollBehavior }),
+          }, h('span', null, n.toLocaleString('en')), h('span', { class: 'pm-word' }, n === 1 ? 'comment' : 'comments'), svg('down', 16))),
+        commentsSection(stories));
+    } else {
+      view.append(
+        h('header', { class: 'song-head rise', style: '--i:0' },
+          h('h1', null, song.title),
+          h('p', null, [song.composer, 'No clip yet'].filter(Boolean).join(' · '))),
+        commentsSection(stories));
+    }
+    app.append(view);
+    if (plan) openStage(plan, song);
+    else if (!stage.hidden) closeStage();
+  }
+
+  // keepStage: going straight to another song, so the players stay and just load the new video.
+  function leaveSong(keepStage) {
+    const st = songState;
+    if (!st) return;
+    stopClouds(true);
+    songState = null;
+    if (!keepStage) closeStage();
+  }
+
+  /* ---------- the video stage ----------
+     The player stays at least 200 x 200 (YouTube's minimum), so the small player is 356 x 200.
+     Moving between big and small sets the new size once, then animates with transform only. */
+
+  let mini = false;
+  let calm = false; // only used when CLOUDS_OVER_VIDEO is false
+
+  function layout() {
+    const W = document.documentElement.clientWidth;
+    const H = window.innerHeight;
+    const css = getComputedStyle(document.documentElement);
+    const top = parseFloat(css.getPropertyValue('--top')) || 56;
+    const peek = parseFloat(css.getPropertyValue('--peek')) || 92;
+    const availH = Math.max(200, H - top - peek);
+
+    const bw = Math.max(200, Math.min(W, availH * 16 / 9));
+    const bh = bw * 9 / 16;
+    const upright = isPhone() && availH > bh * 1.6;
+    const big = { left: (W - bw) / 2, top: upright ? top + 12 : top + (availH - bh) / 2, width: bw, height: bh };
+
+    const margin = Math.min(360, Math.max(260, W * 0.2));
+    const cw = Math.max(356, Math.min(bw, W - margin * 2));
+    const ch = cw * 9 / 16;
+    const calmR = { left: (W - cw) / 2, top: top + (availH - ch) / 2, width: cw, height: ch };
+
+    // Phones keep the big size and slide it off the top instead.
+    const small = isPhone() ? big : { left: W - 356 - 20, top: H - 200 - 52 - 20, width: 356, height: 200 };
+    return { big, calm: calmR, small, top, peek, W, H };
+  }
+
+  function currentRect(L) {
+    if (mini) return L.small;
+    if (calm && !isPhone()) return L.calm;
+    return L.big;
+  }
+
+  function placeStage(animate) {
+    if (stage.hidden) return;
+    const L = layout();
+    const r = currentRect(L);
+    const prev = animate && !reduced && !isPhone() ? stage.getBoundingClientRect() : null;
+    stage.style.width = r.width + 'px';
+    stage.style.height = r.height + 'px';
+    stage.style.left = r.left + 'px';
+    stage.style.top = r.top + 'px';
+    if (prev && prev.width) {
+      const dx = prev.left - r.left;
+      const dy = prev.top - r.top;
+      const sx = prev.width / r.width;
+      const sy = prev.height / r.height;
+      if (Math.abs(dx) + Math.abs(dy) > 1 || Math.abs(sx - 1) > 0.01) {
+        stage.style.transition = 'none';
+        stage.style.transform = `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
+        void stage.offsetWidth;
+        stage.style.transition = '';
+        stage.style.transform = '';
+      }
+    } else {
+      stage.style.transform = '';
+    }
+    stage.classList.toggle('away', mini && isPhone());
+    if (!isPhone()) {
+      dock.style.left = L.small.left + 'px';
+      dock.style.top = (L.small.top + L.small.height + 8) + 'px';
+      dock.style.width = L.small.width + 'px';
+    } else {
+      dock.style.left = dock.style.top = dock.style.width = '';
+    }
+  }
+
+  function setMini(on) {
+    if (!songState || !songState.plan || mini === on) return;
+    mini = on;
+    document.body.classList.toggle('mini', on);
+    stage.classList.toggle('mini', on);
+    dock.hidden = !on;
+    requestAnimationFrame(() => dock.classList.toggle('show', on));
+    if (on) { calm = false; stopClouds(); }
+    placeStage(true);
+    if (!on) startClouds();
+  }
+
+  function openStage(plan, song) {
+    dockTitle.textContent = song.title;
+    stageMsg.hidden = true;
+    if (stage.hidden) {
+      mini = false;
+      calm = false;
+      document.body.classList.remove('mini');
+      stage.hidden = false;
+      stage.classList.remove('mini', 'away');
+      stage.classList.add('entering');
+      placeStage(false);
+      requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('entering')));
+    } else {
+      // Next song: back to the big video.
+      mini = true;
+      setMini(false);
+      dock.hidden = true;
+      dock.classList.remove('show');
+    }
+    loadMedia(plan);
+  }
+
+  function closeStage() {
+    destroyMedia();
+    stage.hidden = true;
+    stage.classList.remove('mini', 'away');
+    document.body.classList.remove('mini');
+    mini = false;
+    calm = false;
+    dock.hidden = true;
+    dock.classList.remove('show');
+  }
+
+  function showStageMsg(text) {
+    stageMsg.textContent = text;
+    stageMsg.hidden = false;
+  }
+
+  // Tap the small player: make it big again. Taps on the big video go to YouTube itself
+  // (pause, and the "Skip ad" button if an ad is playing).
+  stage.addEventListener('click', () => {
+    if (mini) window.scrollTo({ top: 0, behavior: scrollBehavior });
+  });
+
+  /* ---------- YouTube players ---------- */
+
+  const YT_STATE = { ENDED: 0, PLAYING: 1, PAUSED: 2, BUFFERING: 3 };
+  let ytPromise = null;
+  function loadYT() {
+    if (window.YT && window.YT.Player) return Promise.resolve(window.YT);
+    if (ytPromise) return ytPromise;
+    ytPromise = new Promise((resolve, reject) => {
+      const prev = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => { if (prev) prev(); resolve(window.YT); };
+      const s = document.createElement('script');
+      s.src = 'https://www.youtube.com/iframe_api';
+      s.async = true;
+      s.onerror = () => { ytPromise = null; reject(new Error('blocked')); };
+      document.head.appendChild(s);
+      setTimeout(() => reject(new Error('timeout')), 12000);
+    });
+    return ytPromise;
+  }
+
+  // The players stay alive from song to song so the next one starts quickly.
+  const media = { plan: null, scene: null, music: null, ready: { scene: false, music: false }, token: 0, userMuted: false, tick: null, playing: false };
+
+  const master = () => (media.plan && media.plan.music && media.music && media.ready.music ? media.music : (media.ready.scene ? media.scene : null));
+  const masterSpec = () => (media.plan ? (media.plan.music && media.music ? media.plan.music : media.plan.scene) : null);
+  const safe = (fn) => { try { return fn(); } catch (_) { return undefined; } };
+
+  async function loadMedia(plan) {
+    const token = ++media.token;
+    media.plan = plan;
+    media.playing = false;
+    songStateEnded(false);
+    let YT;
+    try { YT = await loadYT(); } catch (_) {
+      if (token === media.token) showStageMsg("Couldn't load the video player.");
+      return;
+    }
+    if (token !== media.token) return;
+    usePlayer(YT, 'scene', plan.scene);
+    if (plan.music) usePlayer(YT, 'music', plan.music);
+    else dropPlayer('music');
+    applyMute();
+    clearInterval(media.tick);
+    media.tick = setInterval(tick, 250);
+    setTimeout(() => { if (token === media.token) checkAutoplay(); }, 1800);
+  }
+
+  function usePlayer(YT, role, spec) {
+    const p = media[role];
+    if (p && media.ready[role]) {
+      safe(() => p.loadVideoById({ videoId: spec.videoId, startSeconds: spec.start || 0, endSeconds: spec.end || undefined }));
+      return;
+    }
+    dropPlayer(role);
+    const wrap = role === 'scene' ? sceneWrap : musicWrap;
+    const id = role === 'scene' ? 'ytScene' : 'ytMusic';
+    wrap.replaceChildren(h('div', { id }));
+    media.ready[role] = false;
+    media[role] = new YT.Player(id, {
+      width: '100%',
+      height: '100%',
+      videoId: spec.videoId,
+      playerVars: Object.assign({
+        autoplay: 1,
+        controls: 0,        // no YouTube control bar; ours sits under the video
+        disablekb: 1,
+        fs: 0,
+        iv_load_policy: 3,  // no annotations
+        playsinline: 1,
+        rel: 0,
+        start: Math.floor(spec.start || 0),
+      }, spec.end ? { end: Math.floor(spec.end) } : {}),
+      events: {
+        onReady: () => onReady(role),
+        onStateChange: (e) => onState(role, e.data),
+        onError: (e) => onError(role, e.data),
+      },
+    });
+  }
+
+  function dropPlayer(role) {
+    const p = media[role];
+    media[role] = null;
+    media.ready[role] = false;
+    if (p) safe(() => p.destroy());
+    (role === 'scene' ? sceneWrap : musicWrap).replaceChildren();
+  }
+
+  function destroyMedia() {
+    media.token++;
+    clearInterval(media.tick);
+    media.tick = null;
+    dropPlayer('scene');
+    dropPlayer('music');
+    media.plan = null;
+    media.playing = false;
+  }
+
+  function onReady(role) {
+    media.ready[role] = true;
+    const p = media[role];
+    const spec = media.plan && (role === 'music' ? media.plan.music : media.plan.scene);
+    if (!spec) return;
+    // Backup for the start setting. Only jumps if the player really ignored it, so the clip doesn't skip twice.
+    const t = safe(() => p.getCurrentTime()) || 0;
+    if (spec.start && t < spec.start - 1) safe(() => p.seekTo(spec.start, true));
+    applyMute();
+    sync();
+  }
+
+  function onState(role, s) {
+    const plan = media.plan;
+    if (!plan) return;
+    const isMaster = role === (plan.music && media.music ? 'music' : 'scene');
+    if (isMaster) {
+      media.playing = s === YT_STATE.PLAYING;
+      if (plan.music && media.scene && media.ready.scene) {
+        if (s === YT_STATE.PLAYING) safe(() => media.scene.playVideo());
+        if (s === YT_STATE.PAUSED) safe(() => media.scene.pauseVideo());
+      }
+      if (s === YT_STATE.PLAYING && songState && songState.ended) { songState.ended = false; hideUpNext(); }
+      if (s === YT_STATE.PLAYING) startClouds();
+      if (s === YT_STATE.PAUSED) stopClouds();
+      if (s === YT_STATE.ENDED) songEnded();
+      sync();
+    } else if (role === 'scene' && s === YT_STATE.ENDED) {
+      // Music still going: loop the scene.
+      safe(() => { media.scene.seekTo(plan.scene.start || 0, true); media.scene.playVideo(); });
+    }
+  }
+
+  function onError(role) {
+    const plan = media.plan;
+    if (!plan) return;
+    if (role === 'music') {
+      // Music track gone: fall back to the scene's own sound.
+      dropPlayer('music');
+      plan.music = null;
+      applyMute();
+      return;
+    }
+    if (plan.music && media.music) {
+      showStageMsg('Clip unavailable');
+      return;
+    }
+    showStageMsg('This clip is unavailable.');
+    songEnded();
+  }
+
+  // The scene is always muted when there's a separate music track.
+  function applyMute() {
+    const plan = media.plan;
+    if (!plan) return;
+    const sep = !!(plan.music && media.music);
+    if (media.scene && media.ready.scene) safe(() => (sep || media.userMuted ? media.scene.mute() : media.scene.unMute()));
+    if (sep && media.ready.music) safe(() => (media.userMuted ? media.music.mute() : media.music.unMute()));
+  }
+
+  // If the browser blocked sound, start muted so the clip still plays, and make the sound button glow.
+  function checkAutoplay() {
+    const p = master();
+    if (!p) return;
+    const s = safe(() => p.getPlayerState());
+    if (s === YT_STATE.PLAYING || s === YT_STATE.BUFFERING || s === YT_STATE.ENDED) return;
+    safe(() => { p.mute(); p.playVideo(); });
+    setTimeout(sync, 300);
+  }
+
+  function togglePlay() {
+    const p = master();
+    if (!p) return;
+    if (safe(() => p.getPlayerState()) === YT_STATE.PLAYING) safe(() => p.pauseVideo());
+    else safe(() => p.playVideo());
+  }
+
+  function toggleSound() {
+    const p = master();
+    if (!p) return;
+    const muted = safe(() => p.isMuted());
+    media.userMuted = !muted;
+    if (muted) safe(() => { p.unMute(); if (p.getVolume() === 0) p.setVolume(80); });
+    else safe(() => p.mute());
+    setTimeout(sync, 80);
+  }
+
+  function seekTo(sec) {
+    const p = master();
+    const spec = masterSpec();
+    if (p && spec) safe(() => p.seekTo((spec.start || 0) + sec, true));
+  }
+
+  function tick() {
+    if (document.hidden) return;
+    const plan = media.plan;
+    // A scene with its own end time loops while the music plays on.
+    if (plan && plan.music && plan.scene.end && media.scene && media.ready.scene) {
+      const t = safe(() => media.scene.getCurrentTime()) || 0;
+      if (t >= plan.scene.end) safe(() => media.scene.seekTo(plan.scene.start || 0, true));
+    }
+    sync();
+  }
+
+  function sync() {
+    const st = songState;
+    const p = master();
+    if (!st || !p) return;
+    const ui = st.ui;
+    const playing = safe(() => p.getPlayerState()) === YT_STATE.PLAYING;
+    const muted = !!safe(() => p.isMuted());
+    setIcon(ui.play, playing ? 'pause' : 'play', playing ? 'Pause' : 'Play');
+    setIcon(dockPlay, playing ? 'pause' : 'play', playing ? 'Pause' : 'Play');
+    if (ui.sound) {
+      setIcon(ui.sound, muted ? 'muted' : 'sound', muted ? 'Turn sound on' : 'Mute');
+      ui.sound.classList.toggle('nudge', muted && !media.userMuted);
+    }
+    const spec = masterSpec();
+    const start = spec.start || 0;
+    const dur = safe(() => p.getDuration()) || 0;
+    const end = spec.end || dur;
+    const len = Math.max(0, end - start);
+    const pos = Math.min(len, Math.max(0, (safe(() => p.getCurrentTime()) || 0) - start));
+    if (ui.time) {
+      const txt = len ? `${fmtTime(pos)} / ${fmtTime(len)}` : fmtTime(pos);
+      if (ui.time.textContent !== txt) ui.time.textContent = txt;
+    }
+    if (ui.seek && len && !ui.seeking) {
+      ui.seek.max = String(Math.floor(len));
+      ui.seek.value = String(Math.floor(pos));
+      ui.seek.style.setProperty('--p', `${(pos / len) * 100}%`);
+      ui.seek.setAttribute('aria-valuetext', `${fmtTime(pos)} of ${fmtTime(len)}`);
+    }
+  }
+
+  dockPlay.addEventListener('click', togglePlay);
+  $('dockUp').addEventListener('click', () => window.scrollTo({ top: 0, behavior: scrollBehavior }));
+
+  /* ---------- up next ---------- */
+
+  let upTimer = null;
+  function songStateEnded(v) { if (songState) songState.ended = v; }
+
+  function songEnded() {
+    const st = songState;
+    if (!st || st.ended) return;
+    st.ended = true;
+    stopClouds();
+    const next = st.next;
+    if (!AUTO_NEXT_SECONDS || !next || next === st.song) {
+      if (!mini) $('comments').scrollIntoView({ behavior: scrollBehavior });
+      return;
+    }
+    let left = AUTO_NEXT_SECONDS;
+    const go = () => { hideUpNext(); location.hash = songHref(st.game, next); };
+    const paint = () => { $('upnextText').textContent = `Next: ${next.title} in ${left}`; };
+    paint();
+    upnext.hidden = false;
+    $('upnextGo').onclick = go;
+    $('upnextStay').onclick = hideUpNext;
+    clearInterval(upTimer);
+    upTimer = setInterval(() => {
+      left -= 1;
+      if (songState !== st) return hideUpNext();
+      if (left <= 0) go(); else paint();
+    }, 1000);
+  }
+
+  function hideUpNext() {
+    clearInterval(upTimer);
+    upTimer = null;
+    upnext.hidden = true;
+  }
+
+  /* ---------- clouds ----------
+     Short comments fade in over the big video one after another while the clip plays.
+     They sit in the corners and sides, away from the middle where the action usually is,
+     alternate left and right, stay up long enough to read, and drift a little while they're up. */
+
+  const clouds = { timer: null, list: [], pool: [], lastSide: null, started: false, song: null };
+
+  function cloudPool(song) {
+    const short = (song.stories || []).filter((c) => c.text && c.text.length <= CLOUD_MAX_CHARS);
+    // Best 30 by score, in a random order.
+    return shuffle([...short].sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 30));
+  }
+
+  const canCloud = () => !!(songState && songState.plan && !mini && media.playing && !document.hidden && !songState.ended);
+
+  // Starts the cloud loop if it isn't already waiting. Leave out delay to use the normal one.
+  function startClouds(delay) {
+    if (!canCloud() || clouds.timer) return;
+    if (clouds.song !== songState.song) {
+      clouds.song = songState.song;
+      clouds.pool = cloudPool(songState.song);
+      clouds.started = false;
+    }
+    if (!clouds.pool.length && !cloudPool(songState.song).length) return;
+    if (delay == null) delay = clouds.started ? 2500 : CLOUD_FIRST_MS;
+    clouds.timer = setTimeout(cloudLoop, delay);
+  }
+
+  function cloudLoop() {
+    clouds.timer = null;
+    if (!canCloud()) return;
+    if (!CLOUDS_OVER_VIDEO && !calm && !isPhone()) {
+      // Make room beside the video first.
+      calm = true;
+      placeStage(true);
+      clouds.timer = setTimeout(cloudLoop, 700);
+      return;
+    }
+    const hold = spawnCloud();
+    clouds.started = true;
+    clouds.timer = setTimeout(cloudLoop, hold ? hold + CLOUD_GAP_MS - 2500 : 4000);
+  }
+
+  function stopClouds(now) {
+    clearTimeout(clouds.timer);
+    clouds.timer = null;
+    for (const c of clouds.list) fadeCloud(c, now);
+    clouds.list = [];
+    if (now) { clouds.song = null; cloudsEl.replaceChildren(); }
+  }
+
+  function fadeCloud(c, now) {
+    clearTimeout(c.timer);
+    if (now || reduced) { c.el.remove(); return; }
+    c.el.classList.add('out');
+    setTimeout(() => c.el.remove(), 1900);
+  }
+
+  // Places a cloud can go, as boxes on screen.
+  function cloudSpots(r, L) {
+    const spots = [];
+    if (CLOUDS_OVER_VIDEO && !isPhone()) {
+      const pad = Math.max(24, r.width * 0.04);
+      const w = Math.min(340, r.width * 0.3);
+      const y1 = r.top + pad;
+      const y2 = r.top + r.height * 0.4;
+      spots.push({ side: 'l', x: r.left + pad, y: y1, w, h: r.height * 0.3 });
+      spots.push({ side: 'l', x: r.left + pad, y: y2, w, h: r.height * 0.32 });
+      spots.push({ side: 'r', x: r.left + r.width - pad - w, y: y1, w, h: r.height * 0.3 });
+      spots.push({ side: 'r', x: r.left + r.width - pad - w, y: y2, w, h: r.height * 0.32 });
+      return spots;
+    }
+    const gap = 20;
+    const minTop = L.top + 12;
+    const maxBottom = L.H - L.peek - 8;
+    if (r.left >= 240 + gap * 2) {
+      spots.push({ side: 'l', x: gap, y: minTop, w: r.left - gap * 2, h: maxBottom - minTop });
+      spots.push({ side: 'r', x: r.left + r.width + gap, y: minTop, w: L.W - r.left - r.width - gap * 2, h: maxBottom - minTop });
+    }
+    const belowY = r.top + r.height + gap;
+    if (maxBottom - belowY >= 110) spots.push({ side: 'b', x: 12, y: belowY, w: L.W - 24, h: maxBottom - belowY });
+    return spots;
+  }
+
+  // Returns how long the cloud stays up, or 0 if there was nowhere to put it.
+  function spawnCloud() {
+    const max = isPhone() ? 1 : CLOUD_MAX;
+    while (clouds.list.length >= max) fadeCloud(clouds.list.shift());
+
+    const L = layout();
+    const r = currentRect(L);
+    let spots = cloudSpots(r, L).filter((s) => !clouds.list.some((c) => c.spot === s));
+    const otherSide = spots.filter((s) => s.side !== clouds.lastSide);
+    if (otherSide.length) spots = otherSide;
+    if (!spots.length) return 0;
+    const spot = spots[Math.floor(Math.random() * spots.length)];
+
+    if (!clouds.pool.length) clouds.pool = cloudPool(songState.song);
+    const c = clouds.pool.pop();
+    if (!c) return 0;
+
+    const el = h('div', { class: 'cloud' }, h('p', null, c.text), metaEl(c, true));
+    el.style.maxWidth = Math.max(180, Math.min(340, spot.w)) + 'px';
+    el.style.visibility = 'hidden';
+    cloudsEl.append(el);
+    const w = el.offsetWidth;
+    const hgt = el.offsetHeight;
+    if (hgt > spot.h + 60) { el.remove(); return 0; }
+    const x = spot.x + Math.random() * Math.max(0, spot.w - w);
+    // Under the video on phones: stay close to it rather than drifting to the bottom of the screen.
+    const room = Math.max(0, spot.h - hgt);
+    const y = spot.y + Math.random() * (spot.side === 'b' ? Math.min(room, 60) : room);
+
+    // Reading time: about 16 characters a second, plus time to notice it.
+    const hold = Math.round(Math.min(14000, Math.max(6500, 3500 + c.text.length * 60)));
+    const drift = 10 + Math.random() * 8;
+    el.style.transform = `translate(${x}px, ${y + drift}px)`;
+    el.style.visibility = '';
+    void el.offsetWidth; // lock in the start position before the transition is set
+    if (!reduced) el.style.transition = `opacity 1.4s ease, transform ${hold + 2000}ms linear`;
+    void el.offsetWidth;
+    el.classList.add('in');
+    el.style.transform = `translate(${x}px, ${y - drift}px)`;
+
+    const rec = { el, spot, timer: null };
+    clouds.list.push(rec);
+    clouds.lastSide = spot.side;
+    rec.timer = setTimeout(() => {
+      fadeCloud(rec);
+      clouds.list = clouds.list.filter((x2) => x2 !== rec);
+    }, hold);
+    return hold;
+  }
+
+  /* ---------- page events ---------- */
+
+  let scrollQueued = false;
+  function onPageScroll() {
+    scrollQueued = false;
+    const y = window.scrollY;
+    topBar.classList.toggle('solid', y > 12);
+    if (songState && songState.plan) setMini(y > 24);
+  }
+  window.addEventListener('scroll', () => {
+    if (!scrollQueued) { scrollQueued = true; requestAnimationFrame(onPageScroll); }
+  }, { passive: true });
+
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      placeStage(false);
+      // Clouds were placed for the old size.
+      if (clouds.list.length) { stopClouds(true); startClouds(1500); }
+    }, 120);
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopClouds();
+    else startClouds();
+  });
+
+  // Space or k plays and pauses, unless you're on a button, link or the seek bar.
+  document.addEventListener('keydown', (e) => {
+    if (!songState || !songState.plan || e.ctrlKey || e.metaKey || e.altKey) return;
+    const tag = (e.target && e.target.tagName) || '';
+    if (/^(INPUT|TEXTAREA|BUTTON|A|SELECT)$/.test(tag) || $('about').open) return;
+    if (e.key === ' ' || e.key === 'k') { e.preventDefault(); togglePlay(); }
+  });
+
+  const about = $('about');
+  $('aboutBtn').addEventListener('click', () => {
+    if (about.showModal) about.showModal(); else about.setAttribute('open', '');
+  });
+
+  /* ---------- start ---------- */
+
+  async function start() {
+    try {
+      const res = await fetch(DATA_URL, { cache: 'no-cache' });
+      if (!res.ok) throw new Error(res.status);
+      DATA = await res.json();
+      if (!DATA || !Array.isArray(DATA.games)) throw new Error('bad data');
+    } catch (err) {
+      app.replaceChildren(h('div', { class: 'notice' },
+        h('p', null, `Couldn't load ${DATA_URL}. This page needs to run from a web server (GitHub Pages works), not straight from a file.`)));
+      return;
+    }
+    window.addEventListener('hashchange', route);
+    route();
+  }
+
+  start();
+})();
