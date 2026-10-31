@@ -11,12 +11,21 @@
           "title": "To Zanarkand",
           "composer": "Nobuo Uematsu",
           "moment": {
-            "videoId": "kilrRiclUFY",
-            "start": 0,
-            "end": null,
-            "label": "Opening, the campfire"
+            "videoId": "5oIjPHo0k5E",
+            "start": 27,
+            "end": 173,
+            "label": ""
           },
-          "commentVideos": ["sy-nrLiAwZI", "PSjTN8WSGNk", "mWYwmM23Sqs"]
+          "commentVideos": [
+            "sy-nrLiAwZI",
+            "PSjTN8WSGNk",
+            "mWYwmM23Sqs"
+          ],
+          "audio": {
+            "videoId": "QQq0zv_JXEk",
+            "start": 0,
+            "end": null
+          }
         },
         {
           "id": "otherworld",
@@ -24,25 +33,40 @@
           "composer": "Nobuo Uematsu",
           "moment": {
             "videoId": "4umidcc_8rU",
-            "start": 0,
+            "start": 15,
             "end": null,
-            "label": "Sin attacks Zanarkand"
+            "label": ""
           },
-          "commentVideos": ["zhYW3dY1hgM", "4umidcc_8rU", "BKZs90_fkt4"]
+          "commentVideos": [
+            "zhYW3dY1hgM",
+            "4umidcc_8rU",
+            "BKZs90_fkt4"
+          ],
+          "audio": {
+            "videoId": "KO6fvJrsTsE",
+            "start": 0,
+            "end": null
+          }
         },
         {
           "id": "besaid-island",
           "title": "Besaid Island",
           "composer": "Nobuo Uematsu",
-          "moment": null,
-          "commentVideos": ["RC1VmGXiEFw", "IKGc_wtQKC8"]
-        },
-        {
-          "id": "hymn-of-the-fayth",
-          "title": "Hymn of the Fayth",
-          "composer": "Nobuo Uematsu",
-          "moment": null,
-          "commentVideos": ["Woz3mS9Ao5k", "FpeqMBG7_7I", "E9vWvXoZhgI"]
+          "moment": {
+            "videoId": "112PPC8JlJg",
+            "start": 418,
+            "end": 935,
+            "label": ""
+          },
+          "commentVideos": [
+            "RC1VmGXiEFw",
+            "IKGc_wtQKC8"
+          ],
+          "audio": {
+            "videoId": "RC1VmGXiEFw",
+            "start": 0,
+            "end": null
+          }
         },
         {
           "id": "suteki-da-ne",
@@ -54,9 +78,15 @@
             "end": null,
             "label": "Macalania, the spring"
           },
-          "commentVideos": ["Vl20g-tBaKc", "zXpm8DPYuTc", "Zbv6KrO_13A"]
+          "commentVideos": [
+            "Vl20g-tBaKc",
+            "zXpm8DPYuTc",
+            "Zbv6KrO_13A"
+          ],
+          "audio": null
         }
-      ]
+      ],
+      "cover": "covers/ffx.jpg"
     }
   ]
 }
