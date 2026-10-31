@@ -25,7 +25,15 @@
             "videoId": "QQq0zv_JXEk",
             "start": 0,
             "end": null
-          }
+          },
+          "moments": [
+            {
+              "videoId": "5oIjPHo0k5E",
+              "start": 27,
+              "end": 173,
+              "label": ""
+            }
+          ]
         },
         {
           "id": "otherworld",
@@ -46,7 +54,21 @@
             "videoId": "KO6fvJrsTsE",
             "start": 0,
             "end": null
-          }
+          },
+          "moments": [
+            {
+              "videoId": "4umidcc_8rU",
+              "start": 15,
+              "end": null,
+              "label": ""
+            },
+            {
+              "videoId": "d8RkZlWA4V8",
+              "start": 547,
+              "end": 1120,
+              "label": ""
+            }
+          ]
         },
         {
           "id": "besaid-island",
@@ -66,7 +88,15 @@
             "videoId": "RC1VmGXiEFw",
             "start": 0,
             "end": null
-          }
+          },
+          "moments": [
+            {
+              "videoId": "112PPC8JlJg",
+              "start": 418,
+              "end": 935,
+              "label": ""
+            }
+          ]
         },
         {
           "id": "suteki-da-ne",
@@ -83,7 +113,15 @@
             "zXpm8DPYuTc",
             "Zbv6KrO_13A"
           ],
-          "audio": null
+          "audio": null,
+          "moments": [
+            {
+              "videoId": "7qrOWpV7b68",
+              "start": 0,
+              "end": null,
+              "label": "Macalania, the spring"
+            }
+          ]
         }
       ],
       "cover": "covers/ffx.jpg"
