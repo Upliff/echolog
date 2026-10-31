@@ -532,11 +532,13 @@
       swapScene(plan);
       return;
     }
+    // Different music (or none): the new scene starts as far in as the song had got.
+    const elapsed = songElapsed();
     st.ended = false;
     st.stayed = false;
     hideUpNext();
     stopClouds(true);
-    loadMedia(plan);
+    loadMedia(plan, { elapsed });
   }
 
   // keepStage: going straight to another song, so the players stay and just load the new video.
@@ -783,14 +785,49 @@
     safe(() => (action === 'play' ? media.scene.playVideo() : media.scene.pauseVideo()));
   }
 
-  async function loadMedia(plan, quiet) {
+  // Seconds into the song right now (from the start of the music track, or of the clip if there's no track).
+  function songElapsed() {
+    const p = master();
+    const spec = masterSpec();
+    if (!p || !spec) return 0;
+    return Math.max(0, (safe(() => p.getCurrentTime()) || 0) - (spec.start || 0));
+  }
+
+  // Where a scene should be for a point in the song. Wraps round when the scene is shorter than the song.
+  function sceneAt(scene, elapsed, duration) {
+    const start = scene.start || 0;
+    const end = scene.end || duration || 0;
+    const len = end - start;
+    return start + (len > 2 ? elapsed % len : elapsed);
+  }
+
+  // A point in a clip, or its start if that point is past (or right at) its end.
+  function clipAt(spec, elapsed) {
+    const start = spec.start || 0;
+    if (spec.end && elapsed > spec.end - start - 3) return start;
+    return start + elapsed;
+  }
+
+  /* Every song loads the same way: the players load muted and hidden behind "Loading...".
+     Each one is held at its starting point as soon as it can play. Once all of them are ready,
+     the video appears (still paused), and a moment later everything plays together.
+     opts.elapsed: start this far into the song (used when switching scenes).
+     opts.quiet: no "Loading..." (repeat). */
+  async function loadMedia(plan, opts = {}) {
     const token = ++media.token;
     media.plan = plan;
     media.playing = false;
     media.lock = false;
     stageMsg.hidden = true;
-    if (!quiet) setLoading(true);
+    if (!opts.quiet) setLoading(true);
     refreshBars();
+    const elapsed = opts.elapsed || 0;
+    if (plan.music) {
+      const musicAt = clipAt(plan.music, elapsed);
+      media.at = { music: musicAt, scene: sceneAt(plan.scene, musicAt - (plan.music.start || 0)) };
+    } else {
+      media.at = { music: 0, scene: clipAt(plan.scene, elapsed) };
+    }
     if (songState) { songState.ended = false; songState.stayed = false; }
     let YT;
     try { YT = await loadYT(); } catch (_) {
@@ -798,20 +835,14 @@
       return;
     }
     if (token !== media.token) return;
-    // With a separate music track, both players load at the same time, muted. Each one is held at
-    // its start as soon as it can play, and once both are ready they start together. Without this
-    // the scene started a second or two after the music while it buffered.
     clearGate();
-    if (plan.music) {
-      media.gate = { scene: false, music: false, timer: setTimeout(() => gateTimeout(token), MUSIC_WAIT_MS) };
-    }
-    usePlayer(YT, 'scene', plan.scene, true);
-    if (plan.music) usePlayer(YT, 'music', plan.music, true);
+    media.gate = { scene: false, music: !plan.music, timer: setTimeout(() => gateTimeout(token), MUSIC_WAIT_MS) };
+    usePlayer(YT, 'scene', plan.scene, true, media.at.scene);
+    if (plan.music) usePlayer(YT, 'music', plan.music, true, media.at.music);
     else dropPlayer('music');
     applyAudio();
     clearInterval(media.tick);
     media.tick = setInterval(tick, 250);
-    if (!media.gate) setTimeout(() => { if (token === media.token) checkAutoplay(); }, 1800);
   }
 
   function clearGate() {
@@ -819,63 +850,64 @@
     media.gate = null;
   }
 
-  // While loading: a player that starts playing is paused and put back at its start until the other one is ready too.
+  // While loading: a player that starts playing is paused and held at its starting point until the others are ready too.
   function gateState(role, s) {
     const g = media.gate;
     if (s !== YT_STATE.PLAYING || g[role]) return;
     g[role] = true;
-    if (g.scene && g.music) { openGate(media.token); return; }
     const p = media[role];
-    const spec = role === 'music' ? media.plan.music : media.plan.scene;
     if (role === 'scene') media.sceneExpect = { action: 'pause', at: Date.now() };
-    safe(() => { p.pauseVideo(); p.seekTo(spec.start || 0, true); });
+    safe(() => { p.pauseVideo(); p.seekTo(media.at[role], true); });
+    if (g.scene && g.music) openGate(media.token);
   }
 
-  // Waited too long. Music not there: play the scene with its own sound. Scene not there: start the music; the picture joins when it's ready.
+  // Waited too long. Music not there: play the scene with its own sound. Otherwise go with what's ready.
   function gateTimeout(token) {
     if (token !== media.token || !media.gate) return;
-    if (!media.gate.music) {
-      clearGate();
+    if (!media.gate.music && media.plan.music) {
       dropPlayer('music');
       media.plan.music = null;
       refreshBars();
-      applyAudio();
-      sceneDo('play');
-      setTimeout(() => { if (token === media.token) checkAutoplay(); }, 1500);
-      return;
     }
     openGate(token);
   }
 
+  // Everything's ready: show the video, then play.
   function openGate(token) {
     if (token !== media.token || !media.gate) return;
-    const plan = media.plan;
     clearGate();
-    media.lock = true;
-    safe(() => media.music.seekTo(plan.music.start || 0, true));
-    if (media.scene && media.ready.scene) safe(() => media.scene.seekTo(plan.scene.start || 0, true));
-    applyAudio();
-    safe(() => media.music.playVideo());
-    sceneDo('play');
-    setTimeout(() => { if (token === media.token) checkAutoplay(); }, 1500);
+    if (media.music && media.ready.music) safe(() => media.music.seekTo(media.at.music, true));
+    if (media.scene && media.ready.scene) safe(() => media.scene.seekTo(media.at.scene, true));
+    setLoading(false);
+    setTimeout(() => {
+      if (token !== media.token) return;
+      media.lock = sep();
+      applyAudio();
+      if (sep()) safe(() => media.music.playVideo());
+      sceneDo('play');
+      setTimeout(() => { if (token === media.token) checkAutoplay(); }, 1500);
+    }, reduced ? 0 : 450);
   }
 
-  // A different scene with the same music: only the picture changes.
+  // A different scene with the same music: only the picture changes, and it opens where the song is up to.
   function swapScene(plan) {
     media.plan = plan;
-    media.lock = false;
+    media.lock = true;
     setLoading(true, true);
+    const mt = safe(() => media.music.getCurrentTime()) || 0;
+    const at = sceneAt(plan.scene, mt - (plan.music.start || 0));
     media.sceneExpect = { action: media.playing ? 'play' : 'pause', at: Date.now() };
     loadYT().then((YT) => {
       if (media.plan !== plan) return;
-      usePlayer(YT, 'scene', plan.scene, true);
+      usePlayer(YT, 'scene', plan.scene, true, at);
       applyAudio();
     }).catch(() => {});
   }
 
-  function usePlayer(YT, role, spec, autoplay) {
+  function usePlayer(YT, role, spec, autoplay, at) {
     const p = media[role];
-    const opts = { videoId: spec.videoId, startSeconds: spec.start || 0, endSeconds: spec.end || undefined };
+    const from = at != null ? at : (spec.start || 0);
+    const opts = { videoId: spec.videoId, startSeconds: from, endSeconds: spec.end || undefined };
     if (p && media.ready[role]) {
       safe(() => (autoplay ? p.loadVideoById(opts) : p.cueVideoById(opts)));
       return;
@@ -897,11 +929,11 @@
         iv_load_policy: 3,  // no annotations
         playsinline: 1,
         rel: 0,
-        start: Math.floor(spec.start || 0),
+        start: Math.floor(from),
         cc_load_policy: 0,
       }, spec.end ? { end: Math.floor(spec.end) } : {},
-      // Start muted when the scene sits under a music track, or while waiting to start together.
-      (role === 'scene' && media.plan && media.plan.music) || (role === 'music' && media.gate) ? { mute: 1 } : {}),
+      // Start muted while loading (and the scene always, when it sits under a music track).
+      (role === 'scene' && media.plan && media.plan.music) || media.gate ? { mute: 1 } : {}),
       events: {
         onReady: () => onReady(role),
         onStateChange: (e) => onState(role, e.data),
@@ -936,7 +968,8 @@
     if (!spec) return;
     // Backup for the start setting. Only jumps if the player really ignored it, so the clip doesn't skip twice.
     const t = safe(() => p.getCurrentTime()) || 0;
-    if (spec.start && t < spec.start - 1) safe(() => p.seekTo(spec.start, true));
+    const want = media.at && media.gate ? media.at[role] : spec.start;
+    if (want && t < want - 1) safe(() => p.seekTo(want, true));
     noCaptions(p);
     applyAudio();
     // Scene became ready after the music already started: catch up.
@@ -971,10 +1004,12 @@
     }
     if (role === 'scene' && sep()) {
       if (s === YT_STATE.ENDED) {
-        // Music still going: loop the scene.
-        media.lock = false;
+        // Music still going: loop the scene (to where it should be for the song, when locked).
+        const mt = safe(() => media.music.getCurrentTime()) || 0;
+        const dur = safe(() => media.scene.getDuration()) || 0;
+        const to = media.lock ? sceneAt(plan.scene, mt - (plan.music.start || 0), dur) : (plan.scene.start || 0);
         media.sceneExpect = { action: 'play', at: Date.now() };
-        safe(() => { media.scene.seekTo(plan.scene.start || 0, true); media.scene.playVideo(); });
+        safe(() => { media.scene.seekTo(to, true); media.scene.playVideo(); });
         return;
       }
       // The scene only plays while the music is actually playing (not while it's loading or buffering).
@@ -1013,7 +1048,11 @@
     const audible = sep() ? media.music : media.scene;
     const audibleReady = sep() ? media.ready.music : media.ready.scene;
     if (sep() && media.scene && media.ready.scene) safe(() => media.scene.mute());
-    if (media.gate) { if (media.music && media.ready.music) safe(() => media.music.mute()); return; }
+    if (media.gate) {
+      if (media.music && media.ready.music) safe(() => media.music.mute());
+      if (media.scene && media.ready.scene) safe(() => media.scene.mute());
+      return;
+    }
     if (audible && audibleReady) {
       safe(() => {
         audible.setVolume(vol);
@@ -1142,30 +1181,27 @@
   function restart() {
     if (!media.plan) return;
     if (songState) songState.ended = false;
-    loadMedia(media.plan, true);
+    loadMedia(media.plan, { quiet: true });
   }
 
   function tick() {
     if (document.hidden) return;
     const plan = media.plan;
-    // A scene with its own end time loops while the music plays on.
-    if (plan && sep() && plan.scene.end && media.scene && media.ready.scene) {
+    // Not locked (someone dragged the Scene bar): a scene with its own end just loops from its start.
+    if (plan && sep() && !media.lock && plan.scene.end && media.scene && media.ready.scene) {
       const t = safe(() => media.scene.getCurrentTime()) || 0;
       if (t >= plan.scene.end) {
-        media.lock = false;
         media.sceneExpect = { action: 'play', at: Date.now() };
         safe(() => media.scene.seekTo(plan.scene.start || 0, true));
       }
     }
-    // Keep the picture in step with the music (until the scene first loops).
-    if (plan && sep() && media.lock && media.playing && media.ready.scene && media.ready.music
+    // Locked: keep the picture where it should be for the song (wrapping round when the scene is shorter).
+    if (plan && sep() && media.lock && !media.gate && media.playing && media.ready.scene && media.ready.music
         && safe(() => media.scene.getPlayerState()) === YT_STATE.PLAYING) {
       const mt = safe(() => media.music.getCurrentTime()) || 0;
       const st = safe(() => media.scene.getCurrentTime()) || 0;
-      const want = (plan.scene.start || 0) + (mt - (plan.music.start || 0));
-      if (!plan.scene.end || want < plan.scene.end - 1) {
-        if (Math.abs(st - want) > 0.8) safe(() => media.scene.seekTo(want, true));
-      }
+      const want = sceneAt(plan.scene, mt - (plan.music.start || 0), safe(() => media.scene.getDuration()) || 0);
+      if (Math.abs(st - want) > 0.8) safe(() => media.scene.seekTo(want, true));
     }
     sync();
   }
