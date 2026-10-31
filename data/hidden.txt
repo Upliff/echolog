@@ -1,0 +1,4 @@
+# Stories to never show. One id per line, copied from data/stories.json.
+# Example:
+# yt:UgxAbc123
+# steam:123456789

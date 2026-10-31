@@ -1,0 +1,65 @@
+{
+  "_note": "SAMPLE DATA. Made-up text so the design has something to show. The real file is data/stories.json.",
+  "updated": "2026-11-01T05:17:00Z",
+  "games": [
+    {
+      "id": "ffx",
+      "title": "Final Fantasy X",
+      "year": 2001,
+      "steamAppId": 359870,
+      "songs": [
+        {
+          "id": "to-zanarkand",
+          "title": "To Zanarkand",
+          "composer": "Nobuo Uematsu",
+          "moment": {
+            "videoId": "kilrRiclUFY",
+            "start": 0,
+            "end": null,
+            "label": "Opening, the campfire"
+          },
+          "stories": [
+            {
+              "id": "yt:sample1",
+              "source": "youtube",
+              "author": "@sample_one",
+              "authorUrl": "",
+              "text": "[sample] Long personal comment goes here. Usually 2-6 sentences, sometimes much longer.",
+              "likes": 5400,
+              "date": "2019-04-01",
+              "url": "",
+              "videoId": "6fp81GzKarQ",
+              "score": 19.2
+            },
+            {
+              "id": "yt:sample2",
+              "source": "youtube",
+              "author": "@sample_two",
+              "authorUrl": "",
+              "text": "[sample] Shorter one.",
+              "likes": 312,
+              "date": "2023-11-12",
+              "url": "",
+              "videoId": "sy-nrLiAwZI",
+              "score": 8.1
+            }
+          ]
+        }
+      ],
+      "stories": [
+        {
+          "id": "steam:sample3",
+          "source": "steam",
+          "author": "Steam player",
+          "authorUrl": "",
+          "text": "[sample] A Steam review that tells a story.",
+          "likes": 300,
+          "date": "2020-09-13",
+          "url": "",
+          "hoursPlayed": 100,
+          "score": 12.4
+        }
+      ]
+    }
+  ]
+}
