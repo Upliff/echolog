@@ -69,6 +69,7 @@ data/hidden.txt          ids of stories to never show
 - **Song volume (song editor):** "Starting volume" slider per song, saved as `volume` (0 to 100) on the song. "Use site default" removes it. Added 31 Oct 2026.
 - **Site tab:** settings for everyone who visits, saved as `settings` in `config/games.json`: default starting volume for songs without their own (0 to 100, default 80) and how many seconds before the end "Next" shows (default 8, 0 turns auto next off). Saving starts the collector, which copies `settings` into `stories.json`.
 - Pasting a YouTube link with `?t=` fills in the start time.
+- Saving always loads the latest `config/games.json` first, applies the change, and retries up to 3 times if GitHub says the file changed in between ("does not match"). API calls use `cache: 'no-store'`, because GitHub lets browsers cache answers for 60 seconds and a cached copy caused that error on 31 Oct 2026.
 - Saving writes `config/games.json` through the GitHub API, uploads the cover to `covers/<game id>.<ext>` (shrunk to 1600px), sets `cover` on the game, then starts the "Collect stories" workflow.
 - It needs a fine-grained GitHub token, limited to Upliff/echolog, with Contents and Actions set to read and write. The token is kept only in that browser (localStorage). It's never in the repo or in chat.
 - Song ids are made from the title and never change on edit, so hidden ids and links keep working. Game ids can't change after creation.
