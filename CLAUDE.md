@@ -17,7 +17,7 @@ Owner: Mohad. Repo: https://github.com/Upliff/echolog (public).
 ## Decisions so far
 
 - **Name:** Echolog (echo + log).
-- **Sources:** YouTube comments on soundtrack videos. Reddit is out: Reddit stopped taking new API requests on 31 Oct 2026. Steam is off for now: Steam shut its public review endpoint in Oct 2026, and the replacement needs a publisher key. The Steam code stays in `collect.py` behind `STEAM_ENABLED = False`. A "submit your own story" form might come later.
+- **Sources:** YouTube comments on soundtrack videos. Reddit is out: Reddit stopped taking new API requests on 31 Oct 2026. Steam is off for now: Steam shut its public review endpoint in Oct 2026, and the replacement needs a publisher key. The Steam code stays in `collect.py` behind `STEAM_ENABLED = False`. People can also send their own comments (see below).
 - **No home server, no local AI model.** Everything runs on GitHub: a GitHub Actions job runs nightly, and the site will be hosted on GitHub Pages.
 - **Filtering:** a free keyword and score filter (`collector/collect.py`). There's no AI scoring for now; paid AI could be added later if needed. To remove a bad comment, add its id to `data/hidden.txt`.
 - **Front end:** plain HTML/CSS/JS in the local `site/` folder for now (see "Front end" below). Reads `data/stories.json`.
