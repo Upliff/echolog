@@ -37,5 +37,10 @@ jobs:
             echo "No changes"
           else
             git commit -m "Update stories"
-            git push
+            # Someone may have saved in the admin page while this ran: pick that up and try again.
+            for i in 1 2 3 4 5; do
+              git pull --rebase origin main && git push && exit 0
+              sleep $((i * 5))
+            done
+            exit 1
           fi
