@@ -92,6 +92,8 @@
     repeat: 'M17 2l3 3-3 3M4 11V9a4 4 0 0 1 4-4h12M7 22l-3-3 3-3M20 13v2a4 4 0 0 1-4 4H4',
     down: 'M12 5v14M6 13l6 6 6-6',
     left: 'M15 5l-7 7 7 7',
+    music: 'M9 18V5l11-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM20 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z',
+    film: 'M3 5h18v14H3zM7 5v14M17 5v14M3 9.5h4M3 14.5h4M17 9.5h4M17 14.5h4',
     right: 'M9 5l7 7-7 7',
   };
   function svg(name, size = 18) {
@@ -344,28 +346,12 @@
     return wrap;
   }
 
+  // One list, most liked first.
   function commentsSection(stories) {
-    let mode = 'liked';
-    const listHolder = h('div');
-    const btnLiked = h('button', { type: 'button', 'aria-pressed': 'true' }, 'Most liked');
-    const btnNew = h('button', { type: 'button', 'aria-pressed': 'false' }, 'Newest');
-    const draw = () => {
-      btnLiked.setAttribute('aria-pressed', String(mode === 'liked'));
-      btnNew.setAttribute('aria-pressed', String(mode === 'new'));
-      const sorted = [...stories].sort(mode === 'liked'
-        ? (a, b) => (b.likes || 0) - (a.likes || 0)
-        : (a, b) => String(b.date || '').localeCompare(String(a.date || '')));
-      listHolder.replaceChildren(stories.length ? commentList(sorted) : h('p', { class: 'empty' }, 'No comments yet.'));
-    };
-    btnLiked.addEventListener('click', () => { if (mode !== 'liked') { mode = 'liked'; draw(); } });
-    btnNew.addEventListener('click', () => { if (mode !== 'new') { mode = 'new'; draw(); } });
-    const section = h('section', { class: 'comments', id: 'comments', 'aria-label': 'Comments' },
-      h('div', { class: 'sort' },
-        h('span', null, plural(stories.length, 'comment', 'comments')),
-        stories.length > 1 ? h('div', null, btnLiked, btnNew) : null),
-      listHolder);
-    draw();
-    return section;
+    const sorted = [...stories].sort((a, b) => (b.likes || 0) - (a.likes || 0));
+    return h('section', { class: 'comments', id: 'comments', 'aria-label': 'Comments' },
+      h('div', { class: 'sort' }, h('span', null, plural(stories.length, 'comment', 'comments'))),
+      stories.length ? commentList(sorted) : h('p', { class: 'empty' }, 'No comments yet.'));
   }
 
   /* ---------- what to play for a song ----------
@@ -456,8 +442,6 @@
       // The volume slider pops up above the sound button when you hover or tab to it.
       const volWrap = h('span', { class: 'vol-wrap' }, ui.sound, h('span', { class: 'vol-pop' }, ui.vol));
       ui.repeat = iconBtn('ctl ctl-repeat', 'repeat', 'Repeat this song');
-      ui.time = h('span', { class: 'ctl-time' }, '0:00');
-      ui.seek = h('input', { class: 'seek', type: 'range', min: '0', max: '100', step: '1', value: '0', 'aria-label': 'Seek' });
       ui.play.addEventListener('click', togglePlay);
       ui.sound.addEventListener('click', toggleSound);
       ui.vol.value = String(currentVolume());
@@ -470,9 +454,8 @@
         ui.repeat.setAttribute('aria-pressed', String(on));
         if (on) hideUpNext();
       });
-      ui.seek.addEventListener('input', () => { ui.seeking = true; seekTo(Number(ui.seek.value)); });
-      ui.seek.addEventListener('change', () => { ui.seeking = false; });
-      const controls = h('div', { class: 'controls' }, ui.play, volWrap, ui.repeat, ui.time, ui.seek);
+      ui.barsBox = h('div', { class: 'bars' });
+      const controls = h('div', { class: 'controls' }, ui.play, volWrap, ui.repeat, ui.barsBox);
 
       // More than one scene: a bar of big buttons above the video, as wide as the video.
       if (scenes.length > 1) {
@@ -1014,10 +997,77 @@
     setTimeout(sync, 80);
   }
 
-  function seekTo(sec) {
-    const p = master();
-    const spec = masterSpec();
-    if (p && spec) safe(() => p.seekTo((spec.start || 0) + sec, true));
+  /* ---------- scrub bars ----------
+     Our own bars, measured from the clip's start rather than the start of the YouTube video
+     (a scene can sit 9 minutes into a 20-minute upload).
+     With a separate music track there are two, and they look different on purpose:
+       Music: gold, with a note icon. Moves the song.
+       Scene: white, with a film icon. Moves the picture only; the song keeps going.
+     Without a separate track there's one plain bar for the clip. */
+
+  // Which player and which start/end each bar works on.
+  function barTarget(kind) {
+    if (!media.plan) return {};
+    if (kind === 'music') return { p: media.ready.music ? media.music : null, spec: media.plan.music };
+    if (kind === 'scene') return { p: media.ready.scene ? media.scene : null, spec: media.plan.scene };
+    return { p: master(), spec: masterSpec() };
+  }
+
+  function makeBar(kind) {
+    const label = kind === 'music' ? 'Music' : kind === 'scene' ? 'Scene' : null;
+    const input = h('input', {
+      class: 'seek', type: 'range', min: '0', max: '100', step: '1', value: '0',
+      'aria-label': kind === 'music' ? 'Music position' : kind === 'scene' ? 'Scene position' : 'Position',
+    });
+    const time = h('span', { class: 'bar-time' }, '0:00');
+    const bar = { kind, input, time, seeking: false };
+    input.addEventListener('input', () => {
+      bar.seeking = true;
+      const { p, spec } = barTarget(kind);
+      if (p && spec) safe(() => p.seekTo((spec.start || 0) + Number(input.value), true));
+    });
+    input.addEventListener('change', () => { bar.seeking = false; });
+    bar.row = h('div', { class: `scrub scrub-${kind}` },
+      label ? h('span', { class: 'scrub-label' }, svg(kind === 'music' ? 'music' : 'film', 14), label) : null,
+      input, time);
+    return bar;
+  }
+
+  // Builds the bars to match what's playing (one bar, or music and scene).
+  function refreshBars() {
+    const st = songState;
+    if (!st || !st.ui.barsBox || !media.plan) return;
+    const kinds = media.plan.music ? ['music', 'scene'] : ['clip'];
+    const sig = kinds.join(',');
+    if (st.ui.barsSig === sig) return;
+    st.ui.barsSig = sig;
+    st.ui.bars = kinds.map(makeBar);
+    st.ui.barsBox.classList.toggle('two', kinds.length > 1);
+    st.ui.barsBox.replaceChildren(...st.ui.bars.map((b) => b.row));
+  }
+
+  // Where a player is within its clip: { pos, len } in seconds.
+  function clipPos(p, spec) {
+    const start = spec.start || 0;
+    const dur = safe(() => p.getDuration()) || 0;
+    const end = spec.end || dur;
+    const len = Math.max(0, end - start);
+    const pos = Math.min(len, Math.max(0, (safe(() => p.getCurrentTime()) || 0) - start));
+    return { pos, len };
+  }
+
+  function drawBar(bar) {
+    const { p, spec } = barTarget(bar.kind);
+    if (!p || !spec) return;
+    const { pos, len } = clipPos(p, spec);
+    const txt = len ? `${fmtTime(pos)} / ${fmtTime(len)}` : fmtTime(pos);
+    if (bar.time.textContent !== txt) bar.time.textContent = txt;
+    if (len && !bar.seeking) {
+      bar.input.max = String(Math.floor(len));
+      bar.input.value = String(Math.floor(pos));
+      bar.input.style.setProperty('--p', `${(pos / len) * 100}%`);
+      bar.input.setAttribute('aria-valuetext', `${fmtTime(pos)} of ${fmtTime(len)}`);
+    }
   }
 
   // Play the current scene again from the top (repeat).
@@ -1054,22 +1104,8 @@
       setIcon(ui.sound, muted ? 'muted' : 'sound', muted ? 'Turn sound on' : 'Mute');
       ui.sound.classList.toggle('nudge', muted && !media.userMuted && currentVolume() > 0);
     }
-    const spec = masterSpec();
-    const start = spec.start || 0;
-    const dur = safe(() => p.getDuration()) || 0;
-    const end = spec.end || dur;
-    const len = Math.max(0, end - start);
-    const pos = Math.min(len, Math.max(0, (safe(() => p.getCurrentTime()) || 0) - start));
-    if (ui.time) {
-      const txt = len ? `${fmtTime(pos)} / ${fmtTime(len)}` : fmtTime(pos);
-      if (ui.time.textContent !== txt) ui.time.textContent = txt;
-    }
-    if (ui.seek && len && !ui.seeking) {
-      ui.seek.max = String(Math.floor(len));
-      ui.seek.value = String(Math.floor(pos));
-      ui.seek.style.setProperty('--p', `${(pos / len) * 100}%`);
-      ui.seek.setAttribute('aria-valuetext', `${fmtTime(pos)} of ${fmtTime(len)}`);
-    }
+    for (const bar of ui.bars || []) drawBar(bar);
+    const { pos, len } = clipPos(p, masterSpec());
     if (len > 1) nearEnd(len - pos, playing);
   }
 
