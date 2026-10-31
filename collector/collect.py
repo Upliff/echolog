@@ -26,7 +26,7 @@ HIDDEN = os.path.join(ROOT, "data", "hidden.txt")
 OUT = os.path.join(ROOT, "data", "stories.json")
 
 YT_PAGES_PER_VIDEO = 5        # 100 comments per page, 1 quota unit per page
-STEAM_PAGES = 5               # 100 reviews per page
+STEAM_PAGES = 10              # 100 reviews per page
 MAX_STORIES_PER_SONG = 60
 MAX_STORIES_PER_GAME = 40     # Steam reviews, per game
 MIN_SCORE = 4.0
@@ -140,7 +140,7 @@ def steam_reviews(app_id):
         params = {
             "json": 1, "filter": "all", "language": "english",
             "review_type": "all", "purchase_type": "all",
-            "num_per_page": 100, "cursor": cursor,
+            "num_per_page": 100, "cursor": cursor, "day_range": 365,
         }
         data = fetch_json(f"https://store.steampowered.com/appreviews/{app_id}?" + urllib.parse.urlencode(params))
         reviews = data.get("reviews", [])
@@ -194,6 +194,7 @@ def main():
         print("No YOUTUBE_API_KEY set, skipping YouTube.", file=sys.stderr)
 
     games_out = []
+    log = []
     for game in config["games"]:
         print(f"{game['title']}")
         prev = prev_games.get(game["id"], {})
@@ -207,10 +208,12 @@ def main():
                     try:
                         got = youtube_comments(vid, key)
                         print(f"  {song['title']} / {vid}: {len(got)} comments")
+                        log.append(f"{game['id']}/{song['id']}/{vid}: {len(got)} comments")
                         raw.extend(got)
                     except Exception as e:  # noqa: BLE001
                         ok = False
                         print(f"  {song['title']} / {vid}: failed ({e})", file=sys.stderr)
+                        log.append(f"{game['id']}/{song['id']}/{vid}: failed ({e})")
             if ok or raw:
                 stories = pick(raw, hidden, MAX_STORIES_PER_SONG)
             else:
@@ -229,9 +232,11 @@ def main():
             try:
                 raw = steam_reviews(game["steamAppId"])
                 print(f"  Steam: {len(raw)} reviews")
+                log.append(f"{game['id']}/steam: {len(raw)} reviews fetched")
                 steam = pick(raw, hidden, MAX_STORIES_PER_GAME)
             except Exception as e:  # noqa: BLE001
                 print(f"  Steam failed ({e}), keeping previous", file=sys.stderr)
+                log.append(f"{game['id']}/steam: failed ({e})")
                 steam = [s for s in prev.get("stories", []) if s["id"] not in hidden]
 
         games_out.append({
@@ -246,6 +251,7 @@ def main():
     result = {
         "updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "games": games_out,
+        "log": log,
     }
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
