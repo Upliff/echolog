@@ -23,6 +23,7 @@ from datetime import datetime, timezone
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG = os.path.join(ROOT, "config", "games.json")
 HIDDEN = os.path.join(ROOT, "data", "hidden.txt")
+SUBMITTED = os.path.join(ROOT, "data", "submitted.json")
 OUT = os.path.join(ROOT, "data", "stories.json")
 
 YT_PAGES_PER_VIDEO = 5        # 100 comments per page, 1 quota unit per page
@@ -99,6 +100,29 @@ def score(text, likes):
     length_bonus = min(len(t), 1200) / 300          # up to 4
     first_person = min(len(re.findall(r"\b(i|me|my)\b", t)), 10) / 5  # up to 2
     return hits * 2 + length_bonus + first_person + math.log10(max(likes, 0) + 1)
+
+
+def load_submitted():
+    """Comments people sent through the site and Mohad approved, keyed by (game, song)."""
+    if not os.path.exists(SUBMITTED):
+        return {}
+    with open(SUBMITTED, encoding="utf-8") as f:
+        data = json.load(f)
+    out = {}
+    for c in data.get("comments", []):
+        if not c.get("id") or not c.get("text"):
+            continue
+        out.setdefault((c.get("game"), c.get("song")), []).append({
+            "id": c["id"],
+            "source": "echolog",
+            "author": c.get("author") or None,
+            "authorUrl": "",
+            "text": c["text"],
+            "likes": 0,
+            "date": c.get("date", ""),
+            "url": "",
+        })
+    return out
 
 
 def load_hidden():
@@ -201,6 +225,7 @@ def main():
     prev_games = {g["id"]: g for g in previous.get("games", [])}
 
     hidden = load_hidden()
+    submitted = load_submitted()
     key = os.environ.get("YOUTUBE_API_KEY", "")
     if not key:
         print("No YOUTUBE_API_KEY set, skipping YouTube.", file=sys.stderr)
@@ -231,11 +256,15 @@ def main():
             else:
                 # keep last run's stories if YouTube was unreachable
                 stories = [s for s in prev_songs.get(song["id"], {}).get("stories", []) if s["id"] not in hidden]
+            own = [c for c in submitted.get((game["id"], song["id"]), []) if c["id"] not in hidden]
+            stories = own + [x for x in stories if x["id"] not in {c["id"] for c in own}]
+            moments = song.get("moments") or ([song["moment"]] if song.get("moment") else [])
             songs_out.append({
                 "id": song["id"],
                 "title": song["title"],
                 "composer": song.get("composer", ""),
-                "moment": song.get("moment"),
+                "moment": song.get("moment") or (moments[0] if moments else None),
+                "moments": moments,
                 "audio": song.get("audio"),
                 "stories": stories,
             })

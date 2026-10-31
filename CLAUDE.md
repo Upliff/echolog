@@ -58,11 +58,18 @@ data/hidden.txt          ids of stories to never show
 - `steamAppId` is the number in the game's Steam store URL. Leave it out if the game isn't on Steam.
 
 **Admin page:** `echolog-admin.html` in the local EchoLog folder (deliberately not in the repo or on the site). Mohad opens it straight from disk in his browser.
-- Lists games. You can add, edit or delete a game: name, year, cover art, and songs (name, composer, scene link and start/end, label, optional music track, comment videos). It can also reorder songs.
+- Lists games. You can add, edit or delete a game: name, year, cover art, and songs (name, composer, scenes, optional music track, comment videos). It can also reorder songs.
+- **Scenes:** each song has a list of scenes (link, start, end, label), which you can add, remove and reorder. Each scene can have its own music under "Different music for this scene". It saves `moments` and also writes `moment` as a copy of the first scene, so the site works before it supports `moments`.
+- **Music track:** a link, a start and an **end**. The end cuts off dead air at the end of a song (added 31 Oct 2026). The site already passes `end` to YouTube as `endSeconds`.
+- An end time before its start is caught before saving.
 - Pasting a YouTube link with `?t=` fills in the start time.
 - Saving writes `config/games.json` through the GitHub API, uploads the cover to `covers/<game id>.<ext>` (shrunk to 1600px), sets `cover` on the game, then starts the "Collect stories" workflow.
 - It needs a fine-grained GitHub token, limited to Upliff/echolog, with Contents and Actions set to read and write. The token is kept only in that browser (localStorage). It's never in the repo or in chat.
 - Song ids are made from the title and never change on edit, so hidden ids and links keep working. Game ids can't change after creation.
+- **Inbox tab:** reads open issues from `Upliff/echolog-inbox` (set in Settings). A missing repo gives a plain message, not an error.
+  - **Comments** show exactly as sent, with Approve and Decline. Approve adds the comment to `data/submitted.json`, labels the issue `accepted`, closes it, and starts the collector.
+  - **Requests:** Accept (game or song) opens the editor filled in from the request, with a banner. Saving labels the issue `accepted` and closes it. Fix requests get "Mark done". Decline labels the issue `declined` and closes it.
+  - The token needs **Issues: Read and write** on the inbox repo too.
 - The collector passes `cover` through to `stories.json`. The front end already uses `game.cover` when it's set, and otherwise falls back to `covers/<id>.jpg|jpeg|png|webp`.
 
 **Quota:** YouTube allows 10,000 units a day, and each page of 100 comments costs 1 unit. At 5 pages per video, that's roughly 5 units per video per run, so there's plenty of room.
@@ -91,7 +98,7 @@ data/hidden.txt          ids of stories to never show
 }
 ```
 
-Song `stories` come from YouTube. Game-level `stories` are for Steam reviews, which are empty while Steam is off. `audio` is passed straight through from `config/games.json`.
+Song `stories` come from YouTube, with approved own comments (`source: "echolog"`) first. Game-level `stories` are for Steam reviews, which are empty while Steam is off. `audio` is passed straight through from `config/games.json`.
 
 ## FFX songs to check
 
@@ -144,7 +151,7 @@ preview.bat + .ps1       local preview server for Windows without Python
 
 ## Own comments, requests and hiding names (planned)
 
-Mohad asked for these on 31 Oct 2026. The chat that built the admin page is building them. Nothing here is built yet.
+Mohad asked for these on 31 Oct 2026. **Built so far:** the admin Inbox tab, and the collector merging `data/submitted.json`. **Not built yet:** the inbox repo, the Worker, the site forms, and the hide names switch.
 
 ### How it fits together
 
@@ -204,11 +211,12 @@ Mohad asked for this on 31 Oct 2026: a song can have several scenes (it often pl
 
 - **Data:** songs get `moments`, a list of scenes in the order they happen in the game. Each one is the same shape as `moment` now: `{ "videoId", "start", "end", "label" }`, plus an optional `audio` of its own. The song-level `audio` is used for any scene without its own.
 - **Old data keeps working:** a song with only `moment` is treated as a one-item `moments` list. Once everything uses `moments`, `moment` can go.
-- **Collector:** passes `moments` through to `stories.json` (like `moment`, `audio` and `cover`).
+- **Collector:** passes `moments` through to `stories.json` (built). Songs with only `moment` get a one-item `moments` list.
+- **Built so far:** the admin scene list and the collector. **Not built yet:** the scene buttons on the song page.
 - **Song page:** if there's more than one scene, a row of small buttons with each scene's `label` sits in the strip under the video (for example "Opening" and "Ending"). The current one is marked (`aria-pressed`). Tapping one loads that scene into the same player straight away, from its `start`. The comments, scroll position and clouds don't reset. On phones the row scrolls sideways if it doesn't fit.
 - **Link:** the scene number goes in the hash, `#/ffx/to-zanarkand/2` for the second scene. No number means the first. A number that doesn't exist falls back to the first.
 - **Auto next:** when the scene playing ends, the next song starts as now. It doesn't run through the other scenes of the same song first.
-- **Admin page:** in the song editor, "Scene" becomes a list with "Add scene", remove and reorder. Each scene has a link (with `?t=` start), end and label, and an optional music track.
+- **Admin page:** in the song editor, "Scene" is a list with "Add scene", remove and reorder. Each scene has a link (with `?t=` start), end and label, and an optional music track (built).
 - **Labels** are short and plain, written by Mohad ("Opening", "Ending", "Macalania").
 
 ## Next steps
@@ -217,5 +225,5 @@ Mohad asked for this on 31 Oct 2026: a song can have several scenes (it often pl
 2. Pick `audio` tracks for songs where the scene has talking over the music (Suteki da Ne first), and add them to `config/games.json`.
 3. Read through the results. Add bad ones to `hidden.txt`, and tweak `STORY_PHRASES` and `MIN_SCORE` in `collect.py` if needed.
 4. Turn on GitHub Pages: Settings, then Pages, then Deploy from a branch, main, / (root). The site will be at https://upliff.github.io/echolog/.
-5. Own comments, requests and hide names (admin-page chat): create the private inbox repo, write the Worker, add the site forms and the switch, add the Inbox tab, and teach the collector to merge `data/submitted.json`. Mohad: make a Cloudflare account and get a Turnstile site key.
-6. More than one scene per song: `moments` in the collector, the scene buttons on the song page, and the scene list in the admin song editor.
+5. Own comments, requests and hide names: create the private inbox repo, write the Worker, add the site forms and the switch. (The admin Inbox tab and the collector merge are done.) Mohad: make a Cloudflare account and get a Turnstile site key.
+6. More than one scene per song: the scene buttons on the song page. (The collector and the admin side are done.)
