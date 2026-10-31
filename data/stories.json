@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-31T11:07:36Z",
+  "updated": "2026-10-31T11:19:36Z",
   "settings": {},
   "games": [
     {
@@ -7,6 +7,7 @@
       "title": "Final Fantasy X",
       "year": 2001,
       "cover": "covers/ffx.jpg",
+      "sounds": [],
       "steamAppId": 359870,
       "songs": [
         {
@@ -781,7 +782,7 @@
           ],
           "audio": {
             "videoId": "KO6fvJrsTsE",
-            "start": 1,
+            "start": 0,
             "end": null
           },
           "stories": [
