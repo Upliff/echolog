@@ -1,10 +1,11 @@
 {
-  "updated": "2026-10-31T08:03:09Z",
+  "updated": "2026-10-31T10:24:27Z",
   "games": [
     {
       "id": "ffx",
       "title": "Final Fantasy X",
       "year": 2001,
+      "cover": null,
       "steamAppId": 359870,
       "songs": [
         {
@@ -17,6 +18,7 @@
             "end": null,
             "label": "Opening, the campfire"
           },
+          "audio": null,
           "stories": [
             {
               "id": "yt:UgwNAb2ZDViJqDzV7aZ4AaABAg",
@@ -101,6 +103,18 @@
               "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgwKJeBTJI6wP5RwOOh4AaABAg",
               "videoId": "PSjTN8WSGNk",
               "score": 10.66
+            },
+            {
+              "id": "yt:UgwKkXOWNwxpH6R6mBt4AaABAg",
+              "source": "youtube",
+              "author": "@JourneyWithNoosh",
+              "authorUrl": "http://www.youtube.com/@JourneyWithNoosh",
+              "text": "This song makes me so sad. It reminds me of when I was young and the world still held wonders. I remember being so enthralled in the lore and beauty of the game and spent hours upon hours playing it. So much so that every time I hear this song now, I'm transported back to that time. \n\nGoodbye childhood, until I dream again",
+              "likes": 0,
+              "date": "2021-01-03",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgwKkXOWNwxpH6R6mBt4AaABAg",
+              "videoId": "PSjTN8WSGNk",
+              "score": 10.48
             },
             {
               "id": "yt:Ugzf5m9I_8Yiv_qXWpN4AaABAg",
@@ -403,6 +417,18 @@
               "score": 7.4
             },
             {
+              "id": "yt:UgwKgDvDPclGnD7a1JR4AaABAg",
+              "source": "youtube",
+              "author": "@shangothrax",
+              "authorUrl": "http://www.youtube.com/@shangothrax",
+              "text": "I first played this game when I was 16. 19 years later (which was last year) I picked it up again, and enjoyed it just as much. But this song brings tears to my eyes.",
+              "likes": 0,
+              "date": "2022-01-25",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgwKgDvDPclGnD7a1JR4AaABAg",
+              "videoId": "PSjTN8WSGNk",
+              "score": 7.35
+            },
+            {
               "id": "yt:Ugzip_lRHYU3TnvVP5x4AaABAg",
               "source": "youtube",
               "author": "@pabloagullo4528",
@@ -413,6 +439,18 @@
               "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugzip_lRHYU3TnvVP5x4AaABAg",
               "videoId": "PSjTN8WSGNk",
               "score": 7.17
+            },
+            {
+              "id": "yt:UgyNxk7fC31zz1RXMQR4AaABAg",
+              "source": "youtube",
+              "author": "@FasterthanLight11",
+              "authorUrl": "http://www.youtube.com/@FasterthanLight11",
+              "text": "Man this song hit EVERY time. No matter what stage of my life I am in it takes me right back to the raw emotion of playing that game so many years ago. Time to replay",
+              "likes": 0,
+              "date": "2022-11-20",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgyNxk7fC31zz1RXMQR4AaABAg",
+              "videoId": "PSjTN8WSGNk",
+              "score": 7.15
             },
             {
               "id": "yt:Ugy6D-3ZYmCoa4LOw9x4AaABAg",
@@ -437,6 +475,18 @@
               "url": "https://www.youtube.com/watch?v=mWYwmM23Sqs&lc=Ugxbc5ue7A31KYiE0_F4AaABAg",
               "videoId": "mWYwmM23Sqs",
               "score": 7.07
+            },
+            {
+              "id": "yt:UgwCTlqsEdR9r42kgVd4AaABAg",
+              "source": "youtube",
+              "author": "@rollinfiber8490",
+              "authorUrl": "http://www.youtube.com/@rollinfiber8490",
+              "text": "The nostalgia of this songs brings me back to being a kid when I was happy with all my family *tears....* 😢",
+              "likes": 0,
+              "date": "2020-07-18",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgwCTlqsEdR9r42kgVd4AaABAg",
+              "videoId": "PSjTN8WSGNk",
+              "score": 6.96
             },
             {
               "id": "yt:UgwFNMJGAP4OsCQkQRt4AaABAg",
@@ -571,6 +621,18 @@
               "score": 6.24
             },
             {
+              "id": "yt:Ugza_VhChWtuoCYm6et4AaABAg",
+              "source": "youtube",
+              "author": "@spirityuuki3290",
+              "authorUrl": "http://www.youtube.com/@spirityuuki3290",
+              "text": "Nineteen years and this song still kills me every time. Even from the first moment, before I knew just how powerful the song really was when you know the story, and I have never been able to hear it without crying ever since. It manages to carry the weight of every decision, every cut scene, and every battle fought throughout the game and pack all of the emotions you felt while playing it. The music in this game was fantastic, but this song was a beautiful masterpiece.",
+              "likes": 0,
+              "date": "2020-08-29",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugza_VhChWtuoCYm6et4AaABAg",
+              "videoId": "PSjTN8WSGNk",
+              "score": 6.18
+            },
+            {
               "id": "yt:UgyGVJdYLhgXj44gudR4AaABAg",
               "source": "youtube",
               "author": "@jombloambyar2994",
@@ -619,6 +681,18 @@
               "score": 6.0
             },
             {
+              "id": "yt:Ugwgo6AumJ6SloV3SV94AaABAg",
+              "source": "youtube",
+              "author": "@SweetCandiezx3",
+              "authorUrl": "http://www.youtube.com/@SweetCandiezx3",
+              "text": "I’ve never played or seen FF but I know of its existence due to my friend. I cant describe the feeling I feel, but for some reason when listening to specifically this composed version of To Zanarkand it always brings me close to tears",
+              "likes": 0,
+              "date": "2022-06-29",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugwgo6AumJ6SloV3SV94AaABAg",
+              "videoId": "PSjTN8WSGNk",
+              "score": 5.98
+            },
+            {
               "id": "yt:UgwPBNkwlk2ab6cLT254AaABAg",
               "source": "youtube",
               "author": "@bkeith1005",
@@ -665,78 +739,6 @@
               "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugx4wikcIKLj-vV9RbJ4AaABAg",
               "videoId": "PSjTN8WSGNk",
               "score": 5.61
-            },
-            {
-              "id": "yt:Ugz1nqCzs50zNEHb1D14AaABAg",
-              "source": "youtube",
-              "author": "@jacopz2173",
-              "authorUrl": "http://www.youtube.com/@jacopz2173",
-              "text": "Hey man, i am 14 years old and i'm italian (so my english isn't perfect), ffx is special, and this version of to zanarkand is too much for me, ffx is my favourite game, and this version of to zanarkand is very emotional, I LOVED IT",
-              "likes": 41,
-              "date": "2020-06-10",
-              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugz1nqCzs50zNEHb1D14AaABAg",
-              "videoId": "PSjTN8WSGNk",
-              "score": 5.59
-            },
-            {
-              "id": "yt:UgyoQ_duGTCE0IKwcaV4AaABAg",
-              "source": "youtube",
-              "author": "@DarkMaySorceress",
-              "authorUrl": "http://www.youtube.com/@DarkMaySorceress",
-              "text": "And i want to play this again ! x) Ha lala. When I think about it, people was critic with this one and the X-2. \nIt surely was different from what there was before, but I still think that it's a good game. Cliché story perhaps... And it was good, music was cool, visuals was incredible for this time, it's still beautiful even if it's old now and I remember that it's a game which push me to do 0s with that dumb chocobo race and dodge 300 f*****g thunderbolts ! The only thing i didn't do beat der richter ! (I didn't get the last attack of Kimahri é_è )",
-              "likes": 1,
-              "date": "2024-02-25",
-              "url": "https://www.youtube.com/watch?v=mWYwmM23Sqs&lc=UgyoQ_duGTCE0IKwcaV4AaABAg",
-              "videoId": "mWYwmM23Sqs",
-              "score": 5.55
-            },
-            {
-              "id": "yt:Ugxd1kClJaVqQ_7sned4AaABAg",
-              "source": "youtube",
-              "author": "@JurgenBlitz",
-              "authorUrl": "http://www.youtube.com/@JurgenBlitz",
-              "text": "So judging by the comments I am not the only one who immediately started crying with emotion while hearing this. Glad to see there are so many of us.",
-              "likes": 353,
-              "date": "2024-04-06",
-              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugxd1kClJaVqQ_7sned4AaABAg",
-              "videoId": "PSjTN8WSGNk",
-              "score": 5.25
-            },
-            {
-              "id": "yt:Ugz30REZ018leVQ0VK54AaABAg",
-              "source": "youtube",
-              "author": "@AsmodeusGamingAdventures",
-              "authorUrl": "http://www.youtube.com/@AsmodeusGamingAdventures",
-              "text": "Ahh I still remember it like it was yesterday... Being 13, falling in love with Yuna... \nBut in the end, it was just a dream... \nBrings me to tears everytime :')",
-              "likes": 1,
-              "date": "2022-04-05",
-              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugz30REZ018leVQ0VK54AaABAg",
-              "videoId": "PSjTN8WSGNk",
-              "score": 5.24
-            },
-            {
-              "id": "yt:UgwzziFzOTF3sDPdGj14AaABAg",
-              "source": "youtube",
-              "author": "@Cihan92",
-              "authorUrl": "http://www.youtube.com/@Cihan92",
-              "text": "10 year old me first time hitting the main menu in FFX, gave me chills and still makes me cry 😌",
-              "likes": 1,
-              "date": "2023-10-01",
-              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgwzziFzOTF3sDPdGj14AaABAg",
-              "videoId": "PSjTN8WSGNk",
-              "score": 5.22
-            },
-            {
-              "id": "yt:UgxCN3ITn-OllCH6-jl4AaABAg",
-              "source": "youtube",
-              "author": "@drooney185",
-              "authorUrl": "http://www.youtube.com/@drooney185",
-              "text": "This game changed my life......i mean really changed my life i have now composed for 13 video games and it all started here!",
-              "likes": 0,
-              "date": "2021-04-24",
-              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgxCN3ITn-OllCH6-jl4AaABAg",
-              "videoId": "PSjTN8WSGNk",
-              "score": 5.21
             }
           ]
         },
@@ -750,6 +752,7 @@
             "end": null,
             "label": "Sin attacks Zanarkand"
           },
+          "audio": null,
           "stories": [
             {
               "id": "yt:Ughbpmkvw8AHH3gCoAEC",
@@ -950,6 +953,7 @@
           "title": "Besaid Island",
           "composer": "Nobuo Uematsu",
           "moment": null,
+          "audio": null,
           "stories": [
             {
               "id": "yt:UgwKNTaspgUB8Ym6n_p4AaABAg",
@@ -1174,6 +1178,7 @@
           "title": "Hymn of the Fayth",
           "composer": "Nobuo Uematsu",
           "moment": null,
+          "audio": null,
           "stories": [
             {
               "id": "yt:Ugwzp1FWiz9y6Usqdep4AaABAg",
@@ -1715,6 +1720,7 @@
             "end": null,
             "label": "Macalania, the spring"
           },
+          "audio": null,
           "stories": [
             {
               "id": "yt:UgxKwSAa3h7l5CBsmP94AaABAg",
@@ -2432,7 +2438,6 @@
     "ffx/hymn-of-the-fayth/E9vWvXoZhgI: 144 comments",
     "ffx/suteki-da-ne/Vl20g-tBaKc: 500 comments",
     "ffx/suteki-da-ne/zXpm8DPYuTc: 102 comments",
-    "ffx/suteki-da-ne/Zbv6KrO_13A: 112 comments",
-    "ffx/steam: failed (not JSON, got: '<!DOCTYPE html>\\n<html class=\" responsive DesktopUI\" lang=\"en\"  >\\n<head>\\n\\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\\n\\t\\t\\t<meta ')"
+    "ffx/suteki-da-ne/Zbv6KrO_13A: 112 comments"
   ]
 }
