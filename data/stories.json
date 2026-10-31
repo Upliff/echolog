@@ -1,11 +1,11 @@
 {
-  "updated": "2026-10-31T10:24:27Z",
+  "updated": "2026-10-31T10:34:07Z",
   "games": [
     {
       "id": "ffx",
       "title": "Final Fantasy X",
       "year": 2001,
-      "cover": null,
+      "cover": "covers/ffx.jpg",
       "steamAppId": 359870,
       "songs": [
         {
@@ -13,12 +13,16 @@
           "title": "To Zanarkand",
           "composer": "Nobuo Uematsu",
           "moment": {
-            "videoId": "kilrRiclUFY",
-            "start": 0,
-            "end": null,
-            "label": "Opening, the campfire"
+            "videoId": "5oIjPHo0k5E",
+            "start": 27,
+            "end": 173,
+            "label": ""
           },
-          "audio": null,
+          "audio": {
+            "videoId": "QQq0zv_JXEk",
+            "start": 0,
+            "end": null
+          },
           "stories": [
             {
               "id": "yt:UgwNAb2ZDViJqDzV7aZ4AaABAg",
@@ -103,18 +107,6 @@
               "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgwKJeBTJI6wP5RwOOh4AaABAg",
               "videoId": "PSjTN8WSGNk",
               "score": 10.66
-            },
-            {
-              "id": "yt:UgwKkXOWNwxpH6R6mBt4AaABAg",
-              "source": "youtube",
-              "author": "@JourneyWithNoosh",
-              "authorUrl": "http://www.youtube.com/@JourneyWithNoosh",
-              "text": "This song makes me so sad. It reminds me of when I was young and the world still held wonders. I remember being so enthralled in the lore and beauty of the game and spent hours upon hours playing it. So much so that every time I hear this song now, I'm transported back to that time. \n\nGoodbye childhood, until I dream again",
-              "likes": 0,
-              "date": "2021-01-03",
-              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgwKkXOWNwxpH6R6mBt4AaABAg",
-              "videoId": "PSjTN8WSGNk",
-              "score": 10.48
             },
             {
               "id": "yt:Ugzf5m9I_8Yiv_qXWpN4AaABAg",
@@ -417,18 +409,6 @@
               "score": 7.4
             },
             {
-              "id": "yt:UgwKgDvDPclGnD7a1JR4AaABAg",
-              "source": "youtube",
-              "author": "@shangothrax",
-              "authorUrl": "http://www.youtube.com/@shangothrax",
-              "text": "I first played this game when I was 16. 19 years later (which was last year) I picked it up again, and enjoyed it just as much. But this song brings tears to my eyes.",
-              "likes": 0,
-              "date": "2022-01-25",
-              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgwKgDvDPclGnD7a1JR4AaABAg",
-              "videoId": "PSjTN8WSGNk",
-              "score": 7.35
-            },
-            {
               "id": "yt:Ugzip_lRHYU3TnvVP5x4AaABAg",
               "source": "youtube",
               "author": "@pabloagullo4528",
@@ -439,18 +419,6 @@
               "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugzip_lRHYU3TnvVP5x4AaABAg",
               "videoId": "PSjTN8WSGNk",
               "score": 7.17
-            },
-            {
-              "id": "yt:UgyNxk7fC31zz1RXMQR4AaABAg",
-              "source": "youtube",
-              "author": "@FasterthanLight11",
-              "authorUrl": "http://www.youtube.com/@FasterthanLight11",
-              "text": "Man this song hit EVERY time. No matter what stage of my life I am in it takes me right back to the raw emotion of playing that game so many years ago. Time to replay",
-              "likes": 0,
-              "date": "2022-11-20",
-              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgyNxk7fC31zz1RXMQR4AaABAg",
-              "videoId": "PSjTN8WSGNk",
-              "score": 7.15
             },
             {
               "id": "yt:Ugy6D-3ZYmCoa4LOw9x4AaABAg",
@@ -475,18 +443,6 @@
               "url": "https://www.youtube.com/watch?v=mWYwmM23Sqs&lc=Ugxbc5ue7A31KYiE0_F4AaABAg",
               "videoId": "mWYwmM23Sqs",
               "score": 7.07
-            },
-            {
-              "id": "yt:UgwCTlqsEdR9r42kgVd4AaABAg",
-              "source": "youtube",
-              "author": "@rollinfiber8490",
-              "authorUrl": "http://www.youtube.com/@rollinfiber8490",
-              "text": "The nostalgia of this songs brings me back to being a kid when I was happy with all my family *tears....* 😢",
-              "likes": 0,
-              "date": "2020-07-18",
-              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgwCTlqsEdR9r42kgVd4AaABAg",
-              "videoId": "PSjTN8WSGNk",
-              "score": 6.96
             },
             {
               "id": "yt:UgwFNMJGAP4OsCQkQRt4AaABAg",
@@ -621,18 +577,6 @@
               "score": 6.24
             },
             {
-              "id": "yt:Ugza_VhChWtuoCYm6et4AaABAg",
-              "source": "youtube",
-              "author": "@spirityuuki3290",
-              "authorUrl": "http://www.youtube.com/@spirityuuki3290",
-              "text": "Nineteen years and this song still kills me every time. Even from the first moment, before I knew just how powerful the song really was when you know the story, and I have never been able to hear it without crying ever since. It manages to carry the weight of every decision, every cut scene, and every battle fought throughout the game and pack all of the emotions you felt while playing it. The music in this game was fantastic, but this song was a beautiful masterpiece.",
-              "likes": 0,
-              "date": "2020-08-29",
-              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugza_VhChWtuoCYm6et4AaABAg",
-              "videoId": "PSjTN8WSGNk",
-              "score": 6.18
-            },
-            {
               "id": "yt:UgyGVJdYLhgXj44gudR4AaABAg",
               "source": "youtube",
               "author": "@jombloambyar2994",
@@ -681,18 +625,6 @@
               "score": 6.0
             },
             {
-              "id": "yt:Ugwgo6AumJ6SloV3SV94AaABAg",
-              "source": "youtube",
-              "author": "@SweetCandiezx3",
-              "authorUrl": "http://www.youtube.com/@SweetCandiezx3",
-              "text": "I’ve never played or seen FF but I know of its existence due to my friend. I cant describe the feeling I feel, but for some reason when listening to specifically this composed version of To Zanarkand it always brings me close to tears",
-              "likes": 0,
-              "date": "2022-06-29",
-              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugwgo6AumJ6SloV3SV94AaABAg",
-              "videoId": "PSjTN8WSGNk",
-              "score": 5.98
-            },
-            {
               "id": "yt:UgwPBNkwlk2ab6cLT254AaABAg",
               "source": "youtube",
               "author": "@bkeith1005",
@@ -739,6 +671,78 @@
               "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugx4wikcIKLj-vV9RbJ4AaABAg",
               "videoId": "PSjTN8WSGNk",
               "score": 5.61
+            },
+            {
+              "id": "yt:Ugz1nqCzs50zNEHb1D14AaABAg",
+              "source": "youtube",
+              "author": "@jacopz2173",
+              "authorUrl": "http://www.youtube.com/@jacopz2173",
+              "text": "Hey man, i am 14 years old and i'm italian (so my english isn't perfect), ffx is special, and this version of to zanarkand is too much for me, ffx is my favourite game, and this version of to zanarkand is very emotional, I LOVED IT",
+              "likes": 41,
+              "date": "2020-06-10",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugz1nqCzs50zNEHb1D14AaABAg",
+              "videoId": "PSjTN8WSGNk",
+              "score": 5.59
+            },
+            {
+              "id": "yt:UgyoQ_duGTCE0IKwcaV4AaABAg",
+              "source": "youtube",
+              "author": "@DarkMaySorceress",
+              "authorUrl": "http://www.youtube.com/@DarkMaySorceress",
+              "text": "And i want to play this again ! x) Ha lala. When I think about it, people was critic with this one and the X-2. \nIt surely was different from what there was before, but I still think that it's a good game. Cliché story perhaps... And it was good, music was cool, visuals was incredible for this time, it's still beautiful even if it's old now and I remember that it's a game which push me to do 0s with that dumb chocobo race and dodge 300 f*****g thunderbolts ! The only thing i didn't do beat der richter ! (I didn't get the last attack of Kimahri é_è )",
+              "likes": 1,
+              "date": "2024-02-25",
+              "url": "https://www.youtube.com/watch?v=mWYwmM23Sqs&lc=UgyoQ_duGTCE0IKwcaV4AaABAg",
+              "videoId": "mWYwmM23Sqs",
+              "score": 5.55
+            },
+            {
+              "id": "yt:Ugxd1kClJaVqQ_7sned4AaABAg",
+              "source": "youtube",
+              "author": "@JurgenBlitz",
+              "authorUrl": "http://www.youtube.com/@JurgenBlitz",
+              "text": "So judging by the comments I am not the only one who immediately started crying with emotion while hearing this. Glad to see there are so many of us.",
+              "likes": 353,
+              "date": "2024-04-06",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugxd1kClJaVqQ_7sned4AaABAg",
+              "videoId": "PSjTN8WSGNk",
+              "score": 5.25
+            },
+            {
+              "id": "yt:Ugz30REZ018leVQ0VK54AaABAg",
+              "source": "youtube",
+              "author": "@AsmodeusGamingAdventures",
+              "authorUrl": "http://www.youtube.com/@AsmodeusGamingAdventures",
+              "text": "Ahh I still remember it like it was yesterday... Being 13, falling in love with Yuna... \nBut in the end, it was just a dream... \nBrings me to tears everytime :')",
+              "likes": 1,
+              "date": "2022-04-05",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugz30REZ018leVQ0VK54AaABAg",
+              "videoId": "PSjTN8WSGNk",
+              "score": 5.24
+            },
+            {
+              "id": "yt:UgwzziFzOTF3sDPdGj14AaABAg",
+              "source": "youtube",
+              "author": "@Cihan92",
+              "authorUrl": "http://www.youtube.com/@Cihan92",
+              "text": "10 year old me first time hitting the main menu in FFX, gave me chills and still makes me cry 😌",
+              "likes": 1,
+              "date": "2023-10-01",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgwzziFzOTF3sDPdGj14AaABAg",
+              "videoId": "PSjTN8WSGNk",
+              "score": 5.22
+            },
+            {
+              "id": "yt:UgxCN3ITn-OllCH6-jl4AaABAg",
+              "source": "youtube",
+              "author": "@drooney185",
+              "authorUrl": "http://www.youtube.com/@drooney185",
+              "text": "This game changed my life......i mean really changed my life i have now composed for 13 video games and it all started here!",
+              "likes": 0,
+              "date": "2021-04-24",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgxCN3ITn-OllCH6-jl4AaABAg",
+              "videoId": "PSjTN8WSGNk",
+              "score": 5.21
             }
           ]
         },
@@ -748,11 +752,15 @@
           "composer": "Nobuo Uematsu",
           "moment": {
             "videoId": "4umidcc_8rU",
-            "start": 0,
+            "start": 15,
             "end": null,
-            "label": "Sin attacks Zanarkand"
+            "label": ""
           },
-          "audio": null,
+          "audio": {
+            "videoId": "KO6fvJrsTsE",
+            "start": 0,
+            "end": null
+          },
           "stories": [
             {
               "id": "yt:Ughbpmkvw8AHH3gCoAEC",
@@ -952,8 +960,17 @@
           "id": "besaid-island",
           "title": "Besaid Island",
           "composer": "Nobuo Uematsu",
-          "moment": null,
-          "audio": null,
+          "moment": {
+            "videoId": "112PPC8JlJg",
+            "start": 418,
+            "end": 935,
+            "label": ""
+          },
+          "audio": {
+            "videoId": "RC1VmGXiEFw",
+            "start": 0,
+            "end": null
+          },
           "stories": [
             {
               "id": "yt:UgwKNTaspgUB8Ym6n_p4AaABAg",
@@ -1170,543 +1187,6 @@
               "url": "https://www.youtube.com/watch?v=RC1VmGXiEFw&lc=UgyLa7fkfVoT3cO8Vql4AaABAg",
               "videoId": "RC1VmGXiEFw",
               "score": 4.36
-            }
-          ]
-        },
-        {
-          "id": "hymn-of-the-fayth",
-          "title": "Hymn of the Fayth",
-          "composer": "Nobuo Uematsu",
-          "moment": null,
-          "audio": null,
-          "stories": [
-            {
-              "id": "yt:Ugwzp1FWiz9y6Usqdep4AaABAg",
-              "source": "youtube",
-              "author": "@Cash_McCoy",
-              "authorUrl": "http://www.youtube.com/@Cash_McCoy",
-              "text": "Many years ago when I was in the US Navy, the ship I was on at the time (USS John F. Kennedy, CV-67) pulled into Livorno, Italy. Me and a buddy took a tour bus up to the Leaning Tower of Pizza. We got to spend some time in the tower cuz you could still go up in it at that time. While that was pretty cool, there was something else that stood out more. There is a cathedral there that we got to visit. While we were in there, there was a group of... monks?... that were doing a chant/hymn something like this one. The acoustics in this cathedral are amazing, of course. This was many years before I got saved, but I remember this being one of the most spiritual moments of my life.",
-              "likes": 60,
-              "date": "2022-08-17",
-              "url": "https://www.youtube.com/watch?v=FpeqMBG7_7I&lc=Ugwzp1FWiz9y6Usqdep4AaABAg",
-              "videoId": "FpeqMBG7_7I",
-              "score": 13.26
-            },
-            {
-              "id": "yt:UgzOA2Aulc1-BgeLu7l4AaABAg",
-              "source": "youtube",
-              "author": "@SummerCo87",
-              "authorUrl": "http://www.youtube.com/@SummerCo87",
-              "text": "That game means so much to me. It came out the day before my 14th birthday, and 14 was also when I fell in love for the first time. I'm still married to the person I fell in love with all the way back then. I also had a rough childhood and was locking for any way out. Any way away from my mother. Playing a teenager falling in love for the first time with a sense of doom was cathardic, and it was exactly what I needed at the time. \nYour singing is beautiful, I got chills..",
-              "likes": 4,
-              "date": "2025-10-06",
-              "url": "https://www.youtube.com/watch?v=FpeqMBG7_7I&lc=UgzOA2Aulc1-BgeLu7l4AaABAg",
-              "videoId": "FpeqMBG7_7I",
-              "score": 12.09
-            },
-            {
-              "id": "yt:UgyH2XvwS8CkPPqHOnh4AaABAg",
-              "source": "youtube",
-              "author": "@RickJamesByatch",
-              "authorUrl": "http://www.youtube.com/@RickJamesByatch",
-              "text": "old final fantasy music always makes me think of my brother. We played them together during our childhood, then later as teens we played on multiple systems in the same room. He died three years ago. The first thing after I found out was go listen to Cosmo Canyon. Our first and favorite was 7, then 10 is close behind. This video got me.",
-              "likes": 28,
-              "date": "2023-01-27",
-              "url": "https://www.youtube.com/watch?v=FpeqMBG7_7I&lc=UgyH2XvwS8CkPPqHOnh4AaABAg",
-              "videoId": "FpeqMBG7_7I",
-              "score": 11.39
-            },
-            {
-              "id": "yt:Ugyq4SaF2rFTmvv_O8J4AaABAg",
-              "source": "youtube",
-              "author": "@SqiudiousRex",
-              "authorUrl": "http://www.youtube.com/@SqiudiousRex",
-              "text": "Thank you. No song can make me sob like this one and i know it's stupid. I could give less of a fuck, this song is my childhood, the best of it, and hearing it always makes so clear how thoroughly that time has passed. I don't know why this is the music of my innocence, but it seems that it always will be. 20+ years later, it manages to wrench me back to the happiest days of my life and the the child i was, reminding me how different my soul used to feel. I wish i could find that part of me again someday, but, as undramatically as possible, i think she's dead. Hearing this is like looking at that corpse and remembering how she once lived.",
-              "likes": 0,
-              "date": "2025-12-26",
-              "url": "https://www.youtube.com/watch?v=FpeqMBG7_7I&lc=Ugyq4SaF2rFTmvv_O8J4AaABAg",
-              "videoId": "FpeqMBG7_7I",
-              "score": 10.15
-            },
-            {
-              "id": "yt:UghUOPHSEKa1hXgCoAEC",
-              "source": "youtube",
-              "author": "@computerscientist814",
-              "authorUrl": "http://www.youtube.com/@computerscientist814",
-              "text": "I remembered this game so fondly from my childhood that I had to replay it. Despite knowing what was coming for the most part and the games' age, this game blew me away over and over again. If you find yourself nitpicking this game for Tidus being whiny, or Yuna's voice acting being bad, or some of the dialogue being awkward then I feel you are missing the bigger picture. Tidus' unawareness of the ultimate outcome of Yuna's quest for the majority of the story results in a really emotional moment (for me) when Tidus learns the truth. Breaking into Sin and fighting Braska's Final Aeon (Jecht) was a seriously badass ending. There are dozens of moments I could break down that I thought were fantastic but suffice to say Final Fantasy X is one of my favourite games of all time. By the way, the soundtrack is masterful.",
-              "likes": 22,
-              "date": "2014-01-24",
-              "url": "https://www.youtube.com/watch?v=E9vWvXoZhgI&lc=UghUOPHSEKa1hXgCoAEC",
-              "videoId": "E9vWvXoZhgI",
-              "score": 9.91
-            },
-            {
-              "id": "yt:UgzmgWzeWl-J_tNGjIl4AaABAg",
-              "source": "youtube",
-              "author": "@peewee78368",
-              "authorUrl": "http://www.youtube.com/@peewee78368",
-              "text": "My cousin passed away 3 days ago out of no where Iraq vet... man..... Hospitals really do wait till ur on the verge to step in when ur poor he was a big final fantasy fan. I hope its fine we play this at his Funerals...  He was just sitting next to me... playing final fantasy 10 on his ps3........ fuk... hes really gone.",
-              "likes": 0,
-              "date": "2024-07-31",
-              "url": "https://www.youtube.com/watch?v=FpeqMBG7_7I&lc=UgzmgWzeWl-J_tNGjIl4AaABAg",
-              "videoId": "FpeqMBG7_7I",
-              "score": 9.67
-            },
-            {
-              "id": "yt:UgwoIJyc3ZsQDoJrL194AaABAg",
-              "source": "youtube",
-              "author": "@owangejewice",
-              "authorUrl": "http://www.youtube.com/@owangejewice",
-              "text": "“There’s a time when you have to stop crying and move on. You’ll be fine. Remember, you’re my son.\"",
-              "likes": 177,
-              "date": "2025-10-13",
-              "url": "https://www.youtube.com/watch?v=FpeqMBG7_7I&lc=UgwoIJyc3ZsQDoJrL194AaABAg",
-              "videoId": "FpeqMBG7_7I",
-              "score": 8.78
-            },
-            {
-              "id": "yt:UgzJdNH7NGJye8T55wF4AaABAg",
-              "source": "youtube",
-              "author": "@StitchGirl94",
-              "authorUrl": "http://www.youtube.com/@StitchGirl94",
-              "text": "Chills all over 😲 my grandma said that the Hymn of fayth reminded her of church music, she passed away many years ago but this always reminds me of her. 🙏🏼",
-              "likes": 21,
-              "date": "2025-01-27",
-              "url": "https://www.youtube.com/watch?v=FpeqMBG7_7I&lc=UgzJdNH7NGJye8T55wF4AaABAg",
-              "videoId": "FpeqMBG7_7I",
-              "score": 8.26
-            },
-            {
-              "id": "yt:UgwVM4EIf9aguTcNRX54AaABAg",
-              "source": "youtube",
-              "author": "@AGoodVibe",
-              "authorUrl": "http://www.youtube.com/@AGoodVibe",
-              "text": "I remember being 12 and playing through to Luca at my uncle’s house (he had a PS2; I didn’t). Being a fan of the series, I stayed up all night trying to get as far as I could before my time with FFX came to an end. A year later, I bought my own PS2 and finished the adventure.",
-              "likes": 42,
-              "date": "2022-08-06",
-              "url": "https://www.youtube.com/watch?v=Woz3mS9Ao5k&lc=UgwVM4EIf9aguTcNRX54AaABAg",
-              "videoId": "Woz3mS9Ao5k",
-              "score": 8.15
-            },
-            {
-              "id": "yt:UgyOR4vgEx1kM3Tl0uZ4AaABAg",
-              "source": "youtube",
-              "author": "@TinaBauder",
-              "authorUrl": "http://www.youtube.com/@TinaBauder",
-              "text": "I replayed this game so many times, my father was emotionally abusive and this game helped me cope. The scene I remember most is in Zanarkand with Yunalesca. She talks about hope, that hope is what keeps the people at peace, even if it's false hope. Yuna and the gang refute that.. no more or I'll spoil it. Anyway, I feel like as an adult, this corresponds with our world today. People hope and pray, but don't take action to help or do their part. Our governments and churches (not all) take advantage of this, like the antagonist in the game. Maybe I'm thinking too deeply into this,.",
-              "likes": 4,
-              "date": "2022-09-26",
-              "url": "https://www.youtube.com/watch?v=E9vWvXoZhgI&lc=UgyOR4vgEx1kM3Tl0uZ4AaABAg",
-              "videoId": "E9vWvXoZhgI",
-              "score": 8.06
-            },
-            {
-              "id": "yt:UgwovjX3tJOY0Z00jDl4AaABAg",
-              "source": "youtube",
-              "author": "@franciscojaviermendezrinco1902",
-              "authorUrl": "http://www.youtube.com/@franciscojaviermendezrinco1902",
-              "text": "The first time I saw the sending I was dumbfounded. My mind couldn't process the scene. Now, years later, I get why that scene hit so hard, especially with the people crying in the background, it was the equivalent of an event of the real life, it was a funeral proceeding. As Tidus said, it was eerie and sad, and exactly as he said, you don't want to see that again.",
-              "likes": 0,
-              "date": "2026-05-08",
-              "url": "https://www.youtube.com/watch?v=E9vWvXoZhgI&lc=UgwovjX3tJOY0Z00jDl4AaABAg",
-              "videoId": "E9vWvXoZhgI",
-              "score": 8.03
-            },
-            {
-              "id": "yt:UgwXG4sJbyBKGF8bU3N4AaABAg",
-              "source": "youtube",
-              "author": "@KBums",
-              "authorUrl": "http://www.youtube.com/@KBums",
-              "text": "Anima reminds me of My Ma. Strong. Wise. Do anything to protect her own. I dunno what I'm trying to say. I remember thinking that back in 2001 when FFX came out. I dunno. I guess as I've grown older I See the sacrifices she made as I grew up.",
-              "likes": 4,
-              "date": "2023-04-11",
-              "url": "https://www.youtube.com/watch?v=Woz3mS9Ao5k&lc=UgwXG4sJbyBKGF8bU3N4AaABAg",
-              "videoId": "Woz3mS9Ao5k",
-              "score": 7.51
-            },
-            {
-              "id": "yt:UgjadQDyFtjgRXgCoAEC",
-              "source": "youtube",
-              "author": "@youwinoneinternets",
-              "authorUrl": "http://www.youtube.com/@youwinoneinternets",
-              "text": "Final Fantasy X was a much much better game than It ever got credit for. I remember the first time I saw previews of it thinking \"ew, it looks lame\" lol, how wrong I was. I clocked up 600+ hours on the PAL version easily, re-writing the sphere grid to kill Penance legitimately.",
-              "likes": 58,
-              "date": "2013-12-17",
-              "url": "https://www.youtube.com/watch?v=E9vWvXoZhgI&lc=UgjadQDyFtjgRXgCoAEC",
-              "videoId": "E9vWvXoZhgI",
-              "score": 7.5
-            },
-            {
-              "id": "yt:Ugy6_mA75QOuUsuUa-R4AaABAg",
-              "source": "youtube",
-              "author": "@roadtripblues",
-              "authorUrl": "http://www.youtube.com/@roadtripblues",
-              "text": "I'm a 35 years old guy, and everytime I listen to this, it always takes me back to 20 years ago when I first played this masterpiece.",
-              "likes": 144,
-              "date": "2023-10-28",
-              "url": "https://www.youtube.com/watch?v=E9vWvXoZhgI&lc=Ugy6_mA75QOuUsuUa-R4AaABAg",
-              "videoId": "E9vWvXoZhgI",
-              "score": 7.4
-            },
-            {
-              "id": "yt:UgyFp9U4ZiqoHOrnD5t4AaABAg",
-              "source": "youtube",
-              "author": "@JixxBlixxGaming",
-              "authorUrl": "http://www.youtube.com/@JixxBlixxGaming",
-              "text": "I've replayed Final Fantasy X at least 6 times in my life.... getting further each time, but I've never finished the game...   I almost don't want to finish the game; I'm scared if I do finish, I'll be saying good bye to everyone. I can always replay it; however it's not that simple for me, and I don't know why.",
-              "likes": 103,
-              "date": "2013-06-01",
-              "url": "https://www.youtube.com/watch?v=E9vWvXoZhgI&lc=UgyFp9U4ZiqoHOrnD5t4AaABAg",
-              "videoId": "E9vWvXoZhgI",
-              "score": 7.06
-            },
-            {
-              "id": "yt:Ugz_lARbgScVo9eGLv14AaABAg",
-              "source": "youtube",
-              "author": "@reaping-equally",
-              "authorUrl": "http://www.youtube.com/@reaping-equally",
-              "text": "I used to hum this for my son, when he was a baby. I haven't seen him for six years.😓 I'm slowly losing my mind, I miss him so much",
-              "likes": 22,
-              "date": "2022-07-31",
-              "url": "https://www.youtube.com/watch?v=Woz3mS9Ao5k&lc=Ugz_lARbgScVo9eGLv14AaABAg",
-              "videoId": "Woz3mS9Ao5k",
-              "score": 7.0
-            },
-            {
-              "id": "yt:UgyjDvTaNUGUmtIBk3J4AaABAg",
-              "source": "youtube",
-              "author": "@thatonefriend1988",
-              "authorUrl": "http://www.youtube.com/@thatonefriend1988",
-              "text": "for some reason i had this stuck in my head since i first played it over 20 years ago, and i still sing it word for word to this day",
-              "likes": 10,
-              "date": "2026-04-01",
-              "url": "https://www.youtube.com/watch?v=Woz3mS9Ao5k&lc=UgyjDvTaNUGUmtIBk3J4AaABAg",
-              "videoId": "Woz3mS9Ao5k",
-              "score": 6.28
-            },
-            {
-              "id": "yt:Ugw_ChsH6WbUxtJ1n5J4AaABAg",
-              "source": "youtube",
-              "author": "@deadmeatdec2164",
-              "authorUrl": "http://www.youtube.com/@deadmeatdec2164",
-              "text": "When my daughter was in diapers I would hum my version of the Hymn of Prayer to her to help her get asleep or calm her down.  When nothing else worked ( bottle, pacifier, diaper change ) it 9/10 times would soothe her.  Even today, she is seventeen, when the passing of my dad sits in we will sit side by side and hum",
-              "likes": 1,
-              "date": "2025-05-05",
-              "url": "https://www.youtube.com/watch?v=Woz3mS9Ao5k&lc=Ugw_ChsH6WbUxtJ1n5J4AaABAg",
-              "videoId": "Woz3mS9Ao5k",
-              "score": 6.16
-            },
-            {
-              "id": "yt:Ugi4xDuhlARLw3gCoAEC",
-              "source": "youtube",
-              "author": "@Yeah-eu5cp",
-              "authorUrl": "http://www.youtube.com/@Yeah-eu5cp",
-              "text": "Anima's version is so sad! I love how each of the different versions tell a story about the fayth and how you get to see all the vibrant characters that lie inside of the Aeons and I love how Ixion is a dude (I thought he was a girl because he looked like a unicorn to me....lol) I named him Beatrix when I was playing the game (Poor Ixion's going to have self Esteem issues now! lol)",
-              "likes": 46,
-              "date": "2015-05-08",
-              "url": "https://www.youtube.com/watch?v=Woz3mS9Ao5k&lc=Ugi4xDuhlARLw3gCoAEC",
-              "videoId": "Woz3mS9Ao5k",
-              "score": 6.15
-            },
-            {
-              "id": "yt:Ughg35vsaDcJ6ngCoAEC",
-              "source": "youtube",
-              "author": "@AwhhYeahh123",
-              "authorUrl": "http://www.youtube.com/@AwhhYeahh123",
-              "text": "I just recently beat FFX on the PS3, and god, by then end I was crying like a baby. Now the hymn has been stuck in my head for a few days and I tear up whenever I listen to it again. Such a good game. :')",
-              "likes": 207,
-              "date": "2014-06-07",
-              "url": "https://www.youtube.com/watch?v=Woz3mS9Ao5k&lc=Ughg35vsaDcJ6ngCoAEC",
-              "videoId": "Woz3mS9Ao5k",
-              "score": 6.0
-            },
-            {
-              "id": "yt:Ugws0-w6HcwAKhCuaOZ4AaABAg",
-              "source": "youtube",
-              "author": "@Warspeak-Con",
-              "authorUrl": "http://www.youtube.com/@Warspeak-Con",
-              "text": "I know I’m late to the party, but you guys crushed this. FFX is my favorite Final Fantasy game, and you guys briefly dropped me back into my childhood.",
-              "likes": 2,
-              "date": "2026-07-05",
-              "url": "https://www.youtube.com/watch?v=FpeqMBG7_7I&lc=Ugws0-w6HcwAKhCuaOZ4AaABAg",
-              "videoId": "FpeqMBG7_7I",
-              "score": 5.98
-            },
-            {
-              "id": "yt:UgyyhJ7QaqdqCp62uIl4AaABAg",
-              "source": "youtube",
-              "author": "@KimTrans-d8f",
-              "authorUrl": "http://www.youtube.com/@KimTrans-d8f",
-              "text": "When I first heard hymn of the faith in final fantasy X I loved it but this brought a tear to my eyes and the harmony of these four extraordinary members of the cloth made it so much better and i have now made this my song of remembrance to the fallen. God bless you and thank you for this remarkable piece of music.",
-              "likes": 54,
-              "date": "2023-10-21",
-              "url": "https://www.youtube.com/watch?v=FpeqMBG7_7I&lc=UgyyhJ7QaqdqCp62uIl4AaABAg",
-              "videoId": "FpeqMBG7_7I",
-              "score": 5.79
-            },
-            {
-              "id": "yt:UgysjGazdQZW26TqVVV4AaABAg",
-              "source": "youtube",
-              "author": "@Cai-AnnaHubacheck-o5w",
-              "authorUrl": "http://www.youtube.com/@Cai-AnnaHubacheck-o5w",
-              "text": "Omg, my mom and I have been playing FFX and my dad wanted to play with us, so he played the intro, and then somehow thought it was a good idea to change the name from tidus to micdanca????? 😂😂😂 and than said he didn't like it, and stopped playing!",
-              "likes": 1,
-              "date": "2026-08-20",
-              "url": "https://www.youtube.com/watch?v=Woz3mS9Ao5k&lc=UgysjGazdQZW26TqVVV4AaABAg",
-              "videoId": "Woz3mS9Ao5k",
-              "score": 5.72
-            },
-            {
-              "id": "yt:Ugy_bJxl5SwTBAKd6-N4AaABAg",
-              "source": "youtube",
-              "author": "@johndreigrandheart7485",
-              "authorUrl": "http://www.youtube.com/@johndreigrandheart7485",
-              "text": "Kilika... Almost Djose gosh this made me cry... I remembered the first Final Fantasy that I actually completed is FFX and boy was it a roller coaster ride that left me sobbing and crying as a kid.",
-              "likes": 0,
-              "date": "2022-08-26",
-              "url": "https://www.youtube.com/watch?v=FpeqMBG7_7I&lc=Ugy_bJxl5SwTBAKd6-N4AaABAg",
-              "videoId": "FpeqMBG7_7I",
-              "score": 5.45
-            },
-            {
-              "id": "yt:Ugw5vh8tG01O1aha3r94AaABAg",
-              "source": "youtube",
-              "author": "@sammakhan9770",
-              "authorUrl": "http://www.youtube.com/@sammakhan9770",
-              "text": "Absolute perfection! You got all the words they sang in the game. I played this years ago on my own, recently played it again for my husband so much has changed but this song remains perfect and unchanged. You all sang this masterfully!",
-              "likes": 0,
-              "date": "2025-11-05",
-              "url": "https://www.youtube.com/watch?v=FpeqMBG7_7I&lc=Ugw5vh8tG01O1aha3r94AaABAg",
-              "videoId": "FpeqMBG7_7I",
-              "score": 5.39
-            },
-            {
-              "id": "yt:Uggbfr2qxkBkXHgCoAEC",
-              "source": "youtube",
-              "author": "@jgfthytrd",
-              "authorUrl": "http://www.youtube.com/@jgfthytrd",
-              "text": "i played the first FFX on the ps2, and to this day it is still the best game i've ever played",
-              "likes": 386,
-              "date": "2014-10-23",
-              "url": "https://www.youtube.com/watch?v=Woz3mS9Ao5k&lc=Uggbfr2qxkBkXHgCoAEC",
-              "videoId": "Woz3mS9Ao5k",
-              "score": 5.3
-            },
-            {
-              "id": "yt:UgwbmygrKtHqs9cAw4d4AaABAg",
-              "source": "youtube",
-              "author": "@shinigamimiroku3723",
-              "authorUrl": "http://www.youtube.com/@shinigamimiroku3723",
-              "text": "Funny enough, X isn't my favorite FF game, but the Hymn of the Fayth is one of my favorite songs of all time because it reminds me of the old hymns, which were sung without any sort of instrumental accompaniment (this is also one of the reasons why I like barbershop quartets), so I'll sometimes out of the blue just start humming it, so hearing a Gregorian group singing this brings tears to my eyes. What made it even better was the fact that you sung it in a church that was designed to maximize the acoustics, giving it that authentic echo effect that lets voices be heard even in the back of the room.",
-              "likes": 0,
-              "date": "2022-07-04",
-              "url": "https://www.youtube.com/watch?v=FpeqMBG7_7I&lc=UgwbmygrKtHqs9cAw4d4AaABAg",
-              "videoId": "FpeqMBG7_7I",
-              "score": 5.22
-            },
-            {
-              "id": "yt:UgwNBsyl8eUfySwzqEF4AaABAg",
-              "source": "youtube",
-              "author": "@MarcusLeziria",
-              "authorUrl": "http://www.youtube.com/@MarcusLeziria",
-              "text": "I still remember all FF I played. Vii, VIII, IX, and X. Then I stopped. This song I will never forget! 24 years have passed.",
-              "likes": 0,
-              "date": "2025-11-27",
-              "url": "https://www.youtube.com/watch?v=Woz3mS9Ao5k&lc=UgwNBsyl8eUfySwzqEF4AaABAg",
-              "videoId": "Woz3mS9Ao5k",
-              "score": 5.21
-            },
-            {
-              "id": "yt:UgyQ7hKWG8GkK9YA6YJ4AaABAg",
-              "source": "youtube",
-              "author": "@DammnDeejay",
-              "authorUrl": "http://www.youtube.com/@DammnDeejay",
-              "text": "Yunelesca and Spira’s hymn always hit harder for me. The collective nature of everyone crying out made me really contemplate what life was really about back then 😂",
-              "likes": 0,
-              "date": "2025-06-28",
-              "url": "https://www.youtube.com/watch?v=Woz3mS9Ao5k&lc=UgyQ7hKWG8GkK9YA6YJ4AaABAg",
-              "videoId": "Woz3mS9Ao5k",
-              "score": 4.94
-            },
-            {
-              "id": "yt:Ugxhw2PuQzzfpddkGZ94AaABAg",
-              "source": "youtube",
-              "author": "@Killy5445",
-              "authorUrl": "http://www.youtube.com/@Killy5445",
-              "text": "FFX is so close to my heart and my childhood. This has to be the best rendition I’ve ever heard. Ty so much for the trip down memory lane.",
-              "likes": 67,
-              "date": "2025-10-16",
-              "url": "https://www.youtube.com/watch?v=FpeqMBG7_7I&lc=Ugxhw2PuQzzfpddkGZ94AaABAg",
-              "videoId": "FpeqMBG7_7I",
-              "score": 4.89
-            },
-            {
-              "id": "yt:UgyTS9dVO3_U3Y964M94AaABAg",
-              "source": "youtube",
-              "author": "@Be_Fallen_Angel",
-              "authorUrl": "http://www.youtube.com/@Be_Fallen_Angel",
-              "text": "So i have to become 35 years old to hear for the first time the song starts with Elohim (God The Father). 😢😢😢❤",
-              "likes": 1,
-              "date": "2024-01-12",
-              "url": "https://www.youtube.com/watch?v=Woz3mS9Ao5k&lc=UgyTS9dVO3_U3Y964M94AaABAg",
-              "videoId": "Woz3mS9Ao5k",
-              "score": 4.87
-            },
-            {
-              "id": "yt:Ugz0XnwvgaglSe2N6VV4AaABAg",
-              "source": "youtube",
-              "author": "@vassengo",
-              "authorUrl": "http://www.youtube.com/@vassengo",
-              "text": "I still remember picking up the game for the first time. This was so majestic it made me cry with bitter joy for Tidus the dream of the fayth",
-              "likes": 0,
-              "date": "2025-12-25",
-              "url": "https://www.youtube.com/watch?v=FpeqMBG7_7I&lc=Ugz0XnwvgaglSe2N6VV4AaABAg",
-              "videoId": "FpeqMBG7_7I",
-              "score": 4.87
-            },
-            {
-              "id": "yt:UgztF_F5auh_DXyobaV4AaABAg",
-              "source": "youtube",
-              "author": "@wordybirb",
-              "authorUrl": "http://www.youtube.com/@wordybirb",
-              "text": "I don't know why, but when I'm feeling particularly hopeless, this where my mind goes. FFX was my first Final Fantasy, but I never had particular emotional attachment to it growing up. Even as a teen, I figured out that, in retrospect, it was bad in a lot of ways.\n\nYet when I'm at the bottom looking up, I hear the Hymn of the Fayth.",
-              "likes": 0,
-              "date": "2026-10-06",
-              "url": "https://www.youtube.com/watch?v=Woz3mS9Ao5k&lc=UgztF_F5auh_DXyobaV4AaABAg",
-              "videoId": "Woz3mS9Ao5k",
-              "score": 4.71
-            },
-            {
-              "id": "yt:UgwAh8I6UbR3Bgf8Z-Z4AaABAg",
-              "source": "youtube",
-              "author": "@frankzar895",
-              "authorUrl": "http://www.youtube.com/@frankzar895",
-              "text": "When my daughter was a baby I played this when she was fussy and it calmed her down... Hey it worked on sin right lol",
-              "likes": 65,
-              "date": "2013-08-28",
-              "url": "https://www.youtube.com/watch?v=Woz3mS9Ao5k&lc=UgwAh8I6UbR3Bgf8Z-Z4AaABAg",
-              "videoId": "Woz3mS9Ao5k",
-              "score": 4.61
-            },
-            {
-              "id": "yt:UgwK7ZQOSp-GT_ntjzt4AaABAg",
-              "source": "youtube",
-              "author": "@60wwediva",
-              "authorUrl": "http://www.youtube.com/@60wwediva",
-              "text": "these hymns always stir up the inner emotions in my soul ugh I miss my ps2 and the game. I was crying like a baby at the end of it.",
-              "likes": 22,
-              "date": "2013-10-31",
-              "url": "https://www.youtube.com/watch?v=Woz3mS9Ao5k&lc=UgwK7ZQOSp-GT_ntjzt4AaABAg",
-              "videoId": "Woz3mS9Ao5k",
-              "score": 4.6
-            },
-            {
-              "id": "yt:UgxyApZr5mt4cHz_-1l4AaABAg",
-              "source": "youtube",
-              "author": "@khalilmason",
-              "authorUrl": "http://www.youtube.com/@khalilmason",
-              "text": "20+ years after I first experienced this game; I only now feel the sorrow woven into Bahamut’s hymn… \n\nIt immediately brought tears to my eyes. A child, martyred… a pertinent notion for all time.",
-              "likes": 21,
-              "date": "2024-06-24",
-              "url": "https://www.youtube.com/watch?v=Woz3mS9Ao5k&lc=UgxyApZr5mt4cHz_-1l4AaABAg",
-              "videoId": "Woz3mS9Ao5k",
-              "score": 4.59
-            },
-            {
-              "id": "yt:UgiL94yXVR2AjHgCoAEC",
-              "source": "youtube",
-              "author": "@GodsDog1",
-              "authorUrl": "http://www.youtube.com/@GodsDog1",
-              "text": "The first time I realized that the Voices are the spirits that inhabit the Bestia. Now I have even more of them feels D:",
-              "likes": 59,
-              "date": "2016-03-28",
-              "url": "https://www.youtube.com/watch?v=Woz3mS9Ao5k&lc=UgiL94yXVR2AjHgCoAEC",
-              "videoId": "Woz3mS9Ao5k",
-              "score": 4.58
-            },
-            {
-              "id": "yt:Ugxs-TRUCo8GzVTP6I94AaABAg",
-              "source": "youtube",
-              "author": "@jorynickila7760",
-              "authorUrl": "http://www.youtube.com/@jorynickila7760",
-              "text": "Yes! I'm the 420th comment on this amazing sounding video. I don't care what anybody says. 4-6 guys harmonizing in a cathedral always sounds amazing! Could you imagine 24 of these guys singing at a kuningas funeral pyre? I definitely could, and I think any king would be honored by them...",
-              "likes": 3,
-              "date": "2023-02-26",
-              "url": "https://www.youtube.com/watch?v=FpeqMBG7_7I&lc=Ugxs-TRUCo8GzVTP6I94AaABAg",
-              "videoId": "FpeqMBG7_7I",
-              "score": 4.37
-            },
-            {
-              "id": "yt:UgxHfSfUp_PYTvf0XAt4AaABAg",
-              "source": "youtube",
-              "author": "@RiptideGaming_GXT",
-              "authorUrl": "http://www.youtube.com/@RiptideGaming_GXT",
-              "text": "Glad im not alone...in being an adult and still getting tears in my eyes when I hear this music.",
-              "likes": 36,
-              "date": "2021-11-25",
-              "url": "https://www.youtube.com/watch?v=Woz3mS9Ao5k&lc=UgxHfSfUp_PYTvf0XAt4AaABAg",
-              "videoId": "Woz3mS9Ao5k",
-              "score": 4.29
-            },
-            {
-              "id": "yt:UgjgochbOS5msngCoAEC",
-              "source": "youtube",
-              "author": "@coreo881",
-              "authorUrl": "http://www.youtube.com/@coreo881",
-              "text": "Spira's gives me tears.  Everytime.  You just let the sound kind of wash over you, it's like your soul gets cleansed lol",
-              "likes": 48,
-              "date": "2015-05-19",
-              "url": "https://www.youtube.com/watch?v=Woz3mS9Ao5k&lc=UgjgochbOS5msngCoAEC",
-              "videoId": "Woz3mS9Ao5k",
-              "score": 4.29
-            },
-            {
-              "id": "yt:UgxUWvGffgLBLghLFBJ4AaABAg",
-              "source": "youtube",
-              "author": "@GamingJr0d",
-              "authorUrl": "http://www.youtube.com/@GamingJr0d",
-              "text": "People who are seeing this in 2023 join me in singing lol. But in all seriousness listening to this gives me chills all the time I'm a firm lover of ffx but hearing this always brings me to tears thats how powerful this is kinda sad they left out the al bhed singing this tho THAT was emotional",
-              "likes": 2,
-              "date": "2023-06-14",
-              "url": "https://www.youtube.com/watch?v=Woz3mS9Ao5k&lc=UgxUWvGffgLBLghLFBJ4AaABAg",
-              "videoId": "Woz3mS9Ao5k",
-              "score": 4.26
-            },
-            {
-              "id": "yt:UgyBTePCaz0weSHYAc54AaABAg",
-              "source": "youtube",
-              "author": "@gloaming4247",
-              "authorUrl": "http://www.youtube.com/@gloaming4247",
-              "text": "I remember seeing previews for this game before it came out and being disgusted by it, it didn't look like a FF at all to me. Ofc I bought it anyway and damn was I wrong. It's juuuust beats out VII as my favourite of the series. The characters, the music, Spira, the metaphysics, the last turn based FF. I just love it.",
-              "likes": 0,
-              "date": "2024-04-04",
-              "url": "https://www.youtube.com/watch?v=E9vWvXoZhgI&lc=UgyBTePCaz0weSHYAc54AaABAg",
-              "videoId": "E9vWvXoZhgI",
-              "score": 4.26
-            },
-            {
-              "id": "yt:Ugz20-Dt6RsOxHFms894AaABAg",
-              "source": "youtube",
-              "author": "@MarrilMahariel",
-              "authorUrl": "http://www.youtube.com/@MarrilMahariel",
-              "text": "This is beautiful. The song and game haunts me. My brother and I played it together as kids, I haven't spoken to him in years. I miss our relationship, but some things can't be fixed.",
-              "likes": 2,
-              "date": "2025-11-07",
-              "url": "https://www.youtube.com/watch?v=FpeqMBG7_7I&lc=Ugz20-Dt6RsOxHFms894AaABAg",
-              "videoId": "FpeqMBG7_7I",
-              "score": 4.09
-            },
-            {
-              "id": "yt:UggDUWbndty88ngCoAEC",
-              "source": "youtube",
-              "author": "@xEllionex",
-              "authorUrl": "http://www.youtube.com/@xEllionex",
-              "text": "So I'm going to hear this LIVE at the \"Distant Worlds\" concert... my life will be complete <3",
-              "likes": 21,
-              "date": "2016-03-17",
-              "url": "https://www.youtube.com/watch?v=E9vWvXoZhgI&lc=UggDUWbndty88ngCoAEC",
-              "videoId": "E9vWvXoZhgI",
-              "score": 4.05
             }
           ]
         },
@@ -2433,9 +1913,6 @@
     "ffx/otherworld/BKZs90_fkt4: 74 comments",
     "ffx/besaid-island/RC1VmGXiEFw: 187 comments",
     "ffx/besaid-island/IKGc_wtQKC8: 28 comments",
-    "ffx/hymn-of-the-fayth/Woz3mS9Ao5k: 500 comments",
-    "ffx/hymn-of-the-fayth/FpeqMBG7_7I: 500 comments",
-    "ffx/hymn-of-the-fayth/E9vWvXoZhgI: 144 comments",
     "ffx/suteki-da-ne/Vl20g-tBaKc: 500 comments",
     "ffx/suteki-da-ne/zXpm8DPYuTc: 102 comments",
     "ffx/suteki-da-ne/Zbv6KrO_13A: 112 comments"
