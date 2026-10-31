@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-31T08:02:13Z",
+  "updated": "2026-10-31T08:03:09Z",
   "games": [
     {
       "id": "ffx",
@@ -2419,7 +2419,6 @@
     }
   ],
   "log": [
-    "ffx/to-zanarkand/6fp81GzKarQ: failed (HTTP Error 403: Forbidden)",
     "ffx/to-zanarkand/sy-nrLiAwZI: 128 comments",
     "ffx/to-zanarkand/PSjTN8WSGNk: 500 comments",
     "ffx/to-zanarkand/mWYwmM23Sqs: 500 comments",
@@ -2434,6 +2433,6 @@
     "ffx/suteki-da-ne/Vl20g-tBaKc: 500 comments",
     "ffx/suteki-da-ne/zXpm8DPYuTc: 102 comments",
     "ffx/suteki-da-ne/Zbv6KrO_13A: 112 comments",
-    "ffx/steam: failed (Expecting value: line 1 column 1 (char 0))"
+    "ffx/steam: failed (not JSON, got: '<!DOCTYPE html>\\n<html class=\" responsive DesktopUI\" lang=\"en\"  >\\n<head>\\n\\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\\n\\t\\t\\t<meta ')"
   ]
 }
