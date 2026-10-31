@@ -271,6 +271,7 @@ def main():
                 "id": song["id"],
                 "title": song["title"],
                 "composer": song.get("composer", ""),
+                "volume": song.get("volume"),
                 "moment": song.get("moment") or (moments[0] if moments else None),
                 "moments": moments,
                 "audio": song.get("audio"),

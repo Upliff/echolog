@@ -21,7 +21,7 @@
 
   // Defaults. The admin page can change these for everyone (config/games.json "settings").
   const DEFAULTS = {
-    volume: 80,         // how loud the music starts (0 to 100); visitors' own choice is remembered
+    volume: 80,         // how loud a song starts (0 to 100) if it has no volume of its own; a visitor's choice is remembered per song
     upNextSeconds: 8,   // "Next: ..." shows this long before a song ends, then the next song starts. 0 = off
   };
 
@@ -747,9 +747,16 @@
   const repeatOn = () => saved.get('repeat') === '1';
   const leadSeconds = () => Math.max(0, setting('upNextSeconds'));
 
+  // Volume: a visitor's own choice for this song, else the song's volume from the admin page, else the site default.
+  const clampVol = (v) => Math.max(0, Math.min(100, v));
+  const volKey = () => (songState ? `volume:${songState.game.id}/${songState.song.id}` : null);
   function currentVolume() {
-    const v = Number(saved.get('volume'));
-    return saved.get('volume') != null && Number.isFinite(v) ? Math.max(0, Math.min(100, v)) : Math.max(0, Math.min(100, setting('volume')));
+    const key = volKey();
+    const mine = key ? saved.get(key) : null;
+    if (mine != null && Number.isFinite(Number(mine))) return clampVol(Number(mine));
+    const songVol = songState && songState.song ? Number(songState.song.volume) : NaN;
+    if (songState && songState.song && songState.song.volume != null && Number.isFinite(songVol)) return clampVol(songVol);
+    return clampVol(setting('volume'));
   }
 
   // Tell the scene to play or pause, and remember that it was us.
@@ -966,8 +973,9 @@
   }
 
   function setVolume(v) {
-    v = Math.max(0, Math.min(100, Math.round(v)));
-    saved.set('volume', v);
+    v = clampVol(Math.round(v));
+    const key = volKey();
+    if (key) saved.set(key, v);
     if (v > 0) media.userMuted = false;
     if (songState && songState.ui.vol) {
       songState.ui.vol.value = String(v);

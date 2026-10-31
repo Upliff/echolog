@@ -64,7 +64,8 @@ data/hidden.txt          ids of stories to never show
 - **Music track:** a link, a start and an **end**. The end cuts off dead air at the end of a song (added 31 Oct 2026). The site already passes `end` to YouTube as `endSeconds`.
 - An end time before its start is caught before saving.
 - **Sounds (game editor):** a list of sounds per game: a name (shown on the button) and an audio file (mp3, ogg, wav or m4a, up to 1.5 MB). Saving uploads new files to `sounds/<game id>/<name>.<ext>` and saves `sounds: [{ "label", "file" }]` on the game. Each row has Play, Replace and Remove.
-- **Site tab:** settings for everyone who visits, saved as `settings` in `config/games.json`: starting volume (0 to 100, default 80) and how many seconds before the end "Next" shows (default 8, 0 turns auto next off). Saving starts the collector, which copies `settings` into `stories.json`.
+- **Song volume (song editor):** "Starting volume" slider per song, saved as `volume` (0 to 100) on the song. "Use site default" removes it. Added 31 Oct 2026.
+- **Site tab:** settings for everyone who visits, saved as `settings` in `config/games.json`: default starting volume for songs without their own (0 to 100, default 80) and how many seconds before the end "Next" shows (default 8, 0 turns auto next off). Saving starts the collector, which copies `settings` into `stories.json`.
 - Pasting a YouTube link with `?t=` fills in the start time.
 - Saving writes `config/games.json` through the GitHub API, uploads the cover to `covers/<game id>.<ext>` (shrunk to 1600px), sets `cover` on the game, then starts the "Collect stories" workflow.
 - It needs a fine-grained GitHub token, limited to Upliff/echolog, with Contents and Actions set to read and write. The token is kept only in that browser (localStorage). It's never in the repo or in chat.
@@ -73,7 +74,7 @@ data/hidden.txt          ids of stories to never show
   - **Comments** show exactly as sent, with Approve and Decline. Approve adds the comment to `data/submitted.json`, labels the issue `accepted`, closes it, and starts the collector.
   - **Requests:** Accept (game or song) opens the editor filled in from the request, with a banner. Saving labels the issue `accepted` and closes it. Fix requests get "Mark done". Decline labels the issue `declined` and closes it.
   - The token needs **Issues: Read and write** on the inbox repo too.
-- The collector passes `cover` and `sounds` through to `stories.json`. The front end already uses `game.cover` when it's set, and otherwise falls back to `covers/<id>.jpg|jpeg|png|webp`.
+- The collector passes `cover`, `sounds` and each song's `volume` through to `stories.json`. The front end already uses `game.cover` when it's set, and otherwise falls back to `covers/<id>.jpg|jpeg|png|webp`.
 
 **Quota:** YouTube allows 10,000 units a day, and each page of 100 comments costs 1 unit. At 5 pages per video, that's roughly 5 units per video per run, so there's plenty of room.
 
@@ -91,7 +92,7 @@ data/hidden.txt          ids of stories to never show
     "id": "ffx", "title": "Final Fantasy X", "year": 2001, "cover": "covers/ffx.jpg", "steamAppId": 359870,
     "sounds": [{ "label": "Save point", "file": "sounds/ffx/save-point.mp3" }],
     "songs": [{
-      "id": "to-zanarkand", "title": "To Zanarkand", "composer": "Nobuo Uematsu",
+      "id": "to-zanarkand", "title": "To Zanarkand", "composer": "Nobuo Uematsu", "volume": 70,
       "moment": { "videoId": "kilrRiclUFY", "start": 0, "end": null, "label": "Opening, the campfire" },
       "audio": null,
       "stories": [{ "id": "yt:...", "source": "youtube", "author": "@name", "authorUrl": "...",
@@ -131,8 +132,8 @@ preview.bat + .ps1       local preview server for Windows without Python
 - **Speed rules (keep these):** no `backdrop-filter` and no live CSS blur anywhere. The cover is drawn once into a small canvas (`BG_DETAIL`, 32 x 32; bigger is sharper, 24 was the old softer look) and stretched, which blurs it for free; it never moves, it only fades when the game changes. Anything that animates only uses opacity or transform. The video changes size once and the move is animated with transform. Comments off screen aren't drawn (`content-visibility`). Fonts load without holding up the page.
 - All comment text goes in through `textContent` (never `innerHTML`), with `white-space: pre-wrap` so line breaks stay.
 - "Show more" is decided from the text (over 650 characters or 9 lines), so nothing is measured on screen. Shorter comments are never cut.
-- `index.html` loads `style.css?v=8` and `app.js?v=8`. Bump the number after changes so browsers don't use old copies.
-- Song page: the clip fills the screen apart from a strip at the bottom with the title, our own controls (play, sound, repeat, time, seek bar) and the comment count. The volume slider pops up above the sound button on hover or keyboard focus. Volume and repeat are remembered in the browser; the starting volume comes from the admin Site tab. Phones hide the volume slider (they use their own buttons) and the seek bar. YouTube's control bar is hidden (`controls: 0`).
+- `index.html` loads `style.css?v=8` and `app.js?v=9`. Bump the number after changes so browsers don't use old copies.
+- Song page: the clip fills the screen apart from a strip at the bottom with the title, our own controls (play, sound, repeat, time, seek bar) and the comment count. The volume slider pops up above the sound button on hover or keyboard focus. **Volume** starts at, in order: the visitor's own choice for that song (saved in the browser as `echolog.volume:<game>/<song>`), the song's `volume`, the site default (`settings.volume`). Changing the slider only saves for the song playing. Repeat is remembered in the browser. Phones hide the volume slider (they use their own buttons) and the seek bar. YouTube's control bar is hidden (`controls: 0`).
 - **Taps on the video** go to our own tap layer, not YouTube, so the scene and the music always pause and play together (letting YouTube take taps made it play then pause straight away). The bottom-right corner of the big video is left open so YouTube's "Skip ad" button still works. Tap the small player to make it big again. Space or K also plays/pauses.
 - **Previous / next song:** big round buttons either side of the big video (inside its edges when there's no room beside it, e.g. on phones). They hide with the small player. Songs with nothing to play are skipped, and both wrap round.
 - **Scene bar:** when a song has more than one scene, a bar of big buttons sits right above the video, the same width as it. The video moves down to make room. The current scene is underlined in gold.
