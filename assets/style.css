@@ -117,8 +117,20 @@ body.on-song .bd-vignette { background: radial-gradient(ellipse 85% 75% at 50% 4
   max-width: 1100px; margin: 0 auto; padding: 0 24px;
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
 }
-.peek h1 { margin: 0; min-width: 0; font-family: var(--serif); font-weight: 400; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.1; }
-.peek h1 small { display: block; margin-top: 4px; font-family: var(--sans); font-size: 13px; color: var(--muted); }
+.peek-title { min-width: 0; }
+.peek h1 { margin: 0; font-family: var(--serif); font-weight: 400; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.1; }
+.peek-title small { display: block; margin-top: 4px; font-size: 13px; color: var(--muted); }
+.peek-title .sub { display: flex; align-items: center; gap: 10px; margin-top: 6px; font-size: 13px; color: var(--muted); min-width: 0; }
+.sub-composer { white-space: nowrap; }
+/* Scene buttons, when a song has more than one scene. */
+.scenes { display: flex; gap: 6px; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.scenes::-webkit-scrollbar { display: none; }
+.scene-btn {
+  flex: none; padding: 3px 11px; border-radius: 999px; border: 1px solid var(--line);
+  font-size: 12px; line-height: 1.4; color: var(--muted); text-decoration: none; white-space: nowrap;
+}
+.scene-btn:hover { color: var(--ink); }
+.scene-btn[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #0b0d10; }
 .peek-more {
   display: inline-flex; align-items: center; gap: 4px; min-height: 44px;
   background: none; border: 0; padding: 0; font-size: 14px; color: var(--muted); white-space: nowrap;
@@ -176,7 +188,10 @@ a.c-author:hover { text-decoration: underline; }
 }
 
 /* Controls in the strip under the video. */
-.controls { display: flex; align-items: center; gap: 2px; flex: 1; max-width: 460px; margin: 0 auto; }
+.controls { display: flex; align-items: center; gap: 2px; flex: 1; max-width: 580px; margin: 0 auto; }
+.ctl-repeat[aria-pressed="true"] { color: var(--acc); }
+.ctl-repeat { position: relative; }
+.ctl-repeat[aria-pressed="true"]::after { content: ""; position: absolute; left: 18px; bottom: 3px; width: 4px; height: 4px; border-radius: 50%; background: var(--acc); }
 .ctl {
   width: 40px; height: 40px; flex: none;
   display: inline-flex; align-items: center; justify-content: center;
@@ -185,18 +200,21 @@ a.c-author:hover { text-decoration: underline; }
 .ctl:hover { color: var(--ink); background: rgba(255, 255, 255, 0.08); }
 .ctl.nudge { color: var(--acc); background: rgba(232, 194, 122, 0.14); }
 .ctl-time { margin: 0 10px 0 6px; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.seek {
+.vol { width: 72px; flex: none; margin: 0 6px 0 0; }
+.seek, .vol {
   flex: 1; min-width: 60px; height: 24px; margin: 0; background: transparent; cursor: pointer;
   -webkit-appearance: none; appearance: none;
   --p: 0%;
 }
-.seek::-webkit-slider-runnable-track { height: 2px; border-radius: 2px; background: linear-gradient(var(--ink), var(--ink)) 0 0 / var(--p) 100% no-repeat, rgba(255, 255, 255, 0.18); }
-.seek::-moz-range-track { height: 2px; border-radius: 2px; background: rgba(255, 255, 255, 0.18); }
-.seek::-moz-range-progress { height: 2px; background: var(--ink); }
-.seek::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; margin-top: -4px; border-radius: 50%; background: var(--ink); opacity: 0; }
-.seek::-moz-range-thumb { width: 10px; height: 10px; border: 0; border-radius: 50%; background: var(--ink); opacity: 0; }
-.seek:hover::-webkit-slider-thumb, .seek:focus-visible::-webkit-slider-thumb { opacity: 1; }
-.seek:hover::-moz-range-thumb, .seek:focus-visible::-moz-range-thumb { opacity: 1; }
+.seek::-webkit-slider-runnable-track, .vol::-webkit-slider-runnable-track { height: 2px; border-radius: 2px; background: linear-gradient(var(--ink), var(--ink)) 0 0 / var(--p) 100% no-repeat, rgba(255, 255, 255, 0.18); }
+.seek::-moz-range-track, .vol::-moz-range-track { height: 2px; border-radius: 2px; background: rgba(255, 255, 255, 0.18); }
+.seek::-moz-range-progress, .vol::-moz-range-progress { height: 2px; background: var(--ink); }
+.seek::-webkit-slider-thumb, .vol::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; margin-top: -4px; border-radius: 50%; background: var(--ink); opacity: 0; }
+.seek::-moz-range-thumb, .vol::-moz-range-thumb { width: 10px; height: 10px; border: 0; border-radius: 50%; background: var(--ink); opacity: 0; }
+.seek:hover::-webkit-slider-thumb, .seek:focus-visible::-webkit-slider-thumb,
+.vol:hover::-webkit-slider-thumb, .vol:focus-visible::-webkit-slider-thumb { opacity: 1; }
+.seek:hover::-moz-range-thumb, .seek:focus-visible::-moz-range-thumb,
+.vol:hover::-moz-range-thumb, .vol:focus-visible::-moz-range-thumb { opacity: 1; }
 
 /* Dock: under the small player on desktop, a bar along the bottom on phones. */
 .dock {
@@ -230,7 +248,8 @@ body.mini .upnext { left: auto; right: 20px; transform: none; bottom: 300px; }
 
 @media (max-width: 639px) {
   .dock { left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); }
-  .controls .seek, .controls .ctl-time { display: none; }
+  /* Phones use their own volume buttons. */
+  .controls .seek, .controls .ctl-time, .controls .vol { display: none; }
   .controls { flex: none; margin: 0; }
   body.mini .upnext { left: 12px; right: 12px; bottom: calc(76px + env(safe-area-inset-bottom)); }
 }
@@ -270,8 +289,10 @@ body.mini .upnext { left: auto; right: 20px; transform: none; bottom: 300px; }
 @media (max-width: 639px) {
   :root { --peek: 96px; }
   .peek { padding: 0 12px 0 20px; gap: 8px; }
-  .peek h1 { flex: 1; font-size: 26px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .peek h1 small { overflow: hidden; text-overflow: ellipsis; }
+  .peek-title { flex: 1; }
+  .peek h1 { font-size: 26px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .peek-title small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sub-composer { display: none; }
   .peek-more .pm-word { display: none; }
   .c-text { font-size: 19px; }
   .cloud p { font-size: 17px; }

@@ -212,7 +212,15 @@ def pick(items, hidden, limit):
             it["score"] = round(s, 2)
             keep.append(it)
     keep.sort(key=lambda x: x["score"], reverse=True)
-    return keep[:limit]
+    # The same text posted more than once (often copied lyrics): keep only the best-scoring copy.
+    texts, unique = set(), []
+    for it in keep:
+        t = " ".join(it["text"].split()).lower()
+        if t in texts:
+            continue
+        texts.add(t)
+        unique.append(it)
+    return unique[:limit]
 
 
 def main():
@@ -293,6 +301,7 @@ def main():
 
     result = {
         "updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "settings": config.get("settings") or {},
         "games": games_out,
         "log": log,
     }
