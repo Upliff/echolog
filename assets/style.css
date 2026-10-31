@@ -125,17 +125,28 @@ body.on-song .bd-vignette { background: radial-gradient(ellipse 85% 75% at 50% 4
 
 /* ---------- home ---------- */
 .home {
-  min-height: 100svh;
-  padding: calc(var(--top) + 40px) 24px 80px;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 44px;
-  text-align: center;
+  max-width: 760px; margin: 0 auto;
+  padding: calc(var(--top) + 24px) 24px 120px;
 }
-.games { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+/* The search box stays under the top bar while the list scrolls. */
+.search-wrap {
+  position: sticky; top: var(--top); z-index: 5;
+  padding: 12px 0 16px;
+}
+.search {
+  width: 100%; height: 48px; padding: 0 18px; border-radius: 999px;
+  border: 1px solid var(--line); background: rgba(14, 16, 20, 0.92); color: var(--ink);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  font: inherit; font-size: 16px; outline: none;
+}
+.search::placeholder { color: var(--muted); }
+.search:focus { border-color: var(--acc); }
+.games { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
 .games > li > a {
-  display: inline-block; padding: 6px 4px;
-  font-family: var(--serif); font-size: clamp(40px, 7vw, 84px); line-height: 1.05;
+  display: block; padding: 14px 4px; border-bottom: 1px solid var(--line);
+  font-family: var(--serif); font-size: clamp(28px, 4.5vw, 44px); line-height: 1.15;
   text-decoration: none; color: var(--faint);
-  transition: color 0.3s ease;
+  transition: color 0.2s ease;
 }
 .games > li > a:hover, .games > li > a:focus-visible, .games > li:hover > a, .games > li:only-child > a { color: var(--ink); }
 

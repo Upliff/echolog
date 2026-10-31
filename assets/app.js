@@ -246,16 +246,43 @@
     const games = [...DATA.games].sort((a, b) => String(a.title).localeCompare(String(b.title)));
     setCover(games[0] || null);
 
-    const list = h('ul', { class: 'games' },
-      games.map((g, i) => h('li', { class: 'rise', style: `--i:${i + 1}`, onmouseenter: () => setCover(g) },
-        h('a', {
-          href: `#/${encodeURIComponent(g.id)}`,
-          onfocus: () => setCover(g),
-        }, g.title))));
+    // A search box over a plain list. It matches game names and song names.
+    const items = games.map((g, i) => {
+      const li = h('li', { class: 'rise', style: `--i:${Math.min(i + 1, 12)}`, onmouseenter: () => setCover(g) },
+        h('a', { href: `#/${encodeURIComponent(g.id)}`, onfocus: () => setCover(g) }, g.title));
+      const words = [g.title, ...(g.songs || []).map((s) => s.title)].join(' ').toLowerCase();
+      return { g, li, words };
+    });
+    const list = h('ul', { class: 'games' }, items.map((x) => x.li));
+    const none = h('p', { class: 'empty', hidden: true }, 'No games match.');
+    const search = h('input', {
+      class: 'search', type: 'search', placeholder: 'Search', 'aria-label': 'Search games and songs',
+      autocomplete: 'off', spellcheck: 'false',
+    });
+    search.addEventListener('input', () => {
+      // Stop the fade-in from replaying when a hidden game comes back.
+      for (const x of items) x.li.classList.remove('rise');
+      const q = search.value.trim().toLowerCase();
+      let shown = 0;
+      for (const x of items) {
+        const hit = !q || q.split(/\s+/).every((w) => x.words.includes(w));
+        x.li.hidden = !hit;
+        if (hit) shown++;
+      }
+      none.hidden = shown > 0;
+      const first = items.find((x) => !x.li.hidden);
+      if (q && first) setCover(first.g);
+    });
+    search.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') return;
+      const first = items.find((x) => !x.li.hidden);
+      if (first) location.hash = `#/${encodeURIComponent(first.g.id)}`;
+    });
 
     app.append(h('section', { class: 'view home' },
-      h('div', { class: 'rise', style: '--i:0' }, h('span', { class: 'placeholder' }, '[TAGLINE]')),
-      games.length ? list : h('p', { class: 'empty' }, 'No games yet.')));
+      h('div', { class: 'search-wrap' }, search),
+      games.length ? list : h('p', { class: 'empty' }, 'No games yet.'),
+      none));
   }
 
   /* ---------- game ---------- */
@@ -735,6 +762,8 @@
     userMuted: false, tick: null, playing: false,
     sceneExpect: null, // what we last told the scene to do
     gate: null,        // while both players are loading: { scene, music, timer } (see loadMedia)
+    extra: 0,          // song seconds added by repeats, so the picture keeps going instead of jumping back
+    repeatAt: 0,
     lock: false,       // picture locked to the music (set when both start together; off after a scene loops or swaps)
     loadTimer: null,
   };
@@ -818,13 +847,14 @@
     media.plan = plan;
     media.playing = false;
     media.lock = false;
+    if (!opts.keepExtra) media.extra = 0;
     stageMsg.hidden = true;
     if (!opts.quiet) setLoading(true);
     refreshBars();
     const elapsed = opts.elapsed || 0;
     if (plan.music) {
       const musicAt = clipAt(plan.music, elapsed);
-      media.at = { music: musicAt, scene: sceneAt(plan.scene, musicAt - (plan.music.start || 0)) };
+      media.at = { music: musicAt, scene: sceneAt(plan.scene, musicAt - (plan.music.start || 0) + media.extra) };
     } else {
       media.at = { music: 0, scene: clipAt(plan.scene, elapsed) };
     }
@@ -895,7 +925,7 @@
     media.lock = true;
     setLoading(true, true);
     const mt = safe(() => media.music.getCurrentTime()) || 0;
-    const at = sceneAt(plan.scene, mt - (plan.music.start || 0));
+    const at = sceneAt(plan.scene, mt - (plan.music.start || 0) + media.extra);
     media.sceneExpect = { action: media.playing ? 'play' : 'pause', at: Date.now() };
     loadYT().then((YT) => {
       if (media.plan !== plan) return;
@@ -1007,7 +1037,7 @@
         // Music still going: loop the scene (to where it should be for the song, when locked).
         const mt = safe(() => media.music.getCurrentTime()) || 0;
         const dur = safe(() => media.scene.getDuration()) || 0;
-        const to = media.lock ? sceneAt(plan.scene, mt - (plan.music.start || 0), dur) : (plan.scene.start || 0);
+        const to = media.lock ? sceneAt(plan.scene, mt - (plan.music.start || 0) + media.extra, dur) : (plan.scene.start || 0);
         media.sceneExpect = { action: 'play', at: Date.now() };
         safe(() => { media.scene.seekTo(to, true); media.scene.playVideo(); });
         return;
@@ -1178,10 +1208,16 @@
   }
 
   // Play the current scene again from the top (repeat).
-  function restart() {
-    if (!media.plan) return;
+  // Repeat: the song goes back to its start without stopping. With a separate music track the
+  // picture carries on where it is (it keeps looping on its own); only the song starts again.
+  function repeatSong() {
+    const p = master();
+    const spec = masterSpec();
+    if (!p || !spec || Date.now() - media.repeatAt < 1500) return;
+    media.repeatAt = Date.now();
     if (songState) songState.ended = false;
-    loadMedia(media.plan, { quiet: true });
+    if (sep()) media.extra += clipPos(p, spec).len;
+    safe(() => { p.seekTo(spec.start || 0, true); p.playVideo(); });
   }
 
   function tick() {
@@ -1200,7 +1236,7 @@
         && safe(() => media.scene.getPlayerState()) === YT_STATE.PLAYING) {
       const mt = safe(() => media.music.getCurrentTime()) || 0;
       const st = safe(() => media.scene.getCurrentTime()) || 0;
-      const want = sceneAt(plan.scene, mt - (plan.music.start || 0), safe(() => media.scene.getDuration()) || 0);
+      const want = sceneAt(plan.scene, mt - (plan.music.start || 0) + media.extra, safe(() => media.scene.getDuration()) || 0);
       if (Math.abs(st - want) > 0.8) safe(() => media.scene.seekTo(want, true));
     }
     sync();
@@ -1221,6 +1257,7 @@
     }
     for (const bar of ui.bars || []) drawBar(bar);
     const { pos, len } = clipPos(p, masterSpec());
+    if (playing && repeatOn() && len > 3 && len - pos < 0.35) repeatSong();
     if (len > 1) nearEnd(len - pos, playing);
   }
 
@@ -1262,7 +1299,7 @@
     const st = songState;
     if (!st || st.ended) return;
     st.ended = true;
-    if (repeatOn()) { restart(); return; }
+    if (repeatOn()) { repeatSong(); return; }
     stopClouds();
     const next = st.next;
     if (!leadSeconds() || st.stayed || !next || next === st.song) {
