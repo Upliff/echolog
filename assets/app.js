@@ -1259,6 +1259,20 @@
   function tick() {
     if (document.hidden) return;
     const plan = media.plan;
+    // Safety net: if the scene is playing from before its start (YouTube ignored the start time,
+    // e.g. after an ad, or a phone that wouldn't jump until tapped), put it where it should be.
+    if (plan && !media.gate && media.scene && media.ready.scene && plan.scene.start
+        && safe(() => media.scene.getPlayerState()) === YT_STATE.PLAYING) {
+      const t = safe(() => media.scene.getCurrentTime()) || 0;
+      if (t < plan.scene.start - 1) {
+        let to = plan.scene.start;
+        if (sep() && media.lock && media.ready.music) {
+          const mt = safe(() => media.music.getCurrentTime()) || 0;
+          to = sceneAt(plan.scene, mt - (plan.music.start || 0) + media.extra, safe(() => media.scene.getDuration()) || 0);
+        }
+        safe(() => media.scene.seekTo(to, true));
+      }
+    }
     // Not locked (someone dragged the Scene bar): a scene with its own end just loops from its start.
     if (plan && sep() && !media.lock && plan.scene.end && media.scene && media.ready.scene) {
       const t = safe(() => media.scene.getCurrentTime()) || 0;
