@@ -236,6 +236,7 @@ def main():
                 "title": song["title"],
                 "composer": song.get("composer", ""),
                 "moment": song.get("moment"),
+                "audio": song.get("audio"),
                 "stories": stories,
             })
 
