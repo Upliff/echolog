@@ -89,8 +89,11 @@ data/hidden.txt          ids of stories to never show
 Other chats add what they need from the admin page here. The admin chat builds it and then removes the line.
 
 - Sounds editor in the game editor (see the Sounds line above). The site and collector already support `sounds`.
+- **Check that every save starts "Collect stories"** (asked 1 Nov 2026): Mohad saved The Other Promise at 9:58 and no collector run started after it (the last one was 9:50). Maybe "Fetch comments after saving" was off, or the start request failed without saying so. If starting the run fails, show it in the status line.
 
 **Quota:** YouTube allows 10,000 units a day, and each page of 100 comments costs 1 unit. At 5 pages per video, that's roughly 5 units per video per run, so there's plenty of room.
+
+**Saves only show on the site after a collector run.** The site reads `data/stories.json`, not `config/games.json`, so a change made in the admin page appears once "Collect stories" has run (about 30 seconds) and GitHub Pages has republished (a minute or two). The collector's push now retries up to 5 times, pulling in anything saved meanwhile: on 1 Nov 2026 a run failed because an admin save landed while it was running, so Kingdom Hearts II changes didn't show until it was run again.
 
 **Run log:** each run writes a `log` list into `data/stories.json` showing how many comments each video gave, or why it failed. GitHub's own job logs can't be read from Claude's side, so check this instead. A video that gives `403` has comments turned off, so swap it for another.
 
