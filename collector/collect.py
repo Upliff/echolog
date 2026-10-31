@@ -290,34 +290,50 @@ def main():
         prev_songs = {s["id"]: s for s in prev.get("songs", [])}
         songs_out = []
 
-        for song in game.get("songs", []):
+        def gather(video_ids, where, previous):
+            """Fetch, filter and pick comments from some videos. Keeps last run's if YouTube was unreachable."""
             raw, ok = [], bool(key)
             if key:
-                for vid in song.get("commentVideos", []):
+                for vid in video_ids:
                     try:
                         got = youtube_comments(vid, key)
-                        print(f"  {song['title']} / {vid}: {len(got)} comments")
-                        log.append(f"{game['id']}/{song['id']}/{vid}: {len(got)} comments")
+                        print(f"  {where} / {vid}: {len(got)} comments")
+                        log.append(f"{where}/{vid}: {len(got)} comments")
                         raw.extend(got)
                     except Exception as e:  # noqa: BLE001
                         ok = False
-                        print(f"  {song['title']} / {vid}: failed ({e})", file=sys.stderr)
-                        log.append(f"{game['id']}/{song['id']}/{vid}: failed ({e})")
+                        print(f"  {where} / {vid}: failed ({e})", file=sys.stderr)
+                        log.append(f"{where}/{vid}: failed ({e})")
             if ok or raw:
-                stories = pick(raw, hidden, MAX_STORIES_PER_SONG)
-            else:
-                # keep last run's stories if YouTube was unreachable
-                stories = [s for s in prev_songs.get(song["id"], {}).get("stories", []) if s["id"] not in hidden]
+                return pick(raw, hidden, MAX_STORIES_PER_SONG)
+            return [x for x in (previous or []) if x["id"] not in hidden]
+
+        for song in game.get("songs", []):
+            prev_song = prev_songs.get(song["id"], {})
+            where = f"{game['id']}/{song['id']}"
+            stories = gather(song.get("commentVideos", []), where, prev_song.get("stories"))
             own = [c for c in submitted.get((game["id"], song["id"]), []) if c["id"] not in hidden]
             stories = own + [x for x in stories if x["id"] not in {c["id"] for c in own}]
-            moments = song.get("moments") or ([song["moment"]] if song.get("moment") else [])
+
+            # A scene can have its own comment videos; its comments go on the scene.
+            # Scenes without their own use the song's.
+            moments = [dict(m) for m in (song.get("moments") or ([song["moment"]] if song.get("moment") else []))]
+            prev_moments = prev_song.get("moments") or []
+            for i, m in enumerate(moments):
+                vids = m.get("commentVideos") or []
+                if not vids:
+                    m.pop("stories", None)
+                    continue
+                before = prev_moments[i].get("stories") if i < len(prev_moments) and prev_moments[i].get("videoId") == m.get("videoId") else None
+                m["stories"] = gather(vids, f"{where}/scene{i + 1}", before)
+
             songs_out.append({
                 "id": song["id"],
                 "title": song["title"],
                 "composer": song.get("composer", ""),
                 "volume": song.get("volume"),
-                "length": song_length(song, durations) or prev_songs.get(song["id"], {}).get("length"),
-                "moment": song.get("moment") or (moments[0] if moments else None),
+                "length": song_length(song, durations) or prev_song.get("length"),
+                "moment": song.get("moment") or ({k: v for k, v in moments[0].items() if k not in ("stories", "commentVideos")} if moments else None),
                 "moments": moments,
                 "audio": song.get("audio"),
                 "stories": stories,

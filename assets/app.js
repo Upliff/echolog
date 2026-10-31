@@ -25,9 +25,11 @@
     upNextSeconds: 8,   // "Next: ..." shows this long before a song ends, then the next song starts. 0 = off
   };
 
-  // Background detail: the cover is drawn this many pixels across, then stretched.
-  // Smaller is blurrier. 24 was the old, very soft look.
-  const BG_DETAIL = 32;
+  // Background: the cover is drawn once, BG_DETAIL pixels wide (shaped like the screen, cropped
+  // to fill it), blurred by BG_BLUR pixels, then stretched to fill the screen. Bigger BG_DETAIL or
+  // smaller BG_BLUR is sharper. (It used to be squashed into a 32 x 32 square, which looked blocky.)
+  const BG_DETAIL = 160;
+  const BG_BLUR = 2.5;
 
   // Comments longer than this get cut off with "Show more".
   const LONG_CHARS = 650;
@@ -179,14 +181,22 @@
     if (key !== coverKey) return; // a newer request won
     const next = layers[1 - activeLayer];
     if (img) {
-      if (next.width !== BG_DETAIL) { next.width = BG_DETAIL; next.height = BG_DETAIL; }
       const ctx = next.getContext('2d');
-      const n = next.width;
-      ctx.clearRect(0, 0, n, n);
-      if ('filter' in ctx) ctx.filter = 'blur(0.6px) saturate(1.3) brightness(0.62)';
-      // Draw a little past the edges so the blur doesn't leave dark borders.
-      ctx.drawImage(img, -2, -2, n + 4, n + 4);
-      if (!('filter' in ctx)) { ctx.fillStyle = 'rgba(5,7,11,0.4)'; ctx.fillRect(0, 0, n, n); }
+      // Browsers without canvas blur (older Safari) get a smaller canvas, which blurs when stretched.
+      const canBlur = typeof ctx.filter === 'string';
+      const w = canBlur ? BG_DETAIL : 40;
+      const hgt = Math.max(1, Math.round(w * window.innerHeight / Math.max(1, window.innerWidth)));
+      next.width = w;
+      next.height = hgt;
+      ctx.clearRect(0, 0, w, hgt);
+      if (canBlur) ctx.filter = `blur(${BG_BLUR}px) saturate(1.3) brightness(0.62)`;
+      // Crop the cover to fill the screen's shape, drawing a little past the edges so the blur doesn't leave dark borders.
+      const pad = canBlur ? BG_BLUR * 3 : 2;
+      const scale = Math.max((w + pad * 2) / img.naturalWidth, (hgt + pad * 2) / img.naturalHeight);
+      const dw = img.naturalWidth * scale;
+      const dh = img.naturalHeight * scale;
+      ctx.drawImage(img, (w - dw) / 2, (hgt - dh) / 2, dw, dh);
+      if (!canBlur) { ctx.fillStyle = 'rgba(5,7,11,0.4)'; ctx.fillRect(0, 0, w, hgt); }
       next.classList.add('on');
     } else {
       next.classList.remove('on');
@@ -462,14 +472,14 @@
     crumb.replaceChildren(h('span', { class: 'has-menu crumb-menu' },
       h('a', { href: `#/${encodeURIComponent(game.id)}` }, game.title), songMenu(game, song)));
 
-    const stories = song.stories || [];
-    const n = stories.length;
     const plan = playable(song, location.hash === firstHash, sceneIndex);
+    const stories = storiesFor(song, plan ? plan.index : 0);
+    const n = stories.length;
     const next = plan ? nextSong(game, song) : null;
     const prev = plan ? nextSong(game, song, -1) : null;
     const scenes = scenesOf(song);
     const view = h('section', { class: 'view song' });
-    songState = { game, song, plan, next, prev, scenes, ui: {}, ended: false, stayed: false };
+    songState = { game, song, plan, next, prev, scenes, stories, ui: {}, ended: false, stayed: false };
 
     if (plan) {
       const ui = songState.ui;
@@ -515,10 +525,7 @@
         h('div', { class: 'peek rise', style: '--i:2' },
           h('div', { class: 'peek-title' }, h('h1', null, song.title), sub),
           controls,
-          h('button', {
-            class: 'peek-more', type: 'button', 'aria-label': `${plural(n, 'comment', 'comments')}, scroll down`,
-            onclick: () => $('comments').scrollIntoView({ behavior: scrollBehavior }),
-          }, h('span', null, n.toLocaleString('en')), h('span', { class: 'pm-word' }, n === 1 ? 'comment' : 'comments'), svg('down', 16))),
+          songState.ui.more = moreButton(n)),
         commentsSection(stories));
     } else {
       view.append(
@@ -530,6 +537,34 @@
     app.append(view);
     if (plan) openStage(plan, song);
     else if (!stage.hidden) closeStage();
+  }
+
+  // The comment count at the end of the strip; scrolls down to the comments.
+  function moreButton(n) {
+    return h('button', {
+      class: 'peek-more', type: 'button', 'aria-label': `${plural(n, 'comment', 'comments')}, scroll down`,
+      onclick: () => $('comments').scrollIntoView({ behavior: scrollBehavior }),
+    }, h('span', null, n.toLocaleString('en')), h('span', { class: 'pm-word' }, n === 1 ? 'comment' : 'comments'), svg('down', 16));
+  }
+
+  // A scene with its own comments shows those; otherwise the song's.
+  function storiesFor(song, index) {
+    const m = scenesOf(song)[index];
+    return m && Array.isArray(m.stories) ? m.stories : (song.stories || []);
+  }
+
+  // Put the comments for the scene now showing on the page (only if they're different).
+  function showSceneComments(index) {
+    const st = songState;
+    const stories = storiesFor(st.song, index);
+    if (stories === st.stories) return;
+    st.stories = stories;
+    const old = $('comments');
+    if (old) old.replaceWith(commentsSection(stories));
+    if (st.ui.more) { const b = moreButton(stories.length); st.ui.more.replaceWith(b); st.ui.more = b; }
+    stopClouds(true);
+    clouds.song = null;
+    startClouds();
   }
 
   function setSideBtn(btn, song, icon, label) {
@@ -553,6 +588,7 @@
     st.plan = plan;
     if (st.ui.scenes) st.ui.scenes.forEach((b, k) => (k === plan.index ? b.setAttribute('aria-current', 'true') : b.removeAttribute('aria-current')));
     stageMsg.hidden = true;
+    showSceneComments(plan.index);
     const sameMusic = old && old.music && plan.music && sep() && media.ready.music
       && old.music.videoId === plan.music.videoId && (old.music.start || 0) === (plan.music.start || 0);
     if (sameMusic) {
@@ -961,7 +997,7 @@
         rel: 0,
         start: Math.floor(from),
         cc_load_policy: 0,
-      }, spec.end ? { end: Math.floor(spec.end) } : {},
+      }, spec.end ? { end: Math.ceil(spec.end) } : {},
       // Start muted while loading (and the scene always, when it sits under a music track).
       (role === 'scene' && media.plan && media.plan.music) || media.gate ? { mute: 1 } : {}),
       events: {
@@ -1258,6 +1294,11 @@
     for (const bar of ui.bars || []) drawBar(bar);
     const { pos, len } = clipPos(p, masterSpec());
     if (playing && repeatOn() && len > 3 && len - pos < 0.35) repeatSong();
+    // Ends can have milliseconds; YouTube only stops on whole seconds, so stop it ourselves.
+    else if (playing && !repeatOn() && masterSpec().end && len > 1 && pos >= len - 0.05) {
+      safe(() => p.pauseVideo());
+      songEnded();
+    }
     if (len > 1) nearEnd(len - pos, playing);
   }
 
@@ -1333,8 +1374,8 @@
 
   const clouds = { timer: null, list: [], pool: [], recent: [], lastSide: null, started: false, song: null };
 
-  function cloudPool(song) {
-    const short = (song.stories || []).filter((c) => c.text && c.text.length <= CLOUD_MAX_CHARS);
+  function cloudPool(stories) {
+    const short = (stories || []).filter((c) => c.text && c.text.length <= CLOUD_MAX_CHARS);
     // Best 30 by score, in a random order.
     return shuffle([...short].sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 30));
   }
@@ -1342,7 +1383,7 @@
   // Every comment shows once before any comes round again, and the last few shown
   // never come straight back when the list starts over.
   function refillClouds() {
-    const fresh = cloudPool(songState.song);
+    const fresh = cloudPool(songState.stories);
     const keep = Math.min(5, Math.max(0, fresh.length - 1));
     const recentIds = keep ? clouds.recent.slice(-keep).reverse() : []; // most recent first
     const byId = new Map(fresh.map((c) => [c.id, c]));
@@ -1356,14 +1397,14 @@
   // Starts the cloud loop if it isn't already waiting. Leave out delay to use the normal one.
   function startClouds(delay) {
     if (!canCloud() || clouds.timer) return;
-    if (clouds.song !== songState.song) {
-      clouds.song = songState.song;
+    if (clouds.song !== songState.stories) {
+      clouds.song = songState.stories;
       clouds.recent = [];
       clouds.pool = [];
       refillClouds();
       clouds.started = false;
     }
-    if (!clouds.pool.length && !cloudPool(songState.song).length) return;
+    if (!clouds.pool.length && !cloudPool(songState.stories).length) return;
     if (delay == null) delay = clouds.started ? 2500 : CLOUD_FIRST_MS;
     clouds.timer = setTimeout(cloudLoop, delay);
   }
