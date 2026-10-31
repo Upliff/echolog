@@ -17,7 +17,7 @@ Owner: Mohad. Repo: https://github.com/Upliff/echolog (public).
 ## Decisions so far
 
 - **Name:** Echolog (echo + log).
-- **Sources:** YouTube comments on soundtrack videos, plus Steam reviews. Reddit is out: Reddit stopped taking new API requests on 31 Oct 2026. A "submit your own story" form might come later.
+- **Sources:** YouTube comments on soundtrack videos. Reddit is out: Reddit stopped taking new API requests on 31 Oct 2026. Steam is off for now: Steam shut its public review endpoint in Oct 2026, and the replacement needs a publisher key. The Steam code stays in `collect.py` behind `STEAM_ENABLED = False`. A "submit your own story" form might come later.
 - **No home server, no local AI model.** Everything runs on GitHub: a GitHub Actions job runs nightly, and the site will be hosted on GitHub Pages.
 - **Filtering:** a free keyword and score filter (`collector/collect.py`). There's no AI scoring for now; paid AI could be added later if needed. To remove a bad comment, add its id to `data/hidden.txt`.
 - **Front end:** Mohad plans to build it with Claude Design. It reads `data/stories.json`.
@@ -27,10 +27,9 @@ Owner: Mohad. Repo: https://github.com/Upliff/echolog (public).
 
 - Google Cloud project "Game Stories" (id `leafy-tenure-513307-e2`), with YouTube Data API v3 enabled. The API key is restricted to that API.
 - GitHub repo secret `YOUTUBE_API_KEY` is added. Never put the key in code, chat or the site.
-- Done: repo created, secret added.
-- Not done yet: Claude can't push to the repo until the Claude GitHub App is installed on it. Until then, files have to be uploaded by hand.
-- Not done yet: the first run of the "Collect stories" workflow.
+- Done: repo created, secret added, Claude GitHub App installed on the repo (Claude can push), and the first runs completed (31 Oct 2026). 196 stories across the 5 FFX songs.
 - Not done yet: GitHub Pages turned on.
+- Not done yet: the front end.
 
 ## How it works
 
@@ -49,6 +48,8 @@ data/hidden.txt          ids of stories to never show
 - `steamAppId` is the number in the game's Steam store URL. Leave it out if the game isn't on Steam.
 
 **Quota:** YouTube allows 10,000 units a day, and each page of 100 comments costs 1 unit. At 5 pages per video, that's roughly 5 units per video per run, so there's plenty of room.
+
+**Run log:** each run writes a `log` list into `data/stories.json` showing how many comments each video gave, or why it failed. GitHub's own job logs can't be read from Claude's side, so check this instead. A video that gives `403` has comments turned off, so swap it for another.
 
 **YouTube rules:** show the author's name and link back to the comment, and don't keep comment data older than 30 days. The nightly rebuild covers this.
 
@@ -71,7 +72,7 @@ data/hidden.txt          ids of stories to never show
 }
 ```
 
-Song `stories` come from YouTube. Game-level `stories` are Steam reviews, which apply to the whole game, not one song.
+Song `stories` come from YouTube. Game-level `stories` are for Steam reviews, which are empty while Steam is off.
 
 ## FFX songs to check
 
@@ -81,8 +82,6 @@ Song `stories` come from YouTube. Game-level `stories` are Steam reviews, which 
 
 ## Next steps
 
-1. Get the files into the repo (install the Claude GitHub App, or upload by hand).
-2. Actions tab, then "Collect stories", then "Run workflow". Check that `data/stories.json` fills up.
-3. Read through the results. Add bad ones to `hidden.txt`, and tweak `STORY_PHRASES` and `MIN_SCORE` in `collect.py` if needed.
-4. Build the front end in Claude Design using `DESIGN_BRIEF.md`.
-5. Turn on GitHub Pages (Settings, then Pages, deploy from the main branch).
+1. Read through the results. Add bad ones to `hidden.txt`, and tweak `STORY_PHRASES` and `MIN_SCORE` in `collect.py` if needed.
+2. Build the front end in Claude Design using `DESIGN_BRIEF.md`.
+3. Turn on GitHub Pages (Settings, then Pages, deploy from the main branch).

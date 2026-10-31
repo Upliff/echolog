@@ -32,6 +32,10 @@ MAX_STORIES_PER_GAME = 40     # Steam reviews, per game
 MIN_SCORE = 4.0
 MIN_LENGTH = 90
 
+# Steam shut its public review endpoint (store.steampowered.com/appreviews) in
+# Oct 2026. The replacement needs a publisher key, so this is off for now.
+STEAM_ENABLED = False
+
 # Phrases that tend to show up when someone is telling a real story.
 STORY_PHRASES = [
     "my dad", "my father", "my mom", "my mum", "my mother", "my brother",
@@ -236,7 +240,7 @@ def main():
             })
 
         steam = []
-        if game.get("steamAppId"):
+        if STEAM_ENABLED and game.get("steamAppId"):
             try:
                 raw = steam_reviews(game["steamAppId"])
                 print(f"  Steam: {len(raw)} reviews")

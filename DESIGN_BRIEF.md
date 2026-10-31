@@ -9,7 +9,7 @@
    - When the clip ends, or as soon as the person scrolls, the video shrinks into a small player pinned to a corner. The music keeps playing.
    - The comments scroll underneath. Tapping the mini player makes it big again.
    - If `moment` is `null`, skip the big intro and just show the comments.
-4. The game's Steam reviews get their own section on the game page, or below the song comments.
+4. Steam reviews are off for now, so the game-level `stories` list is empty. If it ever has items, show them as their own section on the game page.
 
 ## Data
 
