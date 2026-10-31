@@ -242,6 +242,19 @@ Mohad asked for this on 31 Oct 2026: a song can have several scenes (it often pl
 - **Admin page:** in the song editor, "Scene" is a list with "Add scene", remove and reorder. Each scene has a link (with `?t=` start), end and label, and an optional music track (built).
 - **Labels** are short and plain, written by Mohad ("Opening", "Ending", "Macalania").
 
+## Front end to do (31 Oct 2026, not started or not finished)
+
+Mohad's latest list. Unfinished work from the last chat is on branch `wip/scrub-bars-loading` (not merged, doesn't work yet): it removes the sort buttons, starts the two scrub bars, and adds the "Loading..." text to `index.html`. Finish it there or redo it, then merge.
+
+1. **Volume slider hidden under the video:** the pop-up above the sound button sits under the video. Fix: `.peek { position: relative }` and raise it (`z-index: 12`) on `:hover` / `:focus-within`.
+2. **Turn off captions on the videos** if possible: `cc_load_policy: 0` in playerVars, and on ready and on each PLAYING call `player.unloadModule('captions')` and `unloadModule('cc')` (unofficial but usually works).
+3. **Comments: remove "Most liked" and "Newest".** Just one list (most liked first) under a "60 comments" line.
+4. **Our own scrubbing, measured from the clip's start**, not YouTube's bar (scenes can sit inside 20-minute videos). With a separate music track, show two bars that look clearly different: **Music** (gold, note icon) moves the song; **Scene** (white, film icon) moves only the picture while the song keeps going. Without a separate track, one plain bar. A scene with no end runs to the end of the YouTube video, so give scenes an end in the admin page.
+5. **Loading state:** while a song's players load, the video area shows "Loading..." and the video, controls, scene bar and side buttons are hidden; once it's ready to play, everything fades in. Swapping scenes shows it on the video only. Give up after about 12 seconds so people can press play.
+6. **To Zanarkand: the music started well after the video.** Investigate like Otherworld. The "start together" gate (both load muted, wait for both, then start) should cover it; check whether it's opening early (the 6-second give-up), whether a reused player skips the gate, or whether the music upload has silence at the start. Test on real YouTube.
+7. **Home page:** remove the song list that pops up when hovering a game's name.
+8. **Game page:** remove the total comment count from the line under the title (it shows "150 comments"), and remove the comment count on each song. Show each song's length instead (from the music track's start/end, or the scene's if there's no music track). Lengths without an end need the video duration, which the page doesn't know until a player loads; either have the collector store durations (YouTube API `contentDetails.duration`, 1 unit per 50 videos) or show nothing for those.
+
 ## Next steps
 
 1. Check the rebuilt site against real YouTube (start times, auto next, sound).
