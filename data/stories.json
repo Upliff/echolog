@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-31T10:34:07Z",
+  "updated": "2026-10-31T10:54:39Z",
   "games": [
     {
       "id": "ffx",
@@ -18,6 +18,14 @@
             "end": 173,
             "label": ""
           },
+          "moments": [
+            {
+              "videoId": "5oIjPHo0k5E",
+              "start": 27,
+              "end": 173,
+              "label": ""
+            }
+          ],
           "audio": {
             "videoId": "QQq0zv_JXEk",
             "start": 0,
@@ -107,6 +115,30 @@
               "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgwKJeBTJI6wP5RwOOh4AaABAg",
               "videoId": "PSjTN8WSGNk",
               "score": 10.66
+            },
+            {
+              "id": "yt:UgwKkXOWNwxpH6R6mBt4AaABAg",
+              "source": "youtube",
+              "author": "@JourneyWithNoosh",
+              "authorUrl": "http://www.youtube.com/@JourneyWithNoosh",
+              "text": "This song makes me so sad. It reminds me of when I was young and the world still held wonders. I remember being so enthralled in the lore and beauty of the game and spent hours upon hours playing it. So much so that every time I hear this song now, I'm transported back to that time. \n\nGoodbye childhood, until I dream again",
+              "likes": 0,
+              "date": "2021-01-03",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgwKkXOWNwxpH6R6mBt4AaABAg",
+              "videoId": "PSjTN8WSGNk",
+              "score": 10.48
+            },
+            {
+              "id": "yt:Ugz-gQkBgYomkkb7ZTZ4AaABAg",
+              "source": "youtube",
+              "author": "@jonahkaiguam",
+              "authorUrl": "http://www.youtube.com/@jonahkaiguam",
+              "text": "Wow.....I cant even put it into words right now....OK here goes....just hearing the piano intro and I instantly was taken back to 2001 when I played Final Fantasy X for the first time. Then the flute came in.....then the violin...man got my tears going because it's such a beautiful musical arrangement.  Thank you so much everyone involved in this.....brought back good memories of playing this awesome game that to this day I still love.",
+              "likes": 0,
+              "date": "2022-08-17",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugz-gQkBgYomkkb7ZTZ4AaABAg",
+              "videoId": "PSjTN8WSGNk",
+              "score": 10.46
             },
             {
               "id": "yt:Ugzf5m9I_8Yiv_qXWpN4AaABAg",
@@ -409,6 +441,18 @@
               "score": 7.4
             },
             {
+              "id": "yt:UgwKgDvDPclGnD7a1JR4AaABAg",
+              "source": "youtube",
+              "author": "@shangothrax",
+              "authorUrl": "http://www.youtube.com/@shangothrax",
+              "text": "I first played this game when I was 16. 19 years later (which was last year) I picked it up again, and enjoyed it just as much. But this song brings tears to my eyes.",
+              "likes": 0,
+              "date": "2022-01-25",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgwKgDvDPclGnD7a1JR4AaABAg",
+              "videoId": "PSjTN8WSGNk",
+              "score": 7.35
+            },
+            {
               "id": "yt:Ugzip_lRHYU3TnvVP5x4AaABAg",
               "source": "youtube",
               "author": "@pabloagullo4528",
@@ -419,6 +463,18 @@
               "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugzip_lRHYU3TnvVP5x4AaABAg",
               "videoId": "PSjTN8WSGNk",
               "score": 7.17
+            },
+            {
+              "id": "yt:UgyNxk7fC31zz1RXMQR4AaABAg",
+              "source": "youtube",
+              "author": "@FasterthanLight11",
+              "authorUrl": "http://www.youtube.com/@FasterthanLight11",
+              "text": "Man this song hit EVERY time. No matter what stage of my life I am in it takes me right back to the raw emotion of playing that game so many years ago. Time to replay",
+              "likes": 0,
+              "date": "2022-11-20",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgyNxk7fC31zz1RXMQR4AaABAg",
+              "videoId": "PSjTN8WSGNk",
+              "score": 7.15
             },
             {
               "id": "yt:Ugy6D-3ZYmCoa4LOw9x4AaABAg",
@@ -443,6 +499,18 @@
               "url": "https://www.youtube.com/watch?v=mWYwmM23Sqs&lc=Ugxbc5ue7A31KYiE0_F4AaABAg",
               "videoId": "mWYwmM23Sqs",
               "score": 7.07
+            },
+            {
+              "id": "yt:UgwCTlqsEdR9r42kgVd4AaABAg",
+              "source": "youtube",
+              "author": "@rollinfiber8490",
+              "authorUrl": "http://www.youtube.com/@rollinfiber8490",
+              "text": "The nostalgia of this songs brings me back to being a kid when I was happy with all my family *tears....* 😢",
+              "likes": 0,
+              "date": "2020-07-18",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgwCTlqsEdR9r42kgVd4AaABAg",
+              "videoId": "PSjTN8WSGNk",
+              "score": 6.96
             },
             {
               "id": "yt:UgwFNMJGAP4OsCQkQRt4AaABAg",
@@ -577,6 +645,18 @@
               "score": 6.24
             },
             {
+              "id": "yt:Ugza_VhChWtuoCYm6et4AaABAg",
+              "source": "youtube",
+              "author": "@spirityuuki3290",
+              "authorUrl": "http://www.youtube.com/@spirityuuki3290",
+              "text": "Nineteen years and this song still kills me every time. Even from the first moment, before I knew just how powerful the song really was when you know the story, and I have never been able to hear it without crying ever since. It manages to carry the weight of every decision, every cut scene, and every battle fought throughout the game and pack all of the emotions you felt while playing it. The music in this game was fantastic, but this song was a beautiful masterpiece.",
+              "likes": 0,
+              "date": "2020-08-29",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugza_VhChWtuoCYm6et4AaABAg",
+              "videoId": "PSjTN8WSGNk",
+              "score": 6.18
+            },
+            {
               "id": "yt:UgyGVJdYLhgXj44gudR4AaABAg",
               "source": "youtube",
               "author": "@jombloambyar2994",
@@ -625,6 +705,18 @@
               "score": 6.0
             },
             {
+              "id": "yt:Ugwgo6AumJ6SloV3SV94AaABAg",
+              "source": "youtube",
+              "author": "@SweetCandiezx3",
+              "authorUrl": "http://www.youtube.com/@SweetCandiezx3",
+              "text": "I’ve never played or seen FF but I know of its existence due to my friend. I cant describe the feeling I feel, but for some reason when listening to specifically this composed version of To Zanarkand it always brings me close to tears",
+              "likes": 0,
+              "date": "2022-06-29",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugwgo6AumJ6SloV3SV94AaABAg",
+              "videoId": "PSjTN8WSGNk",
+              "score": 5.98
+            },
+            {
               "id": "yt:UgwPBNkwlk2ab6cLT254AaABAg",
               "source": "youtube",
               "author": "@bkeith1005",
@@ -649,100 +741,16 @@
               "score": 5.79
             },
             {
-              "id": "yt:UgxquvdnG9LDgISgSk94AaABAg",
+              "id": "yt:UgyNQiROvD1wm9iiseZ4AaABAg",
               "source": "youtube",
-              "author": "@RayChow-m3h",
-              "authorUrl": "http://www.youtube.com/@RayChow-m3h",
-              "text": "'Listen to my story. This may be our last chance'\n\n20 years ago we might don't know what does this mean.. Now i recall back and i finally understand the meaning of this quote..\n\nFF10 was the last story that we gone through.. Because most of us stop our FF childhood after FF10 as FF11 is going online 💔",
+              "author": "@CuddleBear0310",
+              "authorUrl": "http://www.youtube.com/@CuddleBear0310",
+              "text": "This is my most favourite game ever like I’m 19 and watched my mom play and I tried to play when I was younger and played as I got older",
               "likes": 0,
-              "date": "2026-01-25",
-              "url": "https://www.youtube.com/watch?v=sy-nrLiAwZI&lc=UgxquvdnG9LDgISgSk94AaABAg",
-              "videoId": "sy-nrLiAwZI",
-              "score": 5.61
-            },
-            {
-              "id": "yt:Ugx4wikcIKLj-vV9RbJ4AaABAg",
-              "source": "youtube",
-              "author": "@alcandorhan2918",
-              "authorUrl": "http://www.youtube.com/@alcandorhan2918",
-              "text": "Shivers down my spine, taking me back 20 years now.. Final Fantasy X helped define who I am today and these soundtracks are forever my childhood memories",
-              "likes": 1,
-              "date": "2023-09-05",
-              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugx4wikcIKLj-vV9RbJ4AaABAg",
+              "date": "2020-08-18",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgyNQiROvD1wm9iiseZ4AaABAg",
               "videoId": "PSjTN8WSGNk",
-              "score": 5.61
-            },
-            {
-              "id": "yt:Ugz1nqCzs50zNEHb1D14AaABAg",
-              "source": "youtube",
-              "author": "@jacopz2173",
-              "authorUrl": "http://www.youtube.com/@jacopz2173",
-              "text": "Hey man, i am 14 years old and i'm italian (so my english isn't perfect), ffx is special, and this version of to zanarkand is too much for me, ffx is my favourite game, and this version of to zanarkand is very emotional, I LOVED IT",
-              "likes": 41,
-              "date": "2020-06-10",
-              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugz1nqCzs50zNEHb1D14AaABAg",
-              "videoId": "PSjTN8WSGNk",
-              "score": 5.59
-            },
-            {
-              "id": "yt:UgyoQ_duGTCE0IKwcaV4AaABAg",
-              "source": "youtube",
-              "author": "@DarkMaySorceress",
-              "authorUrl": "http://www.youtube.com/@DarkMaySorceress",
-              "text": "And i want to play this again ! x) Ha lala. When I think about it, people was critic with this one and the X-2. \nIt surely was different from what there was before, but I still think that it's a good game. Cliché story perhaps... And it was good, music was cool, visuals was incredible for this time, it's still beautiful even if it's old now and I remember that it's a game which push me to do 0s with that dumb chocobo race and dodge 300 f*****g thunderbolts ! The only thing i didn't do beat der richter ! (I didn't get the last attack of Kimahri é_è )",
-              "likes": 1,
-              "date": "2024-02-25",
-              "url": "https://www.youtube.com/watch?v=mWYwmM23Sqs&lc=UgyoQ_duGTCE0IKwcaV4AaABAg",
-              "videoId": "mWYwmM23Sqs",
-              "score": 5.55
-            },
-            {
-              "id": "yt:Ugxd1kClJaVqQ_7sned4AaABAg",
-              "source": "youtube",
-              "author": "@JurgenBlitz",
-              "authorUrl": "http://www.youtube.com/@JurgenBlitz",
-              "text": "So judging by the comments I am not the only one who immediately started crying with emotion while hearing this. Glad to see there are so many of us.",
-              "likes": 353,
-              "date": "2024-04-06",
-              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugxd1kClJaVqQ_7sned4AaABAg",
-              "videoId": "PSjTN8WSGNk",
-              "score": 5.25
-            },
-            {
-              "id": "yt:Ugz30REZ018leVQ0VK54AaABAg",
-              "source": "youtube",
-              "author": "@AsmodeusGamingAdventures",
-              "authorUrl": "http://www.youtube.com/@AsmodeusGamingAdventures",
-              "text": "Ahh I still remember it like it was yesterday... Being 13, falling in love with Yuna... \nBut in the end, it was just a dream... \nBrings me to tears everytime :')",
-              "likes": 1,
-              "date": "2022-04-05",
-              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugz30REZ018leVQ0VK54AaABAg",
-              "videoId": "PSjTN8WSGNk",
-              "score": 5.24
-            },
-            {
-              "id": "yt:UgwzziFzOTF3sDPdGj14AaABAg",
-              "source": "youtube",
-              "author": "@Cihan92",
-              "authorUrl": "http://www.youtube.com/@Cihan92",
-              "text": "10 year old me first time hitting the main menu in FFX, gave me chills and still makes me cry 😌",
-              "likes": 1,
-              "date": "2023-10-01",
-              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgwzziFzOTF3sDPdGj14AaABAg",
-              "videoId": "PSjTN8WSGNk",
-              "score": 5.22
-            },
-            {
-              "id": "yt:UgxCN3ITn-OllCH6-jl4AaABAg",
-              "source": "youtube",
-              "author": "@drooney185",
-              "authorUrl": "http://www.youtube.com/@drooney185",
-              "text": "This game changed my life......i mean really changed my life i have now composed for 13 video games and it all started here!",
-              "likes": 0,
-              "date": "2021-04-24",
-              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgxCN3ITn-OllCH6-jl4AaABAg",
-              "videoId": "PSjTN8WSGNk",
-              "score": 5.21
+              "score": 5.65
             }
           ]
         },
@@ -756,6 +764,20 @@
             "end": null,
             "label": ""
           },
+          "moments": [
+            {
+              "videoId": "4umidcc_8rU",
+              "start": 15,
+              "end": null,
+              "label": ""
+            },
+            {
+              "videoId": "d8RkZlWA4V8",
+              "start": 547,
+              "end": 1120,
+              "label": ""
+            }
+          ],
           "audio": {
             "videoId": "KO6fvJrsTsE",
             "start": 0,
@@ -966,6 +988,14 @@
             "end": 935,
             "label": ""
           },
+          "moments": [
+            {
+              "videoId": "112PPC8JlJg",
+              "start": 418,
+              "end": 935,
+              "label": ""
+            }
+          ],
           "audio": {
             "videoId": "RC1VmGXiEFw",
             "start": 0,
@@ -1200,6 +1230,14 @@
             "end": null,
             "label": "Macalania, the spring"
           },
+          "moments": [
+            {
+              "videoId": "7qrOWpV7b68",
+              "start": 0,
+              "end": null,
+              "label": "Macalania, the spring"
+            }
+          ],
           "audio": null,
           "stories": [
             {
@@ -1321,6 +1359,18 @@
               "url": "https://www.youtube.com/watch?v=Vl20g-tBaKc&lc=UgzMjqDpGC-qdVNppXl4AaABAg",
               "videoId": "Vl20g-tBaKc",
               "score": 8.11
+            },
+            {
+              "id": "yt:Ugy9MS9BdNkLPwYOWQ94AaABAg",
+              "source": "youtube",
+              "author": "@QLight-sp6zr",
+              "authorUrl": "http://www.youtube.com/@QLight-sp6zr",
+              "text": "Kaze ga yoseta kotoba ni\r\nOyoida kokoro\r\nKumo ga hakobu ashita ni\r\nHazunda koe\r\n\r\nTsuki ga yureru kagami ni\r\nFurueta kokoro\r\nHoshi ga nagare koboreta\r\nYawarakai namida\r\n\r\nSuteki da ne\r\nFutari te wo tori aruketa nara\r\nIkitai yo\r\nKimi no machi ie ude no naka\r\n\r\nSono mune\r\nKarada azuke\r\nYoi ni magire\r\nYume miru\r\n\r\nKaze wa tomari kotoba wa\r\nYasashii maboroshi\r\nKumo wa yabure ashita wa\r\nTooku no koe\r\n\r\nTsuki ga nijimu kagami wo\r\nNagareta kokoro\r\nHoshi ga yurete koboreta\r\nKakusenai namida\r\n\r\nSuteki da ne\r\nFutari te wo tori aruketa nara\r\nIkitai yo\r\nKimi no machiieude no naka\r\n\r\nSono kao\r\nSotto furete\r\nAsa ni tokeru\r\nYume niru\r\n\r\n\r\nVersi ingrish:\r\n\r\nFor the words which the wind brought\r\nmy heart swam\r\nFor tomorrow which clouds carry\r\nmy voice bounced\r\n\r\nFor the mirror in which the moon swings\r\nmy heart trembled\r\nStars fell and soft tear dropped\r\n\r\nIsn't it nice, if we could walk hand in hand?\r\nI would like to visit your town, your home, in your arms\r\n\r\nLeaning on your chest\r\nhiding in the darkness of night\r\nI dream\r\n\r\nThe wind stops and the words become tender illusion\r\nClouds parted and tomorrow become distant voice\r\n\r\nOn the mirror with blurred moon\r\nmy heart ran\r\nStars swung and\r\nI could not hide my tears drop\r\n\r\nIsn't it nice, if we could walk hand in hand?\r\nI would like to visit your town, your home, in your arms\r\n\r\nTenderly touch your face\r\nmelting in the morning\r\nI dream",
+              "likes": 0,
+              "date": "2024-04-18",
+              "url": "https://www.youtube.com/watch?v=Vl20g-tBaKc&lc=Ugy9MS9BdNkLPwYOWQ94AaABAg",
+              "videoId": "Vl20g-tBaKc",
+              "score": 8.0
             },
             {
               "id": "yt:UgwiY0ckQ6x6tPfrOLd4AaABAg",
