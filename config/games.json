@@ -125,6 +125,84 @@
         }
       ],
       "cover": "covers/ffx.jpg"
+    },
+    {
+      "id": "kingdom-hearts-2",
+      "title": "Kingdom Hearts II",
+      "year": 2005,
+      "songs": [
+        {
+          "id": "dearly-beloved",
+          "title": "Dearly Beloved",
+          "composer": "Yoko Shimomura",
+          "moments": [
+            {
+              "videoId": "IM-r2hxtO8g",
+              "start": 0,
+              "end": null,
+              "label": "Title screen"
+            }
+          ],
+          "moment": {
+            "videoId": "IM-r2hxtO8g",
+            "start": 0,
+            "end": null,
+            "label": "Title screen"
+          },
+          "audio": null,
+          "commentVideos": [
+            "gUQuBBBzx-I",
+            "4It2Prl5E-Q",
+            "l2ztZc5kzGg"
+          ]
+        },
+        {
+          "id": "the-other-promise",
+          "title": "The Other Promise",
+          "composer": "Yoko Shimomura",
+          "moments": [
+            {
+              "videoId": "y4yQioUhk9E",
+              "start": 0,
+              "end": null,
+              "label": "Sora vs Roxas"
+            }
+          ],
+          "moment": {
+            "videoId": "y4yQioUhk9E",
+            "start": 0,
+            "end": null,
+            "label": "Sora vs Roxas"
+          },
+          "audio": {
+            "videoId": "vU78E7S0fgs",
+            "start": 0,
+            "end": null
+          },
+          "commentVideos": [
+            "s9XljBWGrRQ",
+            "KyrWRgg_6KE",
+            "DMznuxvovkY"
+          ]
+        },
+        {
+          "id": "roxas",
+          "title": "Roxas",
+          "composer": "Yoko Shimomura",
+          "moments": [],
+          "moment": null,
+          "audio": {
+            "videoId": "E_BS8egSU3k",
+            "start": 0,
+            "end": null
+          },
+          "commentVideos": [
+            "CSdNxXGUaRU",
+            "pRudm5jCXrs",
+            "73ZjSYHRdkA"
+          ]
+        }
+      ]
     }
   ]
 }
