@@ -25,6 +25,11 @@ Owner: Mohad. Repo: https://github.com/Upliff/echolog (public).
 - **Feel:** snappy and quiet. Only the video and the comments. No heavy effects.
 - **Auto next:** when a song ends, the next song in the game starts after a short countdown (wraps to the first song after the last).
 - **Music over the scene:** a song can have a separate `audio` track. The scene video plays muted and the music plays over it, so you hear the song without the characters talking.
+- **People's own comments:** visitors can add their own comment to a song. Nothing goes up until Mohad approves it in the admin page. Approved ones show exactly as written. (Planned, see "Own comments, requests and hiding names".)
+- **Requests:** visitors can request a game, a song or a fix. Mohad sees them in the admin page and can accept one, which opens the game/song editor filled in. (Planned.)
+- **Hide names:** a switch on the site that hides commenters' names. (Planned.)
+- **Several scenes per song:** when a song plays more than once in a game, it can have several scenes and people can swap between them. (Planned, see "More than one scene per song".)
+- **Inbox:** comments and requests go to a private GitHub repo as issues, through a free Cloudflare Worker. Decided 31 Oct 2026 over a Google Form.
 
 ## Accounts and setup status
 
@@ -34,6 +39,7 @@ Owner: Mohad. Repo: https://github.com/Upliff/echolog (public).
 - Done: front end rebuilt for speed (31 Oct 2026), in the local `site/` folder.
 - Not done yet: front end moved into the repo.
 - Not done yet: GitHub Pages turned on.
+- Not done yet: private repo `Upliff/echolog-inbox`, Cloudflare account and Worker, Turnstile site key (all for own comments and requests).
 
 ## How it works
 
@@ -137,6 +143,75 @@ site/preview.bat + .ps1  local preview server for Windows without Python
 - Mini player is 356x200 on desktop because of YouTube's 200x200 minimum.
 - **Ads:** YouTube can show ads in the embedded player on any video that's monetised, by the uploader or by a Content ID claim (Square Enix claims are likely on custom uploads). The site can't turn them off and earns nothing from them. Autoplayed embeds tend to get fewer ads, but there's no guarantee. Clouds and the seek bar don't know when an ad is playing.
 
+## Own comments, requests and hiding names (planned)
+
+Mohad asked for these on 31 Oct 2026. The chat that built the admin page is building them. Nothing here is built yet.
+
+### How it fits together
+
+```
+site form  ->  Cloudflare Worker  ->  issue in private repo Upliff/echolog-inbox
+admin page Inbox tab  ->  reads those issues  ->  approve / accept / decline
+approved comment  ->  data/submitted.json in Upliff/echolog  ->  collector merges it into stories.json
+accepted request  ->  opens the game/song editor filled in  ->  normal save
+```
+
+- **Why a Worker:** the site is static, and a GitHub token can't sit in public site code. The Worker holds a fine-grained token (Issues read and write on `Upliff/echolog-inbox` only) as a Worker secret. Cloudflare's free plan covers this.
+- **Inbox repo:** `Upliff/echolog-inbox`, private, issues only. Labels: `comment`, `request`, then `accepted` or `declined` when dealt with. Issues are closed once dealt with.
+- **Worker code** can live in the public repo under `worker/` (no secrets in it). Mohad deploys it from his Cloudflare account and adds the token secret there. Never paste the token in chat.
+- **Worker endpoints:** `POST /comment` and `POST /request`, JSON in, `{ "ok": true }` out.
+- **Spam and abuse:** only accept requests from the site's own address and localhost; Cloudflare Turnstile check (free, no puzzles for most people); a hidden honeypot field; length limits; a simple per-IP rate limit (for example 5 an hour). Don't store IP addresses or emails in the issue.
+- **Issue body:** the submitted fields as JSON in a fenced code block, so the admin page can read them back exactly. Title like `Comment: To Zanarkand` or `Request: Kingdom Hearts`.
+
+### Own comments (site)
+
+- On each song page, under the comments: a short form. Fields: comment (required, up to 3000 characters, line breaks kept), name (optional). Button: "Send".
+- Under the form, plain text: comments are only posted after they're checked, and not to include anything private. Mohad can reword this.
+- After sending: "Thanks. It'll show up once it's checked." On failure: "Couldn't send that. Try again later."
+- Issue JSON: `{ "game": "ffx", "song": "to-zanarkand", "text": "...", "name": "..." | null, "sent": "2026-10-31T10:17:00Z" }`.
+
+### Requests (site)
+
+- A "Request" link in the top bar next to About. It opens a dialog like About.
+- Fields: what kind (a game, a song, a fix), game, song (optional), link (optional, e.g. a YouTube video of the scene), note (optional, up to 1000 characters). Button: "Send".
+- Issue JSON: `{ "kind": "game" | "song" | "fix", "game": "...", "song": "...", "link": "...", "note": "...", "sent": "..." }`.
+
+### Admin page: Inbox tab
+
+- New tab next to Games, with two lists: Comments and Requests. Shows open issues only, newest first, with a count on the tab.
+- The admin's GitHub token also needs Issues read and write on `Upliff/echolog-inbox` (add that repo to the same fine-grained token).
+- **Comments:** show the text exactly as sent, the name (or "No name"), the game and song, and the date. "Approve" adds it to `data/submitted.json` in `Upliff/echolog` (text untouched), labels the issue `accepted` and closes it. "Decline" labels it `declined` and closes it. No editing of the text.
+- **Requests:** show all the fields. "Accept" opens the add-game editor (or that game's editor, for a song) with the name, song and link filled in. Saving labels the issue `accepted` and closes it. "Decline" labels it `declined` and closes it.
+- After approving comments, start the "Collect stories" workflow so they show up.
+
+### Approved comments (data)
+
+- `data/submitted.json` in `Upliff/echolog`: `{ "comments": [{ "id": "user:12", "game": "ffx", "song": "to-zanarkand", "author": "name" | null, "text": "...", "date": "2026-10-31" }] }`. The number is the inbox issue number.
+- The collector merges these into each song's `stories` with `"source": "echolog"`, `"likes": 0`, no `authorUrl` and no `url`. `hidden.txt` still applies, so `user:12` there hides it.
+- They aren't YouTube data, so the 30-day rule doesn't apply. They stay until removed.
+- Front end: author shows the name, or "Anonymous" if none. No author link. Instead of "View on YouTube", show nothing (or "Posted on Echolog"). They can show up as clouds like any other short comment. Sorting by "Most liked" puts them last for now.
+
+### Hide names (site)
+
+- A "Hide names" switch in the sort row on song pages (and above Steam reviews on the game page if those ever show).
+- When on, the author name is hidden on every comment, in the list and in the clouds. Likes, date and the "View on YouTube" link stay.
+- Off by default. Remembered in that browser (localStorage, wrapped in try/catch).
+- This is a viewer setting only. The data and the admin page still have the names.
+- **Known rule break (Mohad's choice):** YouTube's rules say to show the author's name with their comment. Hiding them breaks that while the switch is on.
+
+## More than one scene per song (planned)
+
+Mohad asked for this on 31 Oct 2026: a song can have several scenes (it often plays more than once in a game), and people can swap between them.
+
+- **Data:** songs get `moments`, a list of scenes in the order they happen in the game. Each one is the same shape as `moment` now: `{ "videoId", "start", "end", "label" }`, plus an optional `audio` of its own. The song-level `audio` is used for any scene without its own.
+- **Old data keeps working:** a song with only `moment` is treated as a one-item `moments` list. Once everything uses `moments`, `moment` can go.
+- **Collector:** passes `moments` through to `stories.json` (like `moment`, `audio` and `cover`).
+- **Song page:** if there's more than one scene, a row of small buttons with each scene's `label` sits in the strip under the video (for example "Opening" and "Ending"). The current one is marked (`aria-pressed`). Tapping one loads that scene into the same player straight away, from its `start`. The comments, scroll position and clouds don't reset. On phones the row scrolls sideways if it doesn't fit.
+- **Link:** the scene number goes in the hash, `#/ffx/to-zanarkand/2` for the second scene. No number means the first. A number that doesn't exist falls back to the first.
+- **Auto next:** when the scene playing ends, the next song starts as now. It doesn't run through the other scenes of the same song first.
+- **Admin page:** in the song editor, "Scene" becomes a list with "Add scene", remove and reorder. Each scene has a link (with `?t=` start), end and label, and an optional music track.
+- **Labels** are short and plain, written by Mohad ("Opening", "Ending", "Macalania").
+
 ## Next steps
 
 1. Check the rebuilt site against real YouTube (start times, auto next, sound).
@@ -144,3 +219,5 @@ site/preview.bat + .ps1  local preview server for Windows without Python
 3. Read through the results. Add bad ones to `hidden.txt`, and tweak `STORY_PHRASES` and `MIN_SCORE` in `collect.py` if needed.
 4. Move the front end into the repo root (`index.html`, `assets/`, `covers/`). The admin page uploads covers to the repo's `covers/` folder, so move the site's `covers/ffx.jpg` there too.
 5. Turn on GitHub Pages (Settings, then Pages, deploy from the main branch).
+6. Own comments, requests and hide names (admin-page chat): create the private inbox repo, write the Worker, add the site forms and the switch, add the Inbox tab, and teach the collector to merge `data/submitted.json`. Mohad: make a Cloudflare account and get a Turnstile site key.
+7. More than one scene per song: `moments` in the collector, the scene buttons on the song page, and the scene list in the admin song editor.
