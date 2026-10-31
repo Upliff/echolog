@@ -112,8 +112,8 @@ site/preview.bat + .ps1  local preview server for Windows without Python
 - **Speed rules (keep these):** no `backdrop-filter` and no live CSS blur anywhere. The cover is drawn once into a 24 x 24 canvas and stretched, which blurs it for free; it never moves, it only fades when the game changes. Anything that animates only uses opacity or transform. The video changes size once and the move is animated with transform. Comments off screen aren't drawn (`content-visibility`). Fonts load without holding up the page.
 - All comment text goes in through `textContent` (never `innerHTML`), with `white-space: pre-wrap` so line breaks stay.
 - "Show more" is decided from the text (over 650 characters or 9 lines), so nothing is measured on screen. Shorter comments are never cut.
-- `index.html` loads `style.css?v=5` and `app.js?v=5`. Bump the number after changes so browsers don't use old copies.
-- Song page: the clip fills the screen apart from a strip at the bottom with the title, our own controls (play, sound, next song, time, seek bar) and the comment count. YouTube's control bar is hidden (`controls: 0`). Tap the video to pause; tap the small player to make it big again. Space or K also plays/pauses.
+- `index.html` loads `style.css?v=6` and `app.js?v=6`. Bump the number after changes so browsers don't use old copies.
+- Song page: the clip fills the screen apart from a strip at the bottom with the title, our own controls (play, sound, next song, time, seek bar) and the comment count. YouTube's control bar is hidden (`controls: 0`). Taps on the big video go to YouTube itself (pause, and "Skip ad" when an ad plays); tap the small player to make it big again. Space or K also plays/pauses.
 - Scrolling: on desktop the video shrinks to a 356 x 200 player in the bottom-right with a small bar under it. On phones the video slides away and a bar sits along the bottom.
 - The players stay alive between songs, so the next song loads into the same player and starts quickly.
 - **Auto next:** when the song ends, "Next: (song) in 6" appears with "Play now" and "Stay". `AUTO_NEXT_SECONDS` at the top of `app.js` (0 turns it off). Songs with no clip are skipped. After the last song it goes back to the first.
@@ -135,6 +135,7 @@ site/preview.bat + .ps1  local preview server for Windows without Python
 - The start time backup jump only fires if the player really ignored `start`, so the clip shouldn't jump twice. Worth a check on real YouTube.
 - Auto next onto a new song after the page has been idle may start muted if the browser blocks sound. The gold sound button shows when that happens.
 - Mini player is 356x200 on desktop because of YouTube's 200x200 minimum.
+- **Ads:** YouTube can show ads in the embedded player on any video that's monetised, by the uploader or by a Content ID claim (Square Enix claims are likely on custom uploads). The site can't turn them off and earns nothing from them. Autoplayed embeds tend to get fewer ads, but there's no guarantee. Clouds and the seek bar don't know when an ad is playing.
 
 ## Next steps
 
