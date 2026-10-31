@@ -52,7 +52,7 @@ data/hidden.txt          ids of stories to never show
 .github/workflows/collect.yml   runs daily ~3am Sydney, or by hand from the Actions tab
 ```
 
-**Adding a game or song:** use the admin page (below), or edit `config/games.json` by hand.
+**Adding a game or song:** use the admin page (below), an import file (`docs/IMPORT.md`, for adding lots at once; a Claude chat can make one), or edit `config/games.json` by hand.
 - `moment` sets the scene that plays: the YouTube `videoId` plus a `start` time in seconds (and `end` if the scene should stop or loop there). Use `null` if there's no clip yet.
 - `audio` (optional) is a separate music track: `{ "videoId": "...", "start": 0, "end": null }`. When it's set, the scene plays muted and loops until the music ends. The song ends when the music ends. If there's `audio` but no `moment`, the audio video itself is shown.
 - `commentVideos` lists the YouTube videos to pull comments from. Pick videos with lots of views and comments.
@@ -78,6 +78,8 @@ data/hidden.txt          ids of stories to never show
   - **Requests:** Accept (game or song) opens the editor filled in from the request, with a banner. Saving labels the issue `accepted` and closes it. Fix requests get "Mark done". Decline labels the issue `declined` and closes it.
   - The token needs **Issues: Read and write** on the inbox repo too.
 - The collector passes `cover`, `sounds` and each song's `volume` through to `stories.json`. The front end already uses `game.cover` when it's set, and otherwise falls back to `covers/<id>.jpg|jpeg|png|webp`.
+
+- **Import tab (added 1 Nov 2026):** drop or paste one or more import files (format in `docs/IMPORT.md`). Shows a preview per game: new game or adds to existing, each song as New or Already there (skipped unless "Replace the one already there" is ticked), thumbnails of each scene and music video linked to YouTube at the start time, the number of comment videos, the file's `note`, and warnings (unreadable links or times, no comment videos, no scene). Import merges in one save (with the same retry as other saves) and starts the collector. New games need cover art added in the Games tab.
 
 ### Admin page requests
 
