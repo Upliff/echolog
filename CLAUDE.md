@@ -217,5 +217,5 @@ Mohad asked for this on 31 Oct 2026: a song can have several scenes (it often pl
 2. Pick `audio` tracks for songs where the scene has talking over the music (Suteki da Ne first), and add them to `config/games.json`.
 3. Read through the results. Add bad ones to `hidden.txt`, and tweak `STORY_PHRASES` and `MIN_SCORE` in `collect.py` if needed.
 4. Turn on GitHub Pages: Settings, then Pages, then Deploy from a branch, main, / (root). The site will be at https://upliff.github.io/echolog/.
-6. Own comments, requests and hide names (admin-page chat): create the private inbox repo, write the Worker, add the site forms and the switch, add the Inbox tab, and teach the collector to merge `data/submitted.json`. Mohad: make a Cloudflare account and get a Turnstile site key.
-7. More than one scene per song: `moments` in the collector, the scene buttons on the song page, and the scene list in the admin song editor.
+5. Own comments, requests and hide names (admin-page chat): create the private inbox repo, write the Worker, add the site forms and the switch, add the Inbox tab, and teach the collector to merge `data/submitted.json`. Mohad: make a Cloudflare account and get a Turnstile site key.
+6. More than one scene per song: `moments` in the collector, the scene buttons on the song page, and the scene list in the admin song editor.
