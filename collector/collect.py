@@ -256,6 +256,7 @@ def main():
             "id": game["id"],
             "title": game["title"],
             "year": game.get("year"),
+            "cover": game.get("cover"),
             "steamAppId": game.get("steamAppId"),
             "songs": songs_out,
             "stories": steam,

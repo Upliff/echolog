@@ -46,11 +46,19 @@ data/hidden.txt          ids of stories to never show
 .github/workflows/collect.yml   runs daily ~3am Sydney, or by hand from the Actions tab
 ```
 
-**Adding a game or song:** edit `config/games.json`.
+**Adding a game or song:** use the admin page (below), or edit `config/games.json` by hand.
 - `moment` sets the scene that plays: the YouTube `videoId` plus a `start` time in seconds (and `end` if the scene should stop or loop there). Use `null` if there's no clip yet.
 - `audio` (optional) is a separate music track: `{ "videoId": "...", "start": 0, "end": null }`. When it's set, the scene plays muted and loops until the music ends. The song ends when the music ends. If there's `audio` but no `moment`, the audio video itself is shown.
 - `commentVideos` lists the YouTube videos to pull comments from. Pick videos with lots of views and comments.
 - `steamAppId` is the number in the game's Steam store URL. Leave it out if the game isn't on Steam.
+
+**Admin page:** `echolog-admin.html` in the local EchoLog folder (deliberately not in the repo or on the site). Mohad opens it straight from disk in his browser.
+- Lists games. You can add, edit or delete a game: name, year, cover art, and songs (name, composer, scene link and start/end, label, optional music track, comment videos). It can also reorder songs.
+- Pasting a YouTube link with `?t=` fills in the start time.
+- Saving writes `config/games.json` through the GitHub API, uploads the cover to `covers/<game id>.<ext>` (shrunk to 1600px), sets `cover` on the game, then starts the "Collect stories" workflow.
+- It needs a fine-grained GitHub token, limited to Upliff/echolog, with Contents and Actions set to read and write. The token is kept only in that browser (localStorage). It's never in the repo or in chat.
+- Song ids are made from the title and never change on edit, so hidden ids and links keep working. Game ids can't change after creation.
+- The collector passes `cover` through to `stories.json`. The front end already uses `game.cover` when it's set, and otherwise falls back to `covers/<id>.jpg|jpeg|png|webp`.
 
 **Quota:** YouTube allows 10,000 units a day, and each page of 100 comments costs 1 unit. At 5 pages per video, that's roughly 5 units per video per run, so there's plenty of room.
 
@@ -64,7 +72,7 @@ data/hidden.txt          ids of stories to never show
 {
   "updated": "2026-11-01T05:17:00Z",
   "games": [{
-    "id": "ffx", "title": "Final Fantasy X", "year": 2001, "steamAppId": 359870,
+    "id": "ffx", "title": "Final Fantasy X", "year": 2001, "cover": "covers/ffx.jpg", "steamAppId": 359870,
     "songs": [{
       "id": "to-zanarkand", "title": "To Zanarkand", "composer": "Nobuo Uematsu",
       "moment": { "videoId": "kilrRiclUFY", "start": 0, "end": null, "label": "Opening, the campfire" },
@@ -133,5 +141,5 @@ site/preview.bat + .ps1  local preview server for Windows without Python
 1. Check the rebuilt site against real YouTube (start times, auto next, sound).
 2. Pick `audio` tracks for songs where the scene has talking over the music (Suteki da Ne first), and add them to `config/games.json`.
 3. Read through the results. Add bad ones to `hidden.txt`, and tweak `STORY_PHRASES` and `MIN_SCORE` in `collect.py` if needed.
-4. Move the front end into the repo root (`index.html`, `assets/`, `covers/`).
+4. Move the front end into the repo root (`index.html`, `assets/`, `covers/`). The admin page uploads covers to the repo's `covers/` folder, so move the site's `covers/ffx.jpg` there too.
 5. Turn on GitHub Pages (Settings, then Pages, deploy from the main branch).
