@@ -42,6 +42,9 @@
   const sceneWrap = $('sceneWrap');
   const musicWrap = $('musicWrap');
   const stageMsg = $('stageMsg');
+  const sceneBar = $('sceneBar');
+  const prevBtn = $('prevBtn');
+  const nextBtn = $('nextBtn');
   const dock = $('dock');
   const dockTitle = $('dockTitle');
   const dockPlay = $('dockPlay');
@@ -88,6 +91,8 @@
     next: 'M6 5l9 7-9 7zM18 5v14',
     repeat: 'M17 2l3 3-3 3M4 11V9a4 4 0 0 1 4-4h12M7 22l-3-3 3-3M20 13v2a4 4 0 0 1-4 4H4',
     down: 'M12 5v14M6 13l6 6 6-6',
+    left: 'M15 5l-7 7 7 7',
+    right: 'M9 5l7 7-7 7',
   };
   function svg(name, size = 18) {
     const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -233,18 +238,19 @@
 
   function renderHome() {
     document.title = 'Echolog';
+    setSounds(null);
     document.body.classList.remove('on-song');
     crumb.replaceChildren();
     const games = [...DATA.games].sort((a, b) => String(a.title).localeCompare(String(b.title)));
     setCover(games[0] || null);
 
     const list = h('ul', { class: 'games' },
-      games.map((g, i) => h('li', { class: 'rise', style: `--i:${i + 1}` },
+      games.map((g, i) => h('li', { class: 'rise has-menu', style: `--i:${i + 1}`, onmouseenter: () => setCover(g) },
         h('a', {
           href: `#/${encodeURIComponent(g.id)}`,
-          onmouseenter: () => setCover(g),
           onfocus: () => setCover(g),
-        }, g.title))));
+        }, g.title),
+        songMenu(g, null))));
 
     app.append(h('section', { class: 'view home' },
       h('div', { class: 'rise', style: '--i:0' }, h('span', { class: 'placeholder' }, '[TAGLINE]')),
@@ -255,6 +261,7 @@
 
   function renderGame(game) {
     document.title = `${game.title} · Echolog`;
+    setSounds(game);
     document.body.classList.remove('on-song');
     crumb.replaceChildren();
     setCover(game);
@@ -279,6 +286,15 @@
       view.append(h('h2', { class: 'section-label' }, 'Steam reviews'), commentList(game.stories));
     }
     app.append(view);
+  }
+
+  // The game's songs as a small list. Shows when you hover (or tab to) a game's name.
+  function songMenu(game, current) {
+    const songs = game.songs || [];
+    if (!songs.length) return null;
+    return h('ul', { class: 'menu' }, songs.map((s, i) => h('li', null,
+      h('a', { href: songHref(game, s), 'aria-current': s === current ? 'page' : null },
+        h('span', { class: 'menu-n' }, pad2(i + 1)), s.title))));
   }
 
   const songHref = (game, s) => `#/${encodeURIComponent(game.id)}/${encodeURIComponent(s.id)}`;
@@ -400,11 +416,12 @@
     return scene ? { scene, music, index: m ? Math.max(0, scenes.indexOf(m)) : 0 } : null;
   }
 
-  function nextSong(game, song) {
+  // The next (step 1) or previous (step -1) song that has something to play. Wraps round.
+  function nextSong(game, song, step = 1) {
     const list = game.songs || [];
     const i = list.indexOf(song);
     for (let k = 1; k < list.length; k++) {
-      const s = list[(i + k) % list.length];
+      const s = list[(((i + k * step) % list.length) + list.length) % list.length];
       if (playable(s, false)) return s;
     }
     return null;
@@ -416,23 +433,28 @@
 
   function renderSong(game, song, sceneIndex = 0) {
     document.title = `${song.title} · ${game.title} · Echolog`;
+    setSounds(game);
     document.body.classList.add('on-song');
     setCover(game);
-    crumb.replaceChildren(h('a', { href: `#/${encodeURIComponent(game.id)}` }, game.title));
+    crumb.replaceChildren(h('span', { class: 'has-menu crumb-menu' },
+      h('a', { href: `#/${encodeURIComponent(game.id)}` }, game.title), songMenu(game, song)));
 
     const stories = song.stories || [];
     const n = stories.length;
     const plan = playable(song, location.hash === firstHash, sceneIndex);
     const next = plan ? nextSong(game, song) : null;
+    const prev = plan ? nextSong(game, song, -1) : null;
     const scenes = scenesOf(song);
     const view = h('section', { class: 'view song' });
-    songState = { game, song, plan, next, ui: {}, ended: false, stayed: false };
+    songState = { game, song, plan, next, prev, scenes, ui: {}, ended: false, stayed: false };
 
     if (plan) {
       const ui = songState.ui;
       ui.play = iconBtn('ctl', 'pause', 'Pause');
       ui.sound = iconBtn('ctl', 'sound', 'Mute');
       ui.vol = h('input', { class: 'vol', type: 'range', min: '0', max: '100', step: '1', 'aria-label': 'Volume' });
+      // The volume slider pops up above the sound button when you hover or tab to it.
+      const volWrap = h('span', { class: 'vol-wrap' }, ui.sound, h('span', { class: 'vol-pop' }, ui.vol));
       ui.repeat = iconBtn('ctl ctl-repeat', 'repeat', 'Repeat this song');
       ui.time = h('span', { class: 'ctl-time' }, '0:00');
       ui.seek = h('input', { class: 'seek', type: 'range', min: '0', max: '100', step: '1', value: '0', 'aria-label': 'Seek' });
@@ -450,28 +472,24 @@
       });
       ui.seek.addEventListener('input', () => { ui.seeking = true; seekTo(Number(ui.seek.value)); });
       ui.seek.addEventListener('change', () => { ui.seeking = false; });
-      const controls = h('div', { class: 'controls' }, ui.play, ui.sound, ui.vol, ui.repeat);
-      if (next && next !== song) {
-        const nb = iconBtn('ctl', 'next', `Next song: ${next.title}`);
-        nb.addEventListener('click', () => { location.hash = songHref(game, next); });
-        controls.append(nb);
-      }
-      controls.append(ui.time, ui.seek);
+      const controls = h('div', { class: 'controls' }, ui.play, volWrap, ui.repeat, ui.time, ui.seek);
 
-      // More than one scene: a row of buttons, one per scene.
-      let sub;
+      // More than one scene: a bar of big buttons above the video, as wide as the video.
       if (scenes.length > 1) {
         ui.scenes = scenes.map((m, i) => h('a', {
           class: 'scene-btn',
           href: `${songHref(game, song)}/${i + 1}`,
-          'aria-pressed': String(i === plan.index),
+          'aria-current': i === plan.index ? 'true' : null,
         }, m.label || `Scene ${i + 1}`));
-        sub = h('span', { class: 'sub' }, song.composer ? h('span', { class: 'sub-composer' }, song.composer) : null,
-          h('span', { class: 'scenes', role: 'group', 'aria-label': 'Scenes' }, ui.scenes));
+        sceneBar.replaceChildren(...ui.scenes);
       } else {
-        const text = [song.composer, scenes[0] && scenes[0].label].filter(Boolean).join(' · ');
-        sub = text ? h('small', null, text) : null;
+        sceneBar.replaceChildren();
       }
+      // Previous and next song: big buttons either side of the video.
+      setSideBtn(prevBtn, prev, 'left', 'Previous song');
+      setSideBtn(nextBtn, next, 'right', 'Next song');
+      const text = [song.composer, scenes.length === 1 && scenes[0].label].filter(Boolean).join(' · ');
+      const sub = text ? h('small', null, text) : null;
       view.append(
         h('div', { class: 'hero-space' }),
         h('div', { class: 'peek rise', style: '--i:2' },
@@ -494,19 +512,37 @@
     else if (!stage.hidden) closeStage();
   }
 
+  function setSideBtn(btn, song, icon, label) {
+    const st = songState;
+    if (!song || song === st.song) { btn.hidden = true; return; }
+    btn.hidden = false;
+    btn.href = songHref(st.game, song);
+    btn.setAttribute('aria-label', `${label}: ${song.title}`);
+    btn.title = song.title;
+    btn.replaceChildren(svg(icon, 28));
+  }
+
   // Swap to another scene of the song that's already open.
+  // If the music track is the same, it keeps playing and only the picture changes.
   function switchScene(i) {
     const st = songState;
     const plan = playable(st.song, false, i);
     if (!plan) return;
     if (st.plan && plan.index === st.plan.index && plan.scene.videoId === st.plan.scene.videoId) return;
+    const old = st.plan;
     st.plan = plan;
+    if (st.ui.scenes) st.ui.scenes.forEach((b, k) => (k === plan.index ? b.setAttribute('aria-current', 'true') : b.removeAttribute('aria-current')));
+    stageMsg.hidden = true;
+    const sameMusic = old && old.music && plan.music && sep() && media.ready.music
+      && old.music.videoId === plan.music.videoId && (old.music.start || 0) === (plan.music.start || 0);
+    if (sameMusic) {
+      swapScene(plan);
+      return;
+    }
     st.ended = false;
     st.stayed = false;
     hideUpNext();
     stopClouds(true);
-    if (st.ui.scenes) st.ui.scenes.forEach((b, k) => b.setAttribute('aria-pressed', String(k === plan.index)));
-    stageMsg.hidden = true;
     loadMedia(plan);
   }
 
@@ -517,6 +553,7 @@
     stopClouds(true);
     songState = null;
     if (!keepStage) closeStage();
+    else { sceneBar.replaceChildren(); prevBtn.hidden = nextBtn.hidden = true; }
   }
 
   /* ---------- the video stage ----------
@@ -532,21 +569,23 @@
     const css = getComputedStyle(document.documentElement);
     const top = parseFloat(css.getPropertyValue('--top')) || 56;
     const peek = parseFloat(css.getPropertyValue('--peek')) || 92;
-    const availH = Math.max(200, H - top - peek);
+    // Room for the scene bar above the video, when the song has more than one scene.
+    const bar = songState && songState.scenes && songState.scenes.length > 1 ? (isPhone() ? 44 : 56) : 0;
+    const availH = Math.max(200, H - top - peek - bar);
 
     const bw = Math.max(200, Math.min(W, availH * 16 / 9));
     const bh = bw * 9 / 16;
     const upright = isPhone() && availH > bh * 1.6;
-    const big = { left: (W - bw) / 2, top: upright ? top + 12 : top + (availH - bh) / 2, width: bw, height: bh };
+    const big = { left: (W - bw) / 2, top: bar + (upright ? top + 12 : top + (availH - bh) / 2), width: bw, height: bh };
 
     const margin = Math.min(360, Math.max(260, W * 0.2));
     const cw = Math.max(356, Math.min(bw, W - margin * 2));
     const ch = cw * 9 / 16;
-    const calmR = { left: (W - cw) / 2, top: top + (availH - ch) / 2, width: cw, height: ch };
+    const calmR = { left: (W - cw) / 2, top: bar + top + (availH - ch) / 2, width: cw, height: ch };
 
     // Phones keep the big size and slide it off the top instead.
     const small = isPhone() ? big : { left: W - 356 - 20, top: H - 200 - 52 - 20, width: 356, height: 200 };
-    return { big, calm: calmR, small, top, peek, W, H };
+    return { big, calm: calmR, small, top, peek, bar, W, H };
   }
 
   function currentRect(L) {
@@ -580,12 +619,35 @@
       stage.style.transform = '';
     }
     stage.classList.toggle('away', mini && isPhone());
+    placeExtras(L, mini ? L.big : r);
     if (!isPhone()) {
       dock.style.left = L.small.left + 'px';
       dock.style.top = (L.small.top + L.small.height + 8) + 'px';
       dock.style.width = L.small.width + 'px';
     } else {
       dock.style.left = dock.style.top = dock.style.width = '';
+    }
+  }
+
+  // The scene bar sits right above the video, and the previous/next buttons either side of it
+  // (inside its edges when the screen has no room beside it). They fade out with the small player.
+  function placeExtras(L, r) {
+    const show = !mini && !stage.hidden;
+    sceneBar.hidden = !L.bar || !sceneBar.childElementCount;
+    if (!sceneBar.hidden) {
+      Object.assign(sceneBar.style, { left: r.left + 'px', top: (r.top - L.bar) + 'px', width: r.width + 'px', height: L.bar + 'px' });
+      sceneBar.classList.toggle('gone', !show);
+    }
+    const size = isPhone() ? 44 : 60;
+    const gap = 16;
+    const y = r.top + r.height / 2 - size / 2;
+    const outside = r.left >= size + gap * 2;
+    prevBtn.style.left = (outside ? r.left - size - gap : r.left + 10) + 'px';
+    nextBtn.style.left = (outside ? r.left + r.width + gap : r.left + r.width - size - 10) + 'px';
+    for (const b of [prevBtn, nextBtn]) {
+      b.style.top = y + 'px';
+      b.classList.toggle('gone', !show);
+      b.classList.toggle('inside', !outside);
     }
   }
 
@@ -625,6 +687,9 @@
 
   function closeStage() {
     destroyMedia();
+    sceneBar.hidden = true;
+    sceneBar.replaceChildren();
+    prevBtn.hidden = nextBtn.hidden = true;
     stage.hidden = true;
     stage.classList.remove('mini', 'away');
     document.body.classList.remove('mini');
@@ -639,10 +704,12 @@
     stageMsg.hidden = false;
   }
 
-  // Tap the small player: make it big again. Taps on the big video go to YouTube itself
-  // (pause, and the "Skip ad" button if an ad is playing).
-  stage.addEventListener('click', () => {
+  // Taps on the video go to us, not to YouTube, so the scene and the music always pause and play
+  // together. Tap the big video: pause or play. Tap the small player: make it big again.
+  // The bottom-right corner is left open so YouTube's "Skip ad" button can still be pressed.
+  $('stageTap').addEventListener('click', () => {
     if (mini) window.scrollTo({ top: 0, behavior: scrollBehavior });
+    else togglePlay();
   });
 
   /* ---------- YouTube players ---------- */
@@ -669,7 +736,8 @@
   const media = {
     plan: null, scene: null, music: null, ready: { scene: false, music: false }, token: 0,
     userMuted: false, tick: null, playing: false,
-    sceneExpect: null, // what we last told the scene to do, so a tap on the video can be told apart
+    sceneExpect: null, // what we last told the scene to do
+    gate: null,        // while both players are loading: { scene, music, timer } (see loadMedia)
   };
 
   const sep = () => !!(media.plan && media.plan.music && media.music);
@@ -690,7 +758,6 @@
     media.sceneExpect = { action, at: Date.now() };
     safe(() => (action === 'play' ? media.scene.playVideo() : media.scene.pauseVideo()));
   }
-  const weExpected = (action) => media.sceneExpect && media.sceneExpect.action === action && Date.now() - media.sceneExpect.at < 1500;
 
   async function loadMedia(plan) {
     const token = ++media.token;
@@ -703,15 +770,60 @@
       return;
     }
     if (token !== media.token) return;
-    // With a separate music track, the scene waits (cued, not playing) until the music starts,
-    // so the two begin together.
-    usePlayer(YT, 'scene', plan.scene, !plan.music);
+    // With a separate music track, both players load at the same time, muted. Each one is held at
+    // its start as soon as it can play, and once both are ready they start together. Without this
+    // the scene started a second or two after the music while it buffered.
+    clearGate();
+    if (plan.music) {
+      media.gate = { scene: false, music: false, timer: setTimeout(() => openGate(token), 6000) };
+    }
+    usePlayer(YT, 'scene', plan.scene, true);
     if (plan.music) usePlayer(YT, 'music', plan.music, true);
     else dropPlayer('music');
     applyAudio();
     clearInterval(media.tick);
     media.tick = setInterval(tick, 250);
-    setTimeout(() => { if (token === media.token) checkAutoplay(); }, 1800);
+    if (!media.gate) setTimeout(() => { if (token === media.token) checkAutoplay(); }, 1800);
+  }
+
+  function clearGate() {
+    if (media.gate) clearTimeout(media.gate.timer);
+    media.gate = null;
+  }
+
+  // While loading: a player that starts playing is paused and put back at its start until the other one is ready too.
+  function gateState(role, s) {
+    const g = media.gate;
+    if (s !== YT_STATE.PLAYING || g[role]) return;
+    g[role] = true;
+    if (g.scene && g.music) { openGate(media.token); return; }
+    const p = media[role];
+    const spec = role === 'music' ? media.plan.music : media.plan.scene;
+    if (role === 'scene') media.sceneExpect = { action: 'pause', at: Date.now() };
+    safe(() => { p.pauseVideo(); p.seekTo(spec.start || 0, true); });
+  }
+
+  function openGate(token) {
+    if (token !== media.token || !media.gate) return;
+    const plan = media.plan;
+    clearGate();
+    safe(() => media.music.seekTo(plan.music.start || 0, true));
+    if (media.scene && media.ready.scene) safe(() => media.scene.seekTo(plan.scene.start || 0, true));
+    applyAudio();
+    safe(() => media.music.playVideo());
+    sceneDo('play');
+    setTimeout(() => { if (token === media.token) checkAutoplay(); }, 1500);
+  }
+
+  // A different scene with the same music: only the picture changes.
+  function swapScene(plan) {
+    media.plan = plan;
+    media.sceneExpect = { action: media.playing ? 'play' : 'pause', at: Date.now() };
+    loadYT().then((YT) => {
+      if (media.plan !== plan) return;
+      usePlayer(YT, 'scene', plan.scene, true);
+      applyAudio();
+    }).catch(() => {});
   }
 
   function usePlayer(YT, role, spec, autoplay) {
@@ -739,7 +851,9 @@
         playsinline: 1,
         rel: 0,
         start: Math.floor(spec.start || 0),
-      }, spec.end ? { end: Math.floor(spec.end) } : {}),
+      }, spec.end ? { end: Math.floor(spec.end) } : {},
+      // Start muted when the scene sits under a music track, or while waiting to start together.
+      (role === 'scene' && media.plan && media.plan.music) || (role === 'music' && media.gate) ? { mute: 1 } : {}),
       events: {
         onReady: () => onReady(role),
         onStateChange: (e) => onState(role, e.data),
@@ -758,6 +872,7 @@
 
   function destroyMedia() {
     media.token++;
+    clearGate();
     clearInterval(media.tick);
     media.tick = null;
     dropPlayer('scene');
@@ -776,13 +891,14 @@
     if (spec.start && t < spec.start - 1) safe(() => p.seekTo(spec.start, true));
     applyAudio();
     // Scene became ready after the music already started: catch up.
-    if (role === 'scene' && sep() && media.playing) sceneDo('play');
+    if (!media.gate && role === 'scene' && sep() && media.playing) sceneDo('play');
     sync();
   }
 
   function onState(role, s) {
     const plan = media.plan;
     if (!plan) return;
+    if (media.gate) { gateState(role, s); return; }
     const isMaster = role === (sep() ? 'music' : 'scene');
     if (isMaster) {
       media.playing = s === YT_STATE.PLAYING;
@@ -808,9 +924,9 @@
         safe(() => { media.scene.seekTo(plan.scene.start || 0, true); media.scene.playVideo(); });
         return;
       }
-      // Someone tapped the video itself: the music follows.
-      if (s === YT_STATE.PAUSED && !weExpected('pause') && media.playing) safe(() => media.music.pauseVideo());
-      if (s === YT_STATE.PLAYING && !weExpected('play') && !media.playing) safe(() => media.music.playVideo());
+      // The scene only plays while the music does.
+      const ms = safe(() => media.music.getPlayerState());
+      if (s === YT_STATE.PLAYING && (ms === YT_STATE.PAUSED || ms === YT_STATE.ENDED)) sceneDo('pause');
     }
   }
 
@@ -840,6 +956,7 @@
     const audible = sep() ? media.music : media.scene;
     const audibleReady = sep() ? media.ready.music : media.ready.scene;
     if (sep() && media.scene && media.ready.scene) safe(() => media.scene.mute());
+    if (media.gate) { if (media.music && media.ready.music) safe(() => media.music.mute()); return; }
     if (audible && audibleReady) {
       safe(() => {
         audible.setVolume(vol);
@@ -863,7 +980,7 @@
   // If the browser blocked sound, start muted so the clip still plays, and make the sound button glow.
   function checkAutoplay() {
     const p = master();
-    if (!p) return;
+    if (!p || media.gate) return;
     const s = safe(() => p.getPlayerState());
     if (s === YT_STATE.PLAYING || s === YT_STATE.BUFFERING || s === YT_STATE.ENDED) return;
     safe(() => { p.mute(); p.playVideo(); });
@@ -872,7 +989,7 @@
 
   function togglePlay() {
     const p = master();
-    if (!p) return;
+    if (!p || media.gate) return;
     if (safe(() => p.getPlayerState()) === YT_STATE.PLAYING) safe(() => p.pauseVideo());
     else safe(() => p.playVideo());
   }
@@ -1198,6 +1315,52 @@
     if (/^(INPUT|TEXTAREA|BUTTON|A|SELECT)$/.test(tag) || $('about').open) return;
     if (e.key === ' ' || e.key === 'k') { e.preventDefault(); togglePlay(); }
   });
+
+  /* ---------- sounds: short game sounds played over the music ---------- */
+
+  const soundsBtn = $('soundsBtn');
+  const soundsPanel = $('soundsPanel');
+  const soundCache = new Map();
+  let soundsGame = null;
+
+  // Called on every page: the button only shows for a game that has sounds.
+  function setSounds(game) {
+    const list = game && Array.isArray(game.sounds) ? game.sounds.filter((x) => x && x.file) : [];
+    closeSounds();
+    if (!list.length) { soundsBtn.hidden = true; soundsGame = null; return; }
+    soundsBtn.hidden = false;
+    if (soundsGame === game) return;
+    soundsGame = game;
+    soundsPanel.replaceChildren(...list.map((snd) => h('button', {
+      type: 'button', class: 'sound', onclick: () => playSound(snd.file),
+    }, snd.label || 'Sound')));
+  }
+
+  function playSound(file) {
+    let base = soundCache.get(file);
+    if (!base) { base = new Audio(file); base.preload = 'auto'; soundCache.set(file, base); }
+    // A copy each time, so pressing quickly plays them over each other.
+    const a = base.cloneNode();
+    a.volume = Math.max(0.05, currentVolume() / 100);
+    a.play().catch(() => {});
+  }
+
+  function closeSounds() {
+    soundsPanel.hidden = true;
+    soundsBtn.setAttribute('aria-expanded', 'false');
+  }
+  soundsBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = soundsPanel.hidden;
+    soundsPanel.hidden = !open;
+    soundsBtn.setAttribute('aria-expanded', String(open));
+    // Load them now so the first press plays straight away.
+    if (open && soundsGame) for (const snd of soundsGame.sounds || []) if (snd.file && !soundCache.has(snd.file)) {
+      const a = new Audio(snd.file); a.preload = 'auto'; soundCache.set(snd.file, a);
+    }
+  });
+  document.addEventListener('click', (e) => { if (!soundsPanel.hidden && !soundsPanel.contains(e.target)) closeSounds(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !soundsPanel.hidden) { closeSounds(); soundsBtn.focus(); } });
 
   const about = $('about');
   $('aboutBtn').addEventListener('click', () => {

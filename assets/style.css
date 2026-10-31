@@ -60,12 +60,57 @@ body.on-song .bd-vignette { background: radial-gradient(ellipse 85% 75% at 50% 4
 .top.solid { background: rgba(5, 7, 11, 0.9); box-shadow: 0 1px 0 var(--line); }
 .crumbs { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
 .brand { font-family: var(--serif); font-weight: 500; font-size: 22px; text-decoration: none; }
-.crumb { font-size: 14px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.crumb { font-size: 14px; color: var(--muted); white-space: nowrap; min-width: 0; }
 .crumb a { text-decoration: none; }
 .crumb a:hover { color: var(--ink); }
 .crumb:not(:empty)::before { content: "/"; margin-right: 10px; opacity: 0.5; }
 .about-btn { background: none; border: 0; padding: 12px 0; font-size: 14px; color: var(--muted); }
-.about-btn:hover { color: var(--ink); }
+.about-btn:hover, .about-btn[aria-expanded="true"] { color: var(--ink); }
+.top-right { display: flex; gap: 20px; }
+
+/* ---------- song lists that open on hover (home and the top bar) ---------- */
+.has-menu { position: relative; }
+.menu {
+  position: absolute; z-index: 30; top: 100%; left: 50%;
+  min-width: 220px; margin: 0; padding: 6px; list-style: none; text-align: left;
+  background: rgba(14, 16, 20, 0.97); border-radius: 10px;
+  box-shadow: 0 0 0 1px var(--line), 0 16px 40px rgba(0, 0, 0, 0.55);
+  opacity: 0; visibility: hidden; transform: translate(-50%, 6px);
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s linear 0.18s;
+}
+.has-menu:hover > .menu, .has-menu:focus-within > .menu {
+  opacity: 1; visibility: visible; transform: translate(-50%, 0);
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s;
+}
+/* An invisible strip so the mouse can cross the gap to the menu. */
+.menu::before { content: ""; position: absolute; left: 0; right: 0; top: -10px; height: 10px; }
+.menu a {
+  display: flex; gap: 12px; align-items: baseline; padding: 8px 12px; border-radius: 6px;
+  font-family: var(--sans); font-size: 15px; line-height: 1.3; color: var(--ink); text-decoration: none; white-space: nowrap;
+}
+.menu a:hover, .menu a:focus-visible { background: rgba(255, 255, 255, 0.08); }
+.menu a[aria-current="page"] { color: var(--acc); }
+.menu-n { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.crumb-menu > .menu { left: 0; transform: translate(0, 6px); margin-top: 10px; }
+.crumb-menu:hover > .menu, .crumb-menu:focus-within > .menu { transform: none; }
+.crumb-menu > .menu::before { top: -20px; height: 20px; }
+.games .menu { margin-top: 2px; }
+
+/* ---------- sounds panel ---------- */
+.sounds {
+  position: absolute; top: calc(var(--top) - 4px); right: max(20px, env(safe-area-inset-right));
+  display: grid; grid-template-columns: repeat(2, minmax(120px, 1fr)); gap: 6px;
+  max-width: calc(100vw - 24px); max-height: 60vh; overflow-y: auto; padding: 8px;
+  background: rgba(14, 16, 20, 0.97); border-radius: 12px;
+  box-shadow: 0 0 0 1px var(--line), 0 16px 40px rgba(0, 0, 0, 0.55);
+  animation: fade 0.15s ease both;
+}
+.sound {
+  height: 40px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--line);
+  background: transparent; font-size: 14px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sound:hover { background: rgba(255, 255, 255, 0.08); }
+.sound:active { background: rgba(232, 194, 122, 0.2); border-color: var(--acc); }
 
 /* ---------- views ---------- */
 .view { animation: fade 0.22s ease both; }
@@ -86,13 +131,13 @@ body.on-song .bd-vignette { background: radial-gradient(ellipse 85% 75% at 50% 4
   text-align: center;
 }
 .games { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.games a {
+.games > li > a {
   display: inline-block; padding: 6px 4px;
   font-family: var(--serif); font-size: clamp(40px, 7vw, 84px); line-height: 1.05;
   text-decoration: none; color: var(--faint);
   transition: color 0.3s ease;
 }
-.games a:hover, .games a:focus-visible, .games li:only-child a { color: var(--ink); }
+.games > li > a:hover, .games > li > a:focus-visible, .games > li:hover > a, .games > li:only-child > a { color: var(--ink); }
 
 /* ---------- game ---------- */
 .game { max-width: 760px; margin: 0 auto; min-height: 100svh; padding: calc(var(--top) + 8vh) 24px 80px; }
@@ -120,17 +165,7 @@ body.on-song .bd-vignette { background: radial-gradient(ellipse 85% 75% at 50% 4
 .peek-title { min-width: 0; }
 .peek h1 { margin: 0; font-family: var(--serif); font-weight: 400; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.1; }
 .peek-title small { display: block; margin-top: 4px; font-size: 13px; color: var(--muted); }
-.peek-title .sub { display: flex; align-items: center; gap: 10px; margin-top: 6px; font-size: 13px; color: var(--muted); min-width: 0; }
-.sub-composer { white-space: nowrap; }
-/* Scene buttons, when a song has more than one scene. */
-.scenes { display: flex; gap: 6px; min-width: 0; overflow-x: auto; scrollbar-width: none; }
-.scenes::-webkit-scrollbar { display: none; }
-.scene-btn {
-  flex: none; padding: 3px 11px; border-radius: 999px; border: 1px solid var(--line);
-  font-size: 12px; line-height: 1.4; color: var(--muted); text-decoration: none; white-space: nowrap;
-}
-.scene-btn:hover { color: var(--ink); }
-.scene-btn[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #0b0d10; }
+
 .peek-more {
   display: inline-flex; align-items: center; gap: 4px; min-height: 44px;
   background: none; border: 0; padding: 0; font-size: 14px; color: var(--muted); white-space: nowrap;
@@ -181,8 +216,38 @@ a.c-author:hover { text-decoration: underline; }
 .stage iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
 /* Small player: taps go to us (make it big). Big player: taps go to YouTube, so people can skip ads. */
 .stage.mini iframe { pointer-events: none; }
+/* Our own tap layer over the video. The bottom-right corner stays open for YouTube's "Skip ad". */
+.stage-tap { position: absolute; inset: 0; z-index: 2; clip-path: polygon(0 0, 100% 0, 100% 74%, 72% 74%, 72% 100%, 0 100%); }
+.stage.mini .stage-tap { clip-path: none; }
+
+/* Scene bar: big buttons right above the video, as wide as it. */
+.scenebar {
+  position: fixed; z-index: 11; display: flex; gap: 0;
+  transition: opacity 0.3s ease;
+}
+.scenebar.gone, .side-btn.gone { opacity: 0; pointer-events: none; }
+.scene-btn {
+  flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center;
+  padding: 0 16px; border-bottom: 2px solid var(--line);
+  font-family: var(--serif); font-size: 22px; color: var(--faint); text-decoration: none;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.scene-btn:hover { color: var(--ink); }
+.scene-btn[aria-current="true"] { color: var(--ink); border-bottom-color: var(--acc); }
+
+/* Previous and next song, either side of the video. */
+.side-btn {
+  position: fixed; z-index: 12; width: 60px; height: 60px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted); background: rgba(14, 16, 20, 0.55); box-shadow: 0 0 0 1px var(--line);
+  transition: opacity 0.3s ease, color 0.2s ease, background-color 0.2s ease;
+}
+.side-btn:hover { color: var(--ink); background: rgba(14, 16, 20, 0.85); }
+.side-btn.inside { background: rgba(5, 7, 11, 0.5); }
+
 .stage-msg {
-  position: absolute; inset: 0; z-index: 2; margin: 0;
+  position: absolute; inset: 0; z-index: 3; margin: 0;
   display: grid; place-items: center; padding: 20px; text-align: center;
   background: #000; color: var(--muted); font-size: 15px;
 }
@@ -200,7 +265,18 @@ a.c-author:hover { text-decoration: underline; }
 .ctl:hover { color: var(--ink); background: rgba(255, 255, 255, 0.08); }
 .ctl.nudge { color: var(--acc); background: rgba(232, 194, 122, 0.14); }
 .ctl-time { margin: 0 10px 0 6px; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.vol { width: 72px; flex: none; margin: 0 6px 0 0; }
+.vol-wrap { position: relative; display: inline-flex; }
+.vol-pop {
+  position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translate(-50%, 4px);
+  display: flex; align-items: center; padding: 8px 14px; border-radius: 999px;
+  background: rgba(14, 16, 20, 0.97); box-shadow: 0 0 0 1px var(--line), 0 10px 30px rgba(0, 0, 0, 0.5);
+  opacity: 0; visibility: hidden; transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0.15s;
+}
+.vol-pop::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 10px; } /* bridge to the button */
+.vol-wrap:hover .vol-pop, .vol-wrap:focus-within .vol-pop {
+  opacity: 1; visibility: visible; transform: translate(-50%, 0); transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s;
+}
+.vol { width: 110px; flex: none; margin: 0; }
 .seek, .vol {
   flex: 1; min-width: 60px; height: 24px; margin: 0; background: transparent; cursor: pointer;
   -webkit-appearance: none; appearance: none;
@@ -249,7 +325,11 @@ body.mini .upnext { left: auto; right: 20px; transform: none; bottom: 300px; }
 @media (max-width: 639px) {
   .dock { left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); }
   /* Phones use their own volume buttons. */
-  .controls .seek, .controls .ctl-time, .controls .vol { display: none; }
+  .controls .seek, .controls .ctl-time, .vol-pop { display: none; }
+  .scene-btn { font-size: 17px; padding: 0 8px; }
+  .side-btn { width: 44px; height: 44px; }
+  .sounds { grid-template-columns: 1fr 1fr; left: 12px; right: 12px; }
+  .top-right { gap: 14px; }
   .controls { flex: none; margin: 0; }
   body.mini .upnext { left: 12px; right: 12px; bottom: calc(76px + env(safe-area-inset-bottom)); }
 }
@@ -292,7 +372,6 @@ body.mini .upnext { left: auto; right: 20px; transform: none; bottom: 300px; }
   .peek-title { flex: 1; }
   .peek h1 { font-size: 26px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .peek-title small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .sub-composer { display: none; }
   .peek-more .pm-word { display: none; }
   .c-text { font-size: 19px; }
   .cloud p { font-size: 17px; }

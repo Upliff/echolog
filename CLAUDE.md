@@ -29,6 +29,7 @@ Owner: Mohad. Repo: https://github.com/Upliff/echolog (public).
 - **Requests:** visitors can request a game, a song or a fix. Mohad sees them in the admin page and can accept one, which opens the game/song editor filled in. (Planned.)
 - **Hide names:** a switch on the site that hides commenters' names. (Planned.)
 - **Several scenes per song:** when a song plays more than once in a game, it can have several scenes and people can swap between them. (Built, see "More than one scene per song".)
+- **Sounds:** a "Sounds" button in the top bar opens a panel of short game sounds for the current game, which play over the music. Mohad uploads them in the admin page. The files are game audio, so hosting them publicly carries the same copyright risk as the clips (Mohad's choice).
 - **Inbox:** comments and requests go to a private GitHub repo as issues, through a free Cloudflare Worker. Decided 31 Oct 2026 over a Google Form.
 
 ## Accounts and setup status
@@ -62,6 +63,7 @@ data/hidden.txt          ids of stories to never show
 - **Scenes:** each song has a list of scenes (link, start, end, label), which you can add, remove and reorder. Each scene can have its own music under "Different music for this scene". It saves `moments` and also writes `moment` as a copy of the first scene, so the site works before it supports `moments`.
 - **Music track:** a link, a start and an **end**. The end cuts off dead air at the end of a song (added 31 Oct 2026). The site already passes `end` to YouTube as `endSeconds`.
 - An end time before its start is caught before saving.
+- **Sounds (game editor):** a list of sounds per game: a name (shown on the button) and an audio file (mp3, ogg, wav or m4a, up to 1.5 MB). Saving uploads new files to `sounds/<game id>/<name>.<ext>` and saves `sounds: [{ "label", "file" }]` on the game. Each row has Play, Replace and Remove.
 - **Site tab:** settings for everyone who visits, saved as `settings` in `config/games.json`: starting volume (0 to 100, default 80) and how many seconds before the end "Next" shows (default 8, 0 turns auto next off). Saving starts the collector, which copies `settings` into `stories.json`.
 - Pasting a YouTube link with `?t=` fills in the start time.
 - Saving writes `config/games.json` through the GitHub API, uploads the cover to `covers/<game id>.<ext>` (shrunk to 1600px), sets `cover` on the game, then starts the "Collect stories" workflow.
@@ -71,7 +73,7 @@ data/hidden.txt          ids of stories to never show
   - **Comments** show exactly as sent, with Approve and Decline. Approve adds the comment to `data/submitted.json`, labels the issue `accepted`, closes it, and starts the collector.
   - **Requests:** Accept (game or song) opens the editor filled in from the request, with a banner. Saving labels the issue `accepted` and closes it. Fix requests get "Mark done". Decline labels the issue `declined` and closes it.
   - The token needs **Issues: Read and write** on the inbox repo too.
-- The collector passes `cover` through to `stories.json`. The front end already uses `game.cover` when it's set, and otherwise falls back to `covers/<id>.jpg|jpeg|png|webp`.
+- The collector passes `cover` and `sounds` through to `stories.json`. The front end already uses `game.cover` when it's set, and otherwise falls back to `covers/<id>.jpg|jpeg|png|webp`.
 
 **Quota:** YouTube allows 10,000 units a day, and each page of 100 comments costs 1 unit. At 5 pages per video, that's roughly 5 units per video per run, so there's plenty of room.
 
@@ -87,6 +89,7 @@ data/hidden.txt          ids of stories to never show
   "settings": { "volume": 80, "upNextSeconds": 8 },
   "games": [{
     "id": "ffx", "title": "Final Fantasy X", "year": 2001, "cover": "covers/ffx.jpg", "steamAppId": 359870,
+    "sounds": [{ "label": "Save point", "file": "sounds/ffx/save-point.mp3" }],
     "songs": [{
       "id": "to-zanarkand", "title": "To Zanarkand", "composer": "Nobuo Uematsu",
       "moment": { "videoId": "kilrRiclUFY", "start": 0, "end": null, "label": "Opening, the campfire" },
@@ -117,22 +120,28 @@ index.html               page shell: backdrop, top bar, video stage (scene + mus
 assets/style.css    all styles
 assets/app.js       everything else; all the settings are at the top
 covers/                  one cover image per game (README.txt inside explains naming); the admin page uploads here
+sounds/<game id>/        sound files for the Sounds button; the admin page uploads here
 preview.bat + .ps1       local preview server for Windows without Python
 .nojekyll                tells GitHub Pages to serve files as-is
 ```
 
-- Routes use the hash: `#/` home, `#/ffx` game, `#/ffx/to-zanarkand` song.
+- Routes use the hash: `#/` home, `#/ffx` game, `#/ffx/to-zanarkand` song, `#/ffx/otherworld/2` second scene.
+- **Song lists on hover:** on the home page, hovering (or tabbing to) a game's name shows its songs under it. On song pages, hovering the game name in the top bar does the same, with the current song in gold.
 - Look: dark, Cormorant Garamond (titles, comments) and Karla (labels), gold accent `#e8c27a`. The game's cover sits blurred behind every page. No cover image means a plain dark background.
 - **Speed rules (keep these):** no `backdrop-filter` and no live CSS blur anywhere. The cover is drawn once into a small canvas (`BG_DETAIL`, 32 x 32; bigger is sharper, 24 was the old softer look) and stretched, which blurs it for free; it never moves, it only fades when the game changes. Anything that animates only uses opacity or transform. The video changes size once and the move is animated with transform. Comments off screen aren't drawn (`content-visibility`). Fonts load without holding up the page.
 - All comment text goes in through `textContent` (never `innerHTML`), with `white-space: pre-wrap` so line breaks stay.
 - "Show more" is decided from the text (over 650 characters or 9 lines), so nothing is measured on screen. Shorter comments are never cut.
-- `index.html` loads `style.css?v=7` and `app.js?v=7`. Bump the number after changes so browsers don't use old copies.
-- Song page: the clip fills the screen apart from a strip at the bottom with the title, our own controls (play, sound, volume slider, repeat, next song, time, seek bar) and the comment count. Volume and repeat are remembered in the browser; the starting volume comes from the admin Site tab. Phones hide the volume slider (they use their own buttons) and the seek bar. YouTube's control bar is hidden (`controls: 0`). Taps on the big video go to YouTube itself (pause, and "Skip ad" when an ad plays); tap the small player to make it big again. Space or K also plays/pauses.
+- `index.html` loads `style.css?v=8` and `app.js?v=8`. Bump the number after changes so browsers don't use old copies.
+- Song page: the clip fills the screen apart from a strip at the bottom with the title, our own controls (play, sound, repeat, time, seek bar) and the comment count. The volume slider pops up above the sound button on hover or keyboard focus. Volume and repeat are remembered in the browser; the starting volume comes from the admin Site tab. Phones hide the volume slider (they use their own buttons) and the seek bar. YouTube's control bar is hidden (`controls: 0`).
+- **Taps on the video** go to our own tap layer, not YouTube, so the scene and the music always pause and play together (letting YouTube take taps made it play then pause straight away). The bottom-right corner of the big video is left open so YouTube's "Skip ad" button still works. Tap the small player to make it big again. Space or K also plays/pauses.
+- **Previous / next song:** big round buttons either side of the big video (inside its edges when there's no room beside it, e.g. on phones). They hide with the small player. Songs with nothing to play are skipped, and both wrap round.
+- **Scene bar:** when a song has more than one scene, a bar of big buttons sits right above the video, the same width as it. The video moves down to make room. The current scene is underlined in gold.
 - Scrolling: on desktop the video shrinks to a 356 x 200 player in the bottom-right with a small bar under it. On phones the video slides away and a bar sits along the bottom.
 - The players stay alive between songs, so the next song loads into the same player and starts quickly.
 - **Auto next:** "Next: (song) in 8" appears that many seconds before the song ends, with "Play now" and "Stay", and the next song starts as soon as this one finishes. The number is `upNextSeconds` from the Site tab (0 turns it off). Seeking back hides it again. If a clip ends early or fails, a 5-second countdown shows instead. Songs with no clip are skipped. After the last song it goes back to the first.
 - **Repeat:** the repeat button (gold with a dot when on) plays the same scene again when it ends, and stops "Next" showing.
-- **Music over the scene:** two players. The scene is on top and always muted; the music player sits under it at 200 x 200 (YouTube's minimum). The scene is cued and waits until the music actually starts, so they begin together, and it pauses while the music buffers. Play/pause and the seek bar control the music, and the scene follows. Tapping the video itself to pause or play makes the music follow too. If the music video fails, the scene's own sound comes back.
+- **Music over the scene:** two players. The scene is on top and always muted; the music player sits under it at 200 x 200 (YouTube's minimum). **Starting together:** both load muted at the same time. Whichever can play first is held at its start until the other can too, then both start from their start times together and the music is unmuted (gives up waiting after 6 seconds). The scene pauses while the music buffers and only plays while the music does. Play/pause and the seek bar control the music, and the scene follows. If the music video fails, the scene's own sound comes back.
+- **Swapping scenes** keeps the music playing when the new scene uses the same music track; only the picture changes. A scene with its own music loads both again.
 - Clouds: while the big video is playing, short comments (200 characters or less, best 30 by score, shuffled) fade in one at a time in the corners and sides of the video, never the middle. Every one shows once before any comes round again, and the last few shown are put at the back when the list starts over, so nothing repeats back to back. They alternate left and right, stay up for reading time (about 16 characters a second, 6.5 to 14 seconds), drift slightly, then fade out. They stop when the video is paused, small, or the tab is hidden. On phones there's one at a time, just under the video. Settings at the top of `app.js`.
 - **Known rule breaks (Mohad's choice):** YouTube's embed rules don't allow anything on top of the player, and don't allow separating a video's audio from its picture or hiding a player. Clouds over the video break the first; the music track under a muted scene breaks the other two. The risk is YouTube suspending the API key the collector uses. Clouds can be moved beside the video with `CLOUDS_OVER_VIDEO = false`. To drop the music overlay, remove `audio` from the songs.
 - Missing video: the stage says the clip is unavailable and the next song countdown starts. YouTube script blocked: the stage says so, comments still work.
@@ -150,7 +159,7 @@ preview.bat + .ps1       local preview server for Windows without Python
 - The start time backup jump only fires if the player really ignored `start`, so the clip shouldn't jump twice. Worth a check on real YouTube.
 - Auto next onto a new song after the page has been idle may start muted if the browser blocks sound. The gold sound button shows when that happens.
 - Mini player is 356x200 on desktop because of YouTube's 200x200 minimum.
-- Otherworld starting late: the scene used to start before the music track had loaded. Fixed by making the scene wait for the music. If the music still sounds late, the music video itself probably has silence at the start: set its start a second or two in.
+- Otherworld starting late: the first fix (scene waits for the music) still left the scene a second or two behind while it buffered. Now both players buffer first and start together (see "Starting together"). Mohad set Otherworld's music start to 0:01 while testing; set it back to 0:00 if the start of the song is cut off.
 - **Ads:** YouTube can show ads in the embedded player on any video that's monetised, by the uploader or by a Content ID claim (Square Enix claims are likely on custom uploads). The site can't turn them off and earns nothing from them. Autoplayed embeds tend to get fewer ads, but there's no guarantee. Clouds and the seek bar don't know when an ad is playing.
 
 ## Own comments, requests and hiding names (planned)
@@ -217,7 +226,7 @@ Mohad asked for this on 31 Oct 2026: a song can have several scenes (it often pl
 - **Old data keeps working:** a song with only `moment` is treated as a one-item `moments` list. Once everything uses `moments`, `moment` can go.
 - **Collector:** passes `moments` through to `stories.json` (built). Songs with only `moment` get a one-item `moments` list.
 - **Built:** the admin scene list, the collector, and the scene buttons on the song page (31 Oct 2026). Scene buttons show "Scene 1", "Scene 2" when a scene has no label.
-- **Song page:** if there's more than one scene, a row of small buttons with each scene's `label` sits under the song title in the strip under the video (for example "Opening" and "Ending"). The current one is marked (`aria-pressed`). Tapping one loads that scene into the same player straight away, from its `start`. The comments, scroll position and clouds don't reset. On phones the row scrolls sideways if it doesn't fit.
+- **Song page:** if there's more than one scene, a bar of big buttons with each scene's `label` sits right above the video, as wide as it (for example "Opening" and "Ending"). The current one is marked (`aria-current`). Tapping one loads that scene into the same player straight away, from its `start`; the music keeps playing if it's the same track. The comments and scroll position don't reset. On phones the row scrolls sideways if it doesn't fit.
 - **Link:** the scene number goes in the hash, `#/ffx/to-zanarkand/2` for the second scene. No number means the first. A number that doesn't exist falls back to the first.
 - **Auto next:** when the scene playing ends, the next song starts as now. It doesn't run through the other scenes of the same song first.
 - **Admin page:** in the song editor, "Scene" is a list with "Add scene", remove and reorder. Each scene has a link (with `?t=` start), end and label, and an optional music track (built).
