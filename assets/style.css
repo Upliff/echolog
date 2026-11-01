@@ -488,6 +488,17 @@ body.mini .upnext { left: auto; right: 20px; transform: none; bottom: 300px; }
   opacity: 0; transition: opacity 0.4s ease;
 }
 .stage-note.on { opacity: 1; }
+/* Shown while an ad seems to be playing (see adWatch). Top left, clear of YouTube's Skip button. */
+.ad-label {
+  position: absolute; left: 12px; top: 12px; z-index: 6; margin: 0;
+  padding: 7px 12px; border-radius: 8px; background: rgba(5, 7, 11, 0.85);
+  font-size: 13px; color: var(--acc); pointer-events: none;
+  opacity: 0; transition: opacity 0.4s ease;
+}
+.stage.ad:not(.loading):not(.mini) .ad-label { opacity: 1; }
+/* An ad on the hidden music player: bring that player up over the scene so it can be seen and skipped. */
+.stage.music-ad .layer-music { width: 100%; height: 100%; z-index: 3; }
+.stage.music-ad .stage-tap { display: none; }
 .stage.loading .stage-loading { opacity: 1; }
 .layer-scene { transition: opacity 0.6s ease; }
 /* The players stay visible under the loading screen (which is solid, so nothing shows through).

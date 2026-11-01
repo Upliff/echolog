@@ -1167,7 +1167,7 @@
       media.playing = s === YT_STATE.PLAYING;
       if (sep()) {
         // The scene follows the music: starts with it, pauses with it, waits while it buffers.
-        if (s === YT_STATE.PLAYING) sceneDo('play');
+        if (s === YT_STATE.PLAYING && !media.musicAd) sceneDo('play');
         if (s === YT_STATE.PAUSED || s === YT_STATE.BUFFERING) sceneDo('pause');
       }
       if (s === YT_STATE.PLAYING) {
@@ -1409,9 +1409,34 @@
     safe(() => { p.seekTo(spec.start || 0, true); p.playVideo(); });
   }
 
+  /* Ads: YouTube doesn't tell the site when an ad is on, so this guesses. A player that says it's
+     playing while the video's own time doesn't move for 2 seconds is almost always showing an ad.
+     Then a small "Ad playing" label shows. If it's the hidden music player, it's brought up over
+     the scene so the ad can be seen and skipped, and the scene waits. */
+  const adSeen = { scene: { t: -1, since: 0 }, music: { t: -1, since: 0 } };
+  function adWatch() {
+    let any = false;
+    let musicAd = false;
+    for (const role of ['scene', 'music']) {
+      const p = media[role];
+      const a = adSeen[role];
+      const playing = p && media.ready[role] && !media.gate && safe(() => p.getPlayerState()) === YT_STATE.PLAYING;
+      if (!playing) { a.t = -1; a.since = 0; continue; }
+      const t = safe(() => p.getCurrentTime()) || 0;
+      if (Math.abs(t - a.t) > 0.01) { a.t = t; a.since = Date.now(); continue; }
+      if (Date.now() - a.since > 2000) { any = true; if (role === 'music') musicAd = true; }
+    }
+    if (musicAd && !media.musicAd) sceneDo('pause');
+    if (!musicAd && media.musicAd && sep() && media.playing) sceneDo('play');
+    media.musicAd = musicAd;
+    stage.classList.toggle('ad', any);
+    stage.classList.toggle('music-ad', musicAd);
+  }
+
   function tick() {
     if (document.hidden) return;
     musicWatch();
+    adWatch();
     const plan = media.plan;
     // Same for the music track (YouTube can start it from 0:00 after an ad).
     if (plan && !media.gate && sep() && media.ready.music && plan.music.start
@@ -1447,8 +1472,19 @@
       const mt = safe(() => media.music.getCurrentTime()) || 0;
       const st = safe(() => media.scene.getCurrentTime()) || 0;
       const want = sceneAt(plan.scene, mt - (plan.music.start || 0) + media.extra, safe(() => media.scene.getDuration()) || 0);
-      if (Math.abs(st - want) > 0.8) safe(() => media.scene.seekTo(want, true));
-    }
+      // Is the scene moving by itself? (Ticks right after we moved it don't count.)
+      if (media.lockPrev >= 0 && !media.lockSeeked) {
+        media.lockStill = Math.abs(st - media.lockPrev) < 0.01 ? (media.lockStill || 0) + 1 : 0;
+      }
+      media.lockPrev = st;
+      media.lockSeeked = false;
+      // Stood still for 1.5 seconds of its own time while the music plays: probably an ad on the
+      // scene. Stop moving it (so adWatch can spot the ad) until it moves on by itself again.
+      if (Math.abs(st - want) > 0.8 && (media.lockStill || 0) < 6) {
+        safe(() => media.scene.seekTo(want, true));
+        media.lockSeeked = true;
+      }
+    } else { media.lockPrev = -1; media.lockSeeked = false; }
     sync();
   }
 
