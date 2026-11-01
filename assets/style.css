@@ -507,8 +507,9 @@ body.mini .upnext { left: auto; right: 20px; transform: none; bottom: 300px; }
 /* The players stay visible under the loading screen (which is solid, so nothing shows through).
    iPhones won't start a video that's see-through, so they must never be hidden with opacity. */
 .peek .controls, .peek .controls > *, .peek-more, .scenebar, .side-btn { transition: opacity 0.9s ease; }
+.peek .scenes-wrap { transition: opacity 0.9s ease; }
 .peek .fx-btn { transition: opacity 0.9s ease, transform 0.25s var(--ease), box-shadow 0.25s ease; }
-body.media-loading .peek .controls, body.media-loading .peek .controls > *, body.media-loading .peek-more, body.media-loading .peek .fx-btn,
+body.media-loading .peek .controls, body.media-loading .peek .controls > *, body.media-loading .peek-more, body.media-loading .peek .fx-btn, body.media-loading .peek .scenes-wrap,
 body.media-loading .scenebar, body.media-loading .side-btn { opacity: 0; pointer-events: none; }
 
 /* Phones: scrub bars on their own row. */
@@ -581,25 +582,34 @@ html.song-page .song-nav { display: flex; flex-direction: column; gap: 8px; poin
 
 /* Scene picker, next to the other controls. */
 .scenes-wrap { position: relative; display: inline-flex; }
+.scenes-wrap { margin-left: 6px; }
+/* Gold like the Sounds button, with the same glow. */
 .scenes-btn {
-  width: auto; padding: 0 12px 0 10px; gap: 7px; border-radius: 999px;
-  font-size: 13px; color: var(--ink); box-shadow: 0 0 0 1px var(--line);
+  width: auto; height: 46px; padding: 0 16px 0 13px; gap: 8px; border-radius: 999px;
+  font-size: 13px; font-weight: 600; color: #1a1206;
+  background: radial-gradient(circle at 30% 25%, #fff1cf 0%, #e8c27a 50%, #b98a3e 100%);
+  box-shadow: 0 0 0 1px rgba(255, 230, 170, 0.35), 0 6px 18px rgba(232, 194, 122, 0.28);
+  transition: transform 0.25s var(--ease), box-shadow 0.25s ease, opacity 0.9s ease;
+}
+.scenes-btn:hover, .scenes-btn:focus-visible, .scenes-btn[aria-expanded="true"] {
+  color: #1a1206; background: radial-gradient(circle at 30% 25%, #fff1cf 0%, #e8c27a 50%, #b98a3e 100%);
+  transform: scale(1.05); box-shadow: 0 0 0 1px rgba(255, 230, 170, 0.5), 0 8px 24px rgba(232, 194, 122, 0.45);
 }
 .scenes-name { max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .scenes-badge {
   display: inline-flex; align-items: center; justify-content: center;
   min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px;
-  background: var(--acc); color: #0b0d10; font-size: 11px; font-weight: 600;
+  background: #0b0d10; color: var(--acc); font-size: 11px; font-weight: 600;
 }
 .scenes-pop {
-  position: absolute; bottom: calc(100% + 10px); left: 50%; z-index: 30;
+  position: absolute; bottom: calc(100% + 12px); right: 0; left: auto; z-index: 30;
   min-width: 220px; max-height: 50vh; overflow-y: auto; padding: 6px;
   background: rgba(14, 16, 20, 0.98); border-radius: 12px;
   box-shadow: 0 0 0 1px var(--line), 0 16px 40px rgba(0, 0, 0, 0.55);
-  opacity: 0; visibility: hidden; transform: translate(-50%, 6px);
+  opacity: 0; visibility: hidden; transform: translateY(6px);
   transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0.15s;
 }
-.scenes-wrap.open .scenes-pop { opacity: 1; visibility: visible; transform: translate(-50%, 0); transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s; }
+.scenes-wrap.open .scenes-pop { opacity: 1; visibility: visible; transform: none; transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s; }
 .scenes-head { margin: 4px 10px 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 .scene-item {
   display: flex; align-items: baseline; gap: 12px; padding: 10px 12px; border-radius: 8px;
@@ -611,9 +621,7 @@ html.song-page .song-nav { display: flex; flex-direction: column; gap: 8px; poin
 .peek:has(.scenes-wrap.open) { z-index: 12; }
 @media (max-width: 639px) {
   .scenes-name { display: none; }
-  .scenes-btn { padding: 0 10px; }
-  .scenes-pop { left: auto; right: -40px; transform: translate(0, 6px); }
-  .scenes-wrap.open .scenes-pop { transform: none; }
+  .scenes-btn { height: 42px; padding: 0 12px; }
 }
 
 /* ---------- comments: loose, like thoughts in a journal ----------

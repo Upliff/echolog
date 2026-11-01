@@ -617,7 +617,7 @@
         ui.scenesBtn = h('button', { class: 'ctl scenes-btn', type: 'button', 'aria-expanded': 'false', 'aria-label': `Scenes (${scenes.length})` },
           svg('film'), ui.sceneName, badge);
         const pop = h('div', { class: 'scenes-pop', role: 'menu' },
-          h('p', { class: 'scenes-head' }, plural(scenes.length, 'scene', 'scenes')), ...ui.sceneItems);
+          h('p', { class: 'scenes-head' }, 'Scenes'), ...ui.sceneItems);
         scenesWrap = h('span', { class: 'scenes-wrap' }, ui.scenesBtn, pop);
         const close = () => { scenesWrap.classList.remove('open'); ui.scenesBtn.setAttribute('aria-expanded', 'false'); };
         ui.scenesBtn.addEventListener('click', (e) => {
@@ -629,7 +629,7 @@
         });
         pop.addEventListener('click', (e) => { if (e.target.closest('a')) close(); });
       }
-      const controls = h('div', { class: 'controls' }, ui.play, volWrap, ui.repeat, scenesWrap, ui.barsBox);
+      const controls = h('div', { class: 'controls' }, ui.play, volWrap, ui.repeat, ui.barsBox);
 
       // Previous and next song: big buttons either side of the video.
       setSideBtn(prevBtn, prev, 'left', 'Previous song');
@@ -642,7 +642,8 @@
           h('div', { class: 'peek-title' }, h('h1', null, song.title), sub),
           controls,
           songState.ui.more = moreButton(n),
-          soundsBtn),
+          // Scenes and Sounds sit together at the right end, both gold.
+          scenesWrap, soundsBtn),
         commentsSection(stories));
     } else {
       view.append(
