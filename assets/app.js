@@ -988,6 +988,8 @@
     if (!stage.classList.contains('loading')) return;
     const ready = media.ready.scene && (!media.plan || !media.plan.music || media.ready.music);
     if (!ready) { media.loadTimer = setTimeout(showStart, 1000); return; }
+    // Phones: only when even the scene won't start by itself. Music trouble is handled by musicWatch.
+    if (touchScreen() && safe(() => media.scene.getPlayerState()) === YT_STATE.PLAYING) return;
     stage.classList.add('stuck');
   }
 
@@ -996,6 +998,7 @@
     stage.classList.remove('stuck');
     media.tapTried = true;
     media.stuckAt = 0;
+    if (touchScreen() && sep() && !media.musicStarted) { sceneAlone(); wakeMusic(); return; }
     if (media.gate) { clearGate(); media.lock = sep(); }
     applyAudio();
     if (sep() && media.music) safe(() => media.music.playVideo());
@@ -1102,6 +1105,8 @@
     media.musicStarted = false;
     media.stuckAt = 0;
     media.tapTried = false;
+    media.musicWait = false;
+    clearTimeout(media.wakeTimer);
     if (!opts.keepExtra) media.extra = 0;
     stageMsg.hidden = true;
     if (!opts.quiet) { fillLoading(plan, songState ? songState.song.title : ''); setLoading(true); }
@@ -1270,7 +1275,10 @@
   function onState(role, s) {
     const plan = media.plan;
     if (!plan) return;
-    if (role === 'music' && s === YT_STATE.PLAYING) media.musicStarted = true;
+    if (role === 'music' && s === YT_STATE.PLAYING) {
+      media.musicStarted = true;
+      if (media.musicWait) { media.musicWait = false; clearTimeout(media.wakeTimer); media.lock = true; applyAudio(); }
+    }
     if (s === YT_STATE.PLAYING) noCaptions(media[role]);
     if (media.gate) { gateState(role, s); return; }
     const isMaster = role === (sep() ? 'music' : 'scene');
@@ -1305,6 +1313,7 @@
       }
       // The scene only plays while the music is actually playing (not while it's loading or buffering).
       const ms = safe(() => media.music.getPlayerState());
+      if (s === YT_STATE.PLAYING && media.musicWait) { setLoading(false); startClouds(); sync(); return; }
       if (s === YT_STATE.PLAYING && ms !== YT_STATE.PLAYING) { sceneDo('pause'); return; }
       if (s === YT_STATE.PLAYING) setLoading(false);
     }
@@ -1331,23 +1340,54 @@
   // Phones: if the music won't start on its own (iPhones often refuse to start a second video),
   // show our Play button after a few seconds. If a tap doesn't start it either, use the scene's own sound.
   function musicWatch() {
-    if (!touchScreen() || !sep() || media.musicStarted || !media.ready.music || !media.ready.scene) { media.stuckAt = 0; return; }
+    if (!touchScreen() || !sep() || media.musicStarted || media.musicWait || !media.ready.scene) { media.stuckAt = 0; return; }
     if (media.gate && !media.gate.scene) { media.stuckAt = 0; return; }
-    if (safe(() => media.music.getPlayerState()) === YT_STATE.BUFFERING) { media.stuckAt = 0; return; }
+    if (media.ready.music && safe(() => media.music.getPlayerState()) === YT_STATE.BUFFERING) { media.stuckAt = 0; return; }
     if (!media.stuckAt) { media.stuckAt = Date.now(); return; }
-    if (Date.now() - media.stuckAt > 4000) {
-      media.stuckAt = 0;
-      // First time: hold everything and show our Play button, since a tap usually gets the music going.
-      // Only if it still won't start after a tap does the scene's own sound take over.
-      if (!media.tapTried) holdForTap();
-      else dropMusic("The music didn't start on this phone, so this is the scene's own sound.");
-    }
+    if (Date.now() - media.stuckAt > 4000) { media.stuckAt = 0; sceneAlone(); }
   }
-  function holdForTap() {
-    sceneDo('pause');
+
+  /* Phones: the music won't start on its own (iPhones often won't start a second video without a tap).
+     Play the scene by itself, muted, with "Tap for sound" showing. The tap starts the music from the
+     point the scene has reached (see wakeMusic), and the scene locks to it. */
+  function sceneAlone() {
+    clearGate();
+    media.musicWait = true;
+    media.lock = false;
     safe(() => media.music.pauseVideo());
-    setLoading(true);
-    stage.classList.add('stuck');
+    applyAudio();
+    sceneDo('play');
+    clearTimeout(media.loadTimer);
+    media.loadTimer = setTimeout(showStart, 5000);
+    sync();
+  }
+
+  // From a tap: start the music where the scene is up to. If it still won't play, use the scene's own sound.
+  function wakeMusic() {
+    const plan = media.plan;
+    if (!plan || !plan.music) return;
+    const token = media.token;
+    media.tapTried = true;
+    media.soundOk = true;
+    media.userMuted = false;
+    if (currentVolume() === 0) setVolume(60);
+    if (media.music && media.ready.music) {
+      const st = safe(() => media.scene.getCurrentTime()) || 0;
+      let to = (plan.music.start || 0) + Math.max(0, st - (plan.scene.start || 0));
+      const mEnd = plan.music.end || safe(() => media.music.getDuration()) || 0;
+      if (mEnd && to > mEnd - 3) to = plan.music.start || 0;
+      safe(() => { media.music.seekTo(to, true); media.music.setVolume(fadedVolume()); media.music.unMute(); media.music.playVideo(); });
+    }
+    sceneDo('play');
+    clearTimeout(media.wakeTimer);
+    media.wakeTimer = setTimeout(() => {
+      if (token !== media.token || media.musicStarted || !media.musicWait) return;
+      media.musicWait = false;
+      // Unmuting the scene now (not from a tap) would make the phone pause it, so it stays muted
+      // and "Tap for sound" comes back; that tap turns on the scene's own sound.
+      media.soundOk = false;
+      dropMusic("The music didn't start on this phone, so this is the scene's own sound.");
+    }, 4000);
   }
   const touchScreen = () => window.matchMedia('(pointer: coarse)').matches;
 
@@ -1415,6 +1455,11 @@
   }
 
   function togglePlay() {
+    if (media.musicWait) {
+      if (safe(() => media.scene.getPlayerState()) === YT_STATE.PLAYING) sceneDo('pause'); else wakeMusic();
+      setTimeout(sync, 80);
+      return;
+    }
     const p = master();
     if (!p || media.gate) return;
     if (safe(() => p.getPlayerState()) === YT_STATE.PLAYING) safe(() => p.pauseVideo());
@@ -1422,6 +1467,7 @@
   }
 
   function toggleSound() {
+    if (media.musicWait) { wakeMusic(); setTimeout(sync, 80); return; }
     const p = master();
     if (!p) return;
     const muted = safe(() => p.isMuted());
@@ -1556,7 +1602,30 @@
     stage.classList.toggle('music-ad', musicAd);
   }
 
+  // ?debug in the link (before the #) shows what each player is doing, for testing on a phone.
+  const DEBUG = /[?&]debug\b/.test(location.search);
+  let debugBox = null;
+  function debugTick() {
+    if (!debugBox) {
+      debugBox = h('pre', { class: 'debug-box' });
+      document.body.append(debugBox);
+    }
+    const names = { '-1': 'not started', 0: 'ended', 1: 'playing', 2: 'paused', 3: 'buffering', 5: 'cued' };
+    const line = (role) => {
+      const p = media[role];
+      if (!p) return `${role}: none`;
+      if (!media.ready[role]) return `${role}: loading`;
+      const st = safe(() => p.getPlayerState());
+      const t = safe(() => p.getCurrentTime()) || 0;
+      return `${role}: ${names[st] || st} ${t.toFixed(1)}s${safe(() => p.isMuted()) ? ' muted' : ''}`;
+    };
+    debugBox.textContent = [line('scene'), line('music'),
+      `gate ${media.gate ? 'on' : 'off'}  wait ${!!media.musicWait}  lock ${!!media.lock}  tapped ${!!media.tapTried}`,
+      `musicStarted ${!!media.musicStarted}  soundOk ${!!media.soundOk}  plan music ${!!(media.plan && media.plan.music)}`].join('\n');
+  }
+
   function tick() {
+    if (DEBUG) debugTick();
     if (document.hidden) return;
     musicWatch();
     adWatch();
@@ -1616,8 +1685,11 @@
     const p = master();
     if (!st || !p) return;
     const ui = st.ui;
-    const playing = safe(() => p.getPlayerState()) === YT_STATE.PLAYING;
-    const muted = !!safe(() => p.isMuted());
+    const waiting = media.musicWait;
+    const playing = waiting
+      ? safe(() => media.scene.getPlayerState()) === YT_STATE.PLAYING
+      : safe(() => p.getPlayerState()) === YT_STATE.PLAYING;
+    const muted = waiting || !!safe(() => p.isMuted());
     setIcon(ui.play, playing ? 'pause' : 'play', playing ? 'Pause' : 'Play');
     setIcon(dockPlay, playing ? 'pause' : 'play', playing ? 'Pause' : 'Play');
     setIcon(dockSound, muted ? 'muted' : 'sound', muted ? 'Turn sound on' : 'Mute');

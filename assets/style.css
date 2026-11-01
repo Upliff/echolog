@@ -739,3 +739,8 @@ html.song-page .song-nav { display: flex; flex-direction: column; gap: 8px; poin
   .fx-btn { width: 42px; height: 42px; }
   .fx-panel { bottom: calc(var(--peek) + 8px); }
 }
+
+/* ?debug: player states, for testing on a phone */
+.debug-box { position: fixed; left: 4px; top: 50%; z-index: 999; margin: 0; padding: 6px 8px; max-width: calc(100vw - 8px);
+  font: 11px/1.35 ui-monospace, monospace; color: #fff; background: rgba(0,0,0,.8); border: 1px solid #e8c27a; border-radius: 6px;
+  pointer-events: none; white-space: pre-wrap; }
