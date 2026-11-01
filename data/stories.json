@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-31T23:04:31Z",
+  "updated": "2026-11-01T06:57:50Z",
   "settings": {},
   "games": [
     {
@@ -7,7 +7,13 @@
       "title": "Final Fantasy X",
       "year": 2001,
       "cover": "covers/ffx.jpg",
-      "sounds": [],
+      "sounds": [
+        {
+          "id": "0000-bank00-751",
+          "label": "0000 bank00 [751]",
+          "file": "sounds/ffx/0000-bank00-751.wav"
+        }
+      ],
       "steamAppId": 359870,
       "songs": [
         {
@@ -15,6 +21,8 @@
           "title": "To Zanarkand",
           "composer": "Nobuo Uematsu",
           "volume": null,
+          "fadeIn": null,
+          "fadeOut": null,
           "length": 185,
           "moment": {
             "videoId": "5oIjPHo0k5E",
@@ -35,6 +43,7 @@
             "start": 0,
             "end": null
           },
+          "sounds": [],
           "stories": [
             {
               "id": "yt:UgwNAb2ZDViJqDzV7aZ4AaABAg",
@@ -649,6 +658,18 @@
               "score": 6.24
             },
             {
+              "id": "yt:Ugza_VhChWtuoCYm6et4AaABAg",
+              "source": "youtube",
+              "author": "@spirityuuki3290",
+              "authorUrl": "http://www.youtube.com/@spirityuuki3290",
+              "text": "Nineteen years and this song still kills me every time. Even from the first moment, before I knew just how powerful the song really was when you know the story, and I have never been able to hear it without crying ever since. It manages to carry the weight of every decision, every cut scene, and every battle fought throughout the game and pack all of the emotions you felt while playing it. The music in this game was fantastic, but this song was a beautiful masterpiece.",
+              "likes": 0,
+              "date": "2020-08-29",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugza_VhChWtuoCYm6et4AaABAg",
+              "videoId": "PSjTN8WSGNk",
+              "score": 6.18
+            },
+            {
               "id": "yt:UgyGVJdYLhgXj44gudR4AaABAg",
               "source": "youtube",
               "author": "@jombloambyar2994",
@@ -709,18 +730,6 @@
               "score": 5.98
             },
             {
-              "id": "yt:UgznDNvVuVHEAi3kVJ54AaABAg",
-              "source": "youtube",
-              "author": "@trionghost",
-              "authorUrl": "http://www.youtube.com/@trionghost",
-              "text": "Go now, if you want it. \nAn otherworld awaits you.\nDon't you give up on it. \nYou bite the hand that feeds you\n\nAll alone cold fields you wander,\nMemories of it cloud your sight.\nFills your dreams, disturbs your slumber,\nLost your way a fallen knight\n\nHold now, aim is steady. \nAn otherworld awaits you.\nOne thousand years--you ready? \nThe otherworld it takes you.\n\nGo, go into the sand and the dust and the sky,\nGo now, no better plan than to do or to die.\nFree me, pray to the faith in the face of the light\nFeed me, fill me with sin, now get ready to fight\nYou know you will,\nYou know you will.\nYou know you know you know you know that you will,\nYou know you know you know you know that you will.\nYou know you will.\n\nFight fight fight\nFight fight fight\nFight fight fight\nFight fight fight\n\nHope dies and you wander. \nThe otherworld it makes you.\nDreams they rip asunder. \nThe otherworld it hates you.\nFree now, ride up on it. \nUp to the heights it takes you.\nGo now if you want it. \nAn otherworld awaits you.",
-              "likes": 0,
-              "date": "2026-07-29",
-              "url": "https://www.youtube.com/watch?v=mWYwmM23Sqs&lc=UgznDNvVuVHEAi3kVJ54AaABAg",
-              "videoId": "mWYwmM23Sqs",
-              "score": 5.97
-            },
-            {
               "id": "yt:UgwPBNkwlk2ab6cLT254AaABAg",
               "source": "youtube",
               "author": "@bkeith1005",
@@ -745,16 +754,16 @@
               "score": 5.79
             },
             {
-              "id": "yt:UgyNQiROvD1wm9iiseZ4AaABAg",
+              "id": "yt:UgxquvdnG9LDgISgSk94AaABAg",
               "source": "youtube",
-              "author": "@CuddleBear0310",
-              "authorUrl": "http://www.youtube.com/@CuddleBear0310",
-              "text": "This is my most favourite game ever like I’m 19 and watched my mom play and I tried to play when I was younger and played as I got older",
+              "author": "@RayChow-m3h",
+              "authorUrl": "http://www.youtube.com/@RayChow-m3h",
+              "text": "'Listen to my story. This may be our last chance'\n\n20 years ago we might don't know what does this mean.. Now i recall back and i finally understand the meaning of this quote..\n\nFF10 was the last story that we gone through.. Because most of us stop our FF childhood after FF10 as FF11 is going online 💔",
               "likes": 0,
-              "date": "2020-08-18",
-              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgyNQiROvD1wm9iiseZ4AaABAg",
-              "videoId": "PSjTN8WSGNk",
-              "score": 5.65
+              "date": "2026-01-25",
+              "url": "https://www.youtube.com/watch?v=sy-nrLiAwZI&lc=UgxquvdnG9LDgISgSk94AaABAg",
+              "videoId": "sy-nrLiAwZI",
+              "score": 5.61
             }
           ]
         },
@@ -763,6 +772,8 @@
           "title": "Otherworld",
           "composer": "Nobuo Uematsu",
           "volume": null,
+          "fadeIn": null,
+          "fadeOut": null,
           "length": 196,
           "moment": {
             "videoId": "4umidcc_8rU",
@@ -789,6 +800,13 @@
             "start": 0,
             "end": null
           },
+          "sounds": [
+            {
+              "id": "0000-bank00-751",
+              "label": "0000 bank00 [751]",
+              "file": "sounds/ffx/0000-bank00-751.wav"
+            }
+          ],
           "stories": [
             {
               "id": "yt:Ughbpmkvw8AHH3gCoAEC",
@@ -808,7 +826,7 @@
               "author": "@kirbyeatsyou5248",
               "authorUrl": "http://www.youtube.com/@kirbyeatsyou5248",
               "text": "Go now, if you want it\r\nAn otherworld awaits you\r\nDon't you give up on it\r\nYou bite the hand that feeds you\n\r\nAll alone, cold fields you wander\r\nMemories of it, cloud your sight\r\nFills your dreams, disturbs your slumber\r\nLost your way, a fallen knight\n\r\nHold now, aim is steady\r\nAn otherworld awaits you\r\nOne thousand years, you ready?\r\nThe otherworld, it takes you\n\r\nGo into the sand, and the dust, and the sky\r\nGo now, there's no better plan than to do or to die\r\nFree me, pray to the faith, in the face of the light\r\nFeed me, fill me with sin, and get ready to fight\n\r\nYou know you will, you know you will\r\nYou know, you know, you know\r\nYou know that you will\r\nYou know, you know, you know\r\nYou know that you will\r\nYou know you will\n\r\nFight, fight, fight\r\nFight, fight, fight\r\nFight, fight, fight\r\nFight, fight, fight\n\r\nHope dies and you wander\r\nThe otherworld, it makes you\r\nDreams, they rip asunder\r\nThe otherworld, it hates you\n\r\nFree now, ride up on it\r\nUp to the heights, it takes you\r\nGo now, if you want it\r\nAn otherworld awaits you",
-              "likes": 272,
+              "likes": 273,
               "date": "2025-06-07",
               "url": "https://www.youtube.com/watch?v=zhYW3dY1hgM&lc=UgyPc-chsv7qxtC8-xp4AaABAg",
               "videoId": "zhYW3dY1hgM",
@@ -977,6 +995,8 @@
           "title": "Besaid Island",
           "composer": "Nobuo Uematsu",
           "volume": null,
+          "fadeIn": null,
+          "fadeOut": null,
           "length": 280,
           "moment": {
             "videoId": "112PPC8JlJg",
@@ -997,6 +1017,7 @@
             "start": 0,
             "end": 280
           },
+          "sounds": [],
           "stories": [
             {
               "id": "yt:UgwKNTaspgUB8Ym6n_p4AaABAg",
@@ -1221,6 +1242,8 @@
           "title": "Suteki da Ne",
           "composer": "Nobuo Uematsu",
           "volume": null,
+          "fadeIn": null,
+          "fadeOut": null,
           "length": 523,
           "moment": {
             "videoId": "7qrOWpV7b68",
@@ -1237,6 +1260,7 @@
             }
           ],
           "audio": null,
+          "sounds": [],
           "stories": [
             {
               "id": "yt:UgxKwSAa3h7l5CBsmP94AaABAg",
@@ -1940,6 +1964,8 @@
           "title": "Dearly Beloved",
           "composer": "Yoko Shimomura",
           "volume": null,
+          "fadeIn": null,
+          "fadeOut": null,
           "length": 91,
           "moment": {
             "videoId": "IM-r2hxtO8g",
@@ -1956,6 +1982,7 @@
             }
           ],
           "audio": null,
+          "sounds": [],
           "stories": [
             {
               "id": "yt:UgzFV8WwZOjwfIR5hGt4AaABAg",
@@ -2684,6 +2711,8 @@
           "title": "The Other Promise",
           "composer": "Yoko Shimomura",
           "volume": null,
+          "fadeIn": null,
+          "fadeOut": null,
           "length": 278,
           "moment": {
             "videoId": "y4yQioUhk9E",
@@ -2704,6 +2733,7 @@
             "start": 0,
             "end": null
           },
+          "sounds": [],
           "stories": [
             {
               "id": "yt:UgzW6JrGIF1Ps57r-4Z4AaABAg",
@@ -2872,18 +2902,6 @@
               "url": "https://www.youtube.com/watch?v=s9XljBWGrRQ&lc=UgxOsVy2nZ2xJ34fu8B4AaABAg",
               "videoId": "s9XljBWGrRQ",
               "score": 6.28
-            },
-            {
-              "id": "yt:UgwUkFcmGKFSljJnO8J4AaABAg",
-              "source": "youtube",
-              "author": "@dball_94",
-              "authorUrl": "http://www.youtube.com/@dball_94",
-              "text": "@RedLeif1 I've been a fan of Kingdom Hearts all my life and then I bought a 360 because all my friends did. I stand by my decision but now I can't play KH3 when/if it comes out. My life is over.",
-              "likes": 0,
-              "date": "2011-08-18",
-              "url": "https://www.youtube.com/watch?v=DMznuxvovkY&lc=UgwUkFcmGKFSljJnO8J4AaABAg",
-              "videoId": "DMznuxvovkY",
-              "score": 6.25
             },
             {
               "id": "yt:Ugw9ipEkde_1R1w8xyt4AaABAg",
@@ -3270,18 +3288,6 @@
               "score": 4.11
             },
             {
-              "id": "yt:UgxJ98721k5Vzkk9TU14AaABAg",
-              "source": "youtube",
-              "author": "@Cheesy_Danish",
-              "authorUrl": "http://www.youtube.com/@Cheesy_Danish",
-              "text": "My first time going up against him he kicked my ass multiple times because I was under leveled and didn’t have the proper abilities to fight him\nHowever I persevered and eventually beat him despite my handicap\nAnd then immediately felt horrible",
-              "likes": 1,
-              "date": "2020-11-13",
-              "url": "https://www.youtube.com/watch?v=s9XljBWGrRQ&lc=UgxJ98721k5Vzkk9TU14AaABAg",
-              "videoId": "s9XljBWGrRQ",
-              "score": 4.11
-            },
-            {
               "id": "yt:Ugz2NRK4wtyD-Ohf7Wh4AaABAg",
               "source": "youtube",
               "author": "@samapak7",
@@ -3336,6 +3342,8 @@
           "title": "Roxas",
           "composer": "Yoko Shimomura",
           "volume": null,
+          "fadeIn": null,
+          "fadeOut": null,
           "length": 147,
           "moment": null,
           "moments": [],
@@ -3344,6 +3352,7 @@
             "start": 0,
             "end": null
           },
+          "sounds": [],
           "stories": [
             {
               "id": "yt:UgyH-XDOQVHMd3S3ztV4AaABAg",
@@ -3450,18 +3459,6 @@
               "likes": 1,
               "date": "2026-07-06",
               "url": "https://www.youtube.com/watch?v=CSdNxXGUaRU&lc=Ugy5pPB_OlIfvcFAwpZ4AaABAg",
-              "videoId": "CSdNxXGUaRU",
-              "score": 10.74
-            },
-            {
-              "id": "yt:Ugxi6uW5WjQlBQyAhHZ4AaABAg",
-              "source": "youtube",
-              "author": "@chandrakurniawan157",
-              "authorUrl": "http://www.youtube.com/@chandrakurniawan157",
-              "text": "Suddenly I missed all the music from Kingdom Hearts 1 and 2 that I played when I was studying in college. On weekends, I went to my Grandma's house and had a chat with one of my nanny/house maid. Now, I'm working as salaryman and both my grandma and nanny had passed away. R.I.P. 😢",
-              "likes": 0,
-              "date": "2023-02-23",
-              "url": "https://www.youtube.com/watch?v=CSdNxXGUaRU&lc=Ugxi6uW5WjQlBQyAhHZ4AaABAg",
               "videoId": "CSdNxXGUaRU",
               "score": 10.74
             },
@@ -3874,18 +3871,6 @@
               "score": 7.94
             },
             {
-              "id": "yt:UgyKwvzQNxyIVudACy54AaABAg",
-              "source": "youtube",
-              "author": "@luthfihatta3490",
-              "authorUrl": "http://www.youtube.com/@luthfihatta3490",
-              "text": "I remember back in the days i used to play this game a lot after i came back from school. Turn on the ps2 and insert the disk. I miss being  a kid. Life was so simple and more fun. I hope i can play this game again",
-              "likes": 0,
-              "date": "2020-12-27",
-              "url": "https://www.youtube.com/watch?v=CSdNxXGUaRU&lc=UgyKwvzQNxyIVudACy54AaABAg",
-              "videoId": "CSdNxXGUaRU",
-              "score": 7.91
-            },
-            {
               "id": "yt:UgyQ64jK9T_V1pUCNzp4AaABAg",
               "source": "youtube",
               "author": "@djoloflevidenis1738",
@@ -4064,6 +4049,30 @@
               "url": "https://www.youtube.com/watch?v=CSdNxXGUaRU&lc=Ugw2W9Lo5_2KKMQxIe54AaABAg",
               "videoId": "CSdNxXGUaRU",
               "score": 7.25
+            },
+            {
+              "id": "yt:Ugg2SxRxmX26OXgCoAEC",
+              "source": "youtube",
+              "author": "@laedis1013",
+              "authorUrl": "http://www.youtube.com/@laedis1013",
+              "text": "Twilight reminds me to my town. When I was young and was running around the streets with my friends.. so good memories",
+              "likes": 0,
+              "date": "2016-12-21",
+              "url": "https://www.youtube.com/watch?v=CSdNxXGUaRU&lc=Ugg2SxRxmX26OXgCoAEC",
+              "videoId": "CSdNxXGUaRU",
+              "score": 7.19
+            },
+            {
+              "id": "yt:Ugw-kIrQ4q0s_FbpoMN4AaABAg",
+              "source": "youtube",
+              "author": "@angbandsbane",
+              "authorUrl": "http://www.youtube.com/@angbandsbane",
+              "text": "Roxas: \"Man, I'm so glad people liked me so much. I remember at first everyone was about ready to murder me since I wasn't the player character from the first game.\"\nArthur Morgan: \"Sure. I can relate.\"",
+              "likes": 12,
+              "date": "2024-12-13",
+              "url": "https://www.youtube.com/watch?v=pRudm5jCXrs&lc=Ugw-kIrQ4q0s_FbpoMN4AaABAg",
+              "videoId": "pRudm5jCXrs",
+              "score": 6.99
             }
           ]
         }
@@ -4076,7 +4085,7 @@
     "ffx/to-zanarkand/sy-nrLiAwZI: 128 comments",
     "ffx/to-zanarkand/PSjTN8WSGNk: 500 comments",
     "ffx/to-zanarkand/mWYwmM23Sqs: 500 comments",
-    "ffx/otherworld/zhYW3dY1hgM: 191 comments",
+    "ffx/otherworld/zhYW3dY1hgM: 192 comments",
     "ffx/otherworld/4umidcc_8rU: 500 comments",
     "ffx/otherworld/BKZs90_fkt4: 74 comments",
     "ffx/besaid-island/RC1VmGXiEFw: 187 comments",
