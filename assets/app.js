@@ -297,7 +297,6 @@
     document.documentElement.classList.toggle('song-page', on);
   }
   // Song pages: home, about (?) and a record that goes back to the game's songs.
-  $('navAbout').addEventListener('click', () => $('aboutBtn').click());
   function setSongNav(game) {
     const link = $('navGame');
     link.href = `#/${encodeURIComponent(game.id)}`;
@@ -995,6 +994,8 @@
   // Our Play button on the loading screen.
   function startByTap() {
     stage.classList.remove('stuck');
+    media.tapTried = true;
+    media.stuckAt = 0;
     if (media.gate) { clearGate(); media.lock = sep(); }
     applyAudio();
     if (sep() && media.music) safe(() => media.music.playVideo());
@@ -1100,6 +1101,7 @@
     media.lock = false;
     media.musicStarted = false;
     media.stuckAt = 0;
+    media.tapTried = false;
     if (!opts.keepExtra) media.extra = 0;
     stageMsg.hidden = true;
     if (!opts.quiet) { fillLoading(plan, songState ? songState.song.title : ''); setLoading(true); }
@@ -1315,7 +1317,9 @@
     const token = media.token;
     stageNote(note);
     clearGate();
-    dropPlayer('music');
+    // Keep the music player (paused and muted) so the next song can try it again; phones are much
+    // less willing to start a brand new player than one that has already played.
+    if (media.music) safe(() => { media.music.pauseVideo(); media.music.mute(); });
     plan.music = null;
     media.lock = false;
     refreshBars();
@@ -1325,7 +1329,7 @@
   }
 
   // Phones: if the music won't start on its own (iPhones often refuse to start a second video),
-  // fall back to the scene's own sound after a few seconds, instead of nothing playing at all.
+  // show our Play button after a few seconds. If a tap doesn't start it either, use the scene's own sound.
   function musicWatch() {
     if (!touchScreen() || !sep() || media.musicStarted || !media.ready.music || !media.ready.scene) { media.stuckAt = 0; return; }
     if (media.gate && !media.gate.scene) { media.stuckAt = 0; return; }
@@ -1333,8 +1337,17 @@
     if (!media.stuckAt) { media.stuckAt = Date.now(); return; }
     if (Date.now() - media.stuckAt > 4000) {
       media.stuckAt = 0;
-      dropMusic("The music didn't start on this phone, so this is the scene's own sound.");
+      // First time: hold everything and show our Play button, since a tap usually gets the music going.
+      // Only if it still won't start after a tap does the scene's own sound take over.
+      if (!media.tapTried) holdForTap();
+      else dropMusic("The music didn't start on this phone, so this is the scene's own sound.");
     }
+  }
+  function holdForTap() {
+    sceneDo('pause');
+    safe(() => media.music.pauseVideo());
+    setLoading(true);
+    stage.classList.add('stuck');
   }
   const touchScreen = () => window.matchMedia('(pointer: coarse)').matches;
 
