@@ -332,6 +332,8 @@ def main():
                 "title": song["title"],
                 "composer": song.get("composer", ""),
                 "volume": song.get("volume"),
+                "fadeIn": song.get("fadeIn"),
+                "fadeOut": song.get("fadeOut"),
                 "length": song_length(song, durations) or prev_song.get("length"),
                 "moment": song.get("moment") or ({k: v for k, v in moments[0].items() if k not in ("stories", "commentVideos")} if moments else None),
                 "moments": moments,

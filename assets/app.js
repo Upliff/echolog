@@ -949,6 +949,35 @@
     return clampVol(setting('volume'));
   }
 
+  // Fades: the song's fadeIn / fadeOut (seconds, from the admin page) ramp the volume up at the start
+  // and down at the end. Only the player's volume moves; the slider keeps showing the visitor's level.
+  function fadeFactor() {
+    const song = songState && songState.song;
+    const fi = song ? Number(song.fadeIn) || 0 : 0;
+    const fo = song ? Number(song.fadeOut) || 0 : 0;
+    if (!fi && !fo) return 1;
+    const p = master();
+    const spec = masterSpec();
+    if (!p || !spec) return 1;
+    const { pos, len } = clipPos(p, spec);
+    let f = 1;
+    if (fi > 0) f = Math.min(f, pos / fi);
+    if (fo > 0 && len > 0) f = Math.min(f, (len - pos) / fo);
+    return Math.max(0, Math.min(1, f));
+  }
+  const fadedVolume = () => Math.round(currentVolume() * fadeFactor());
+
+  function fadeTick() {
+    if (document.hidden || !media.plan || media.gate || !songState) return;
+    const song = songState.song;
+    if (!(Number(song.fadeIn) > 0 || Number(song.fadeOut) > 0)) return;
+    const p = master();
+    if (!p || safe(() => p.getPlayerState()) !== YT_STATE.PLAYING) return;
+    const v = fadedVolume();
+    if (v !== media.fadeVol) { media.fadeVol = v; safe(() => p.setVolume(v)); }
+  }
+  setInterval(fadeTick, 100);
+
   // Tell the scene to play or pause, and remember that it was us.
   function sceneDo(action) {
     if (!media.scene || !media.ready.scene) return;
@@ -1253,6 +1282,7 @@
     if (!media.plan) return;
     const vol = currentVolume();
     const audible = sep() ? media.music : media.scene;
+    media.fadeVol = null;
     const audibleReady = sep() ? media.ready.music : media.ready.scene;
     if (sep() && media.scene && media.ready.scene) safe(() => media.scene.mute());
     if (media.gate) {
@@ -1262,7 +1292,7 @@
     }
     if (audible && audibleReady) {
       safe(() => {
-        audible.setVolume(vol);
+        audible.setVolume(fadedVolume());
         if (media.userMuted || vol === 0 || (touchScreen() && !media.soundOk)) audible.mute(); else audible.unMute();
       });
     }

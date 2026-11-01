@@ -22,6 +22,8 @@ An import file adds games and songs in bulk. Mohad drops it into the **Import** 
           "music": { "video": "https://youtu.be/VIDEOID", "start": "0:00", "end": "2:35" },
           "commentVideos": ["https://youtu.be/VIDEOID", "https://youtu.be/VIDEOID"],
           "volume": 70,
+          "fadeIn": 2,
+          "fadeOut": 3.5,
           "note": "Anything Mohad should check, e.g. the start time is a guess"
         }
       ]
@@ -37,6 +39,7 @@ An import file adds games and songs in bulk. Mohad drops it into the **Import** 
 - **`music`** (optional) is a clean soundtrack upload, played over a scene that has talking over the song.
 - **`commentVideos`**: 2 to 4 popular uploads of the song (official soundtrack uploads, well known fan uploads) with lots of comments.
 - **`volume`** (optional) is 0 to 100. Leave it out to use the site default.
+- **`fadeIn` / `fadeOut`** (optional) are seconds, 0 to 30, decimals ok. The volume rises from silent at the start and drops to silent before the end.
 - **`note`** shows in the admin preview and isn't saved.
 - Games are matched to existing ones by name (or `id`). Songs are matched by name. Songs that already exist are skipped unless Mohad ticks "Replace" in the preview.
 
