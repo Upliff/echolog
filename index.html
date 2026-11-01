@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://www.youtube.com">
 <!-- Fonts load without holding up the page. -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Karla:wght@400;600&display=swap" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="assets/style.css?v=17">
+<link rel="stylesheet" href="assets/style.css?v=18">
 </head>
 <body>
 <div class="backdrop" aria-hidden="true">
@@ -59,11 +59,13 @@
 <a class="side-btn next" id="nextBtn" hidden></a>
 
 <div class="dock" id="dock" hidden>
-  <span class="dock-title" id="dockTitle"></span>
+  <a class="ctl" id="dockPrev" aria-label="Previous song"></a>
   <button class="ctl" type="button" id="dockPlay" aria-label="Pause"></button>
-  <button class="ctl" type="button" id="dockUp" aria-label="Back to the video">
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </button>
+  <a class="ctl" id="dockNext" aria-label="Next song"></a>
+  <span class="vol-wrap dock-vol">
+    <button class="ctl" type="button" id="dockSound" aria-label="Mute"></button>
+    <span class="vol-pop"><input class="vol" id="dockVol" type="range" min="0" max="100" step="1" aria-label="Volume"></span>
+  </span>
 </div>
 
 <div class="upnext" id="upnext" role="status" hidden>
@@ -79,6 +81,6 @@
   <form method="dialog"><button type="submit">Close</button></form>
 </dialog>
 
-<script src="assets/app.js?v=21" defer></script>
+<script src="assets/app.js?v=22" defer></script>
 </body>
 </html>

@@ -337,7 +337,9 @@ a.c-author:hover { text-decoration: underline; }
   transition: opacity 0.3s ease 0.15s, transform 0.3s var(--ease) 0.15s;
 }
 .dock.show { opacity: 1; transform: none; }
-.dock-title { flex: 1; min-width: 0; font-family: var(--serif); font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dock { padding: 4px; justify-content: center; }
+.dock a.ctl[hidden] { display: none; }
+.dock-vol .vol-pop { bottom: calc(100% + 10px); }
 
 /* Up next: shows for a few seconds when a song ends. */
 .upnext {
@@ -608,4 +610,58 @@ html.song-page .crumb-menu > .menu::before { top: 0; bottom: 0; left: -16px; rig
   .scenes-btn { padding: 0 10px; }
   .scenes-pop { left: auto; right: -40px; transform: translate(0, 6px); }
   .scenes-wrap.open .scenes-pop { transform: none; }
+}
+
+/* Caveat, hosted with the site (SIL Open Font License, see assets/fonts/Caveat-LICENSE.txt). */
+@font-face { font-family: 'Caveat'; font-style: normal; font-weight: 400; font-display: swap; src: url('fonts/caveat-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Caveat'; font-style: normal; font-weight: 600; font-display: swap; src: url('fonts/caveat-latin-600-normal.woff2') format('woff2'); }
+
+/* ---------- echoes: a journal of scribbled thoughts ----------
+   Handwritten (Caveat), no boxes or rules. Each echo gets its own small tilt, indent and size,
+   worked out from its id so it always looks the same. Short ones are written bigger. */
+:root { --hand: 'Caveat', 'Segoe Print', 'Bradley Hand', cursive; }
+.comments { max-width: 720px; }
+.comments > .sort { font-family: var(--hand); font-size: 28px; color: var(--muted); padding: 26px 0 4px; }
+.c {
+  border-top: 0; padding: 22px 0 26px;
+  width: fit-content; max-width: min(100%, 600px);
+  margin-left: var(--shift, 0%);
+  transform: rotate(var(--tilt, 0deg)); transform-origin: left center;
+}
+.c.c-right { margin-left: auto; margin-right: var(--shift, 0%); transform-origin: right center; }
+.c-text {
+  font-family: var(--hand); font-weight: 400; line-height: 1.22; letter-spacing: 0.005em;
+  color: rgba(243, 241, 236, 0.92);
+}
+.c-short .c-text { font-size: 34px; line-height: 1.15; }
+.c-mid .c-text { font-size: 28px; }
+.c-long .c-text { font-size: 25px; }
+.c-meta { margin-top: 8px; gap: 4px 12px; font-size: 12.5px; }
+.c-author { font-family: var(--hand); font-size: 20px; font-weight: 600; color: var(--acc); }
+.c-author::before { content: "~ "; opacity: 0.7; }
+.c-more { font-family: var(--hand); font-size: 22px; font-weight: 600; padding: 4px 0; }
+.c + .c::before {
+  /* a small pen stroke between thoughts */
+  content: ""; display: block; width: 46px; height: 8px; margin: 0 0 22px 2px; opacity: 0.35;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 46 8'%3E%3Cpath d='M1 5c6-4 10 2 16-1s9-3 14 0 9 1 14-2' fill='none' stroke='%23f3f1ec' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat;
+}
+@media (max-width: 639px) {
+  .c, .c.c-right { margin-left: calc(var(--shift, 0%) / 2); margin-right: 0; max-width: 100%; }
+  .c-short .c-text { font-size: 30px; }
+  .c-mid .c-text { font-size: 25px; }
+  .c-long .c-text { font-size: 23px; }
+}
+
+/* Clouds: handwriting straight onto the scene, with a soft dark halo so it reads over anything. */
+.cloud { padding: 14px 20px; border-radius: 0; background: none; box-shadow: none; }
+.cloud-in { transform: rotate(var(--tilt, 0deg)); }
+.cloud p {
+  font-family: var(--hand); font-style: normal; font-size: 28px; line-height: 1.15;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.9), 0 0 10px rgba(0, 0, 0, 0.85), 0 0 26px rgba(0, 0, 0, 0.7);
+}
+.cloud .c-meta { margin-top: 4px; text-shadow: 0 0 6px rgba(0, 0, 0, 0.95); }
+.cloud .c-author { font-size: 19px; }
+@media (max-width: 639px) {
+  .cloud p { font-size: 24px; }
+  .cloud { padding: 8px 12px; }
 }

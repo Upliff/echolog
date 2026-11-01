@@ -50,7 +50,8 @@
   const prevBtn = $('prevBtn');
   const nextBtn = $('nextBtn');
   const dock = $('dock');
-  const dockTitle = $('dockTitle');
+  const dockSound = $('dockSound');
+  const dockVol = $('dockVol');
   const dockPlay = $('dockPlay');
   const cloudsEl = $('clouds');
   const upnext = $('upnext');
@@ -455,7 +456,21 @@
         more.setAttribute('aria-expanded', String(open));
       });
     }
-    return h('article', { class: 'c' }, p, more, metaEl(c));
+    const art = h('article', { class: `c ${sizeClass(text)}` }, p, more, metaEl(c));
+    const r = seeded(c.id || text);
+    art.style.setProperty('--tilt', `${((r() * 2 - 1) * 1.3).toFixed(2)}deg`);
+    art.style.setProperty('--shift', `${Math.round(r() * 12)}%`);
+    if (r() < 0.25) art.classList.add('c-right');
+    return art;
+  }
+
+  // Journal look: short echoes are written bigger, long ones smaller.
+  const sizeClass = (t) => (t.length < 110 ? 'c-short' : t.length < 320 ? 'c-mid' : 'c-long');
+  // A small repeatable random number generator, so each echo always gets the same tilt and place.
+  function seeded(str) {
+    let x = 2166136261;
+    for (let i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619); }
+    return () => { x ^= x << 13; x ^= x >>> 17; x ^= x << 5; return ((x >>> 0) % 10000) / 10000; };
   }
 
   function commentList(stories) {
@@ -467,9 +482,9 @@
   // One list, most liked first.
   function commentsSection(stories) {
     const sorted = [...stories].sort((a, b) => (b.likes || 0) - (a.likes || 0));
-    return h('section', { class: 'comments', id: 'comments', 'aria-label': 'Comments' },
-      h('div', { class: 'sort' }, h('span', null, plural(stories.length, 'comment', 'comments'))),
-      stories.length ? commentList(sorted) : h('p', { class: 'empty' }, 'No comments yet.'));
+    return h('section', { class: 'comments', id: 'comments', 'aria-label': 'Echoes' },
+      h('div', { class: 'sort' }, h('span', null, plural(stories.length, 'echo', 'echoes'))),
+      stories.length ? commentList(sorted) : h('p', { class: 'empty' }, 'No echoes yet.'));
   }
 
   /* ---------- what to play for a song ----------
@@ -633,9 +648,9 @@
   // The comment count at the end of the strip; scrolls down to the comments.
   function moreButton(n) {
     return h('button', {
-      class: 'peek-more', type: 'button', 'aria-label': `${plural(n, 'comment', 'comments')}, scroll down`,
+      class: 'peek-more', type: 'button', 'aria-label': `${plural(n, 'echo', 'echoes')}, scroll down`,
       onclick: () => $('comments').scrollIntoView({ behavior: scrollBehavior }),
-    }, h('span', null, n.toLocaleString('en')), h('span', { class: 'pm-word' }, n === 1 ? 'comment' : 'comments'), svg('down', 16));
+    }, h('span', null, n.toLocaleString('en')), h('span', { class: 'pm-word' }, n === 1 ? 'echo' : 'echoes'), svg('down', 16));
   }
 
   // A scene with its own comments shows those; otherwise the song's.
@@ -660,7 +675,7 @@
 
   function setSideBtn(btn, song, icon, label) {
     const st = songState;
-    if (!song || song === st.song) { btn.hidden = true; return; }
+    if (!song || song === st.song) { btn.hidden = true; $(btn === prevBtn ? 'dockPrev' : 'dockNext').hidden = true; return; }
     btn.hidden = false;
     btn.href = songHref(st.game, song);
     btn.setAttribute('aria-label', `${label}: ${song.title}`);
@@ -676,6 +691,10 @@
         h('strong', null, song.title),
         len ? h('small', null, fmtTime(len)) : null));
     btn.replaceChildren(svg(icon, 28), card);
+    const d = $(btn === prevBtn ? 'dockPrev' : 'dockNext');
+    d.href = btn.href;
+    d.hidden = false;
+    d.replaceChildren(svg(icon === 'left' ? 'left' : 'right'));
   }
 
   // Swap to another scene of the song that's already open.
@@ -826,7 +845,6 @@
   }
 
   function openStage(plan, song) {
-    dockTitle.textContent = song.title;
     stageMsg.hidden = true;
     if (stage.hidden) {
       mini = false;
@@ -1577,6 +1595,8 @@
     const muted = !!safe(() => p.isMuted());
     setIcon(ui.play, playing ? 'pause' : 'play', playing ? 'Pause' : 'Play');
     setIcon(dockPlay, playing ? 'pause' : 'play', playing ? 'Pause' : 'Play');
+    setIcon(dockSound, muted ? 'muted' : 'sound', muted ? 'Turn sound on' : 'Mute');
+    if (document.activeElement !== dockVol) { const v = currentVolume(); if (dockVol.value !== String(v)) { dockVol.value = String(v); dockVol.style.setProperty('--p', `${v}%`); } }
     if (ui.sound) {
       setIcon(ui.sound, muted ? 'muted' : 'sound', muted ? 'Turn sound on' : 'Mute');
       ui.sound.classList.toggle('nudge', muted && !media.userMuted && currentVolume() > 0);
@@ -1595,7 +1615,9 @@
   }
 
   dockPlay.addEventListener('click', togglePlay);
-  $('dockUp').addEventListener('click', () => window.scrollTo({ top: 0, behavior: scrollBehavior }));
+  // The small player's bar: previous, play/pause, next, and sound (volume slider on hover).
+  dockSound.addEventListener('click', toggleSound);
+  dockVol.addEventListener('input', () => setVolume(Number(dockVol.value)));
 
   /* ---------- up next ----------
      "Next: (song)" shows a few seconds before the song ends, and the next song starts the moment
@@ -1776,7 +1798,8 @@
     clouds.recent.push(c.id);
     if (clouds.recent.length > 10) clouds.recent.shift();
 
-    const el = h('div', { class: 'cloud' }, h('p', null, c.text), metaEl(c, true));
+    const el = h('div', { class: 'cloud' }, h('div', { class: 'cloud-in' }, h('p', null, c.text), metaEl(c, true)));
+    el.firstChild.style.setProperty('--tilt', `${((Math.random() * 2 - 1) * 3).toFixed(2)}deg`);
     el.style.maxWidth = Math.max(180, Math.min(340, spot.w)) + 'px';
     el.style.visibility = 'hidden';
     cloudsEl.append(el);
