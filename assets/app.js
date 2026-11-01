@@ -460,8 +460,27 @@
     const r = seeded(c.id || text);
     art.style.setProperty('--tilt', `${((r() * 2 - 1) * 1.3).toFixed(2)}deg`);
     art.style.setProperty('--shift', `${Math.round(r() * 12)}%`);
-    if (r() < 0.25) art.classList.add('c-right');
+    // Where across the page it sits (0 = left edge, 1 = right edge).
+    art.style.setProperty('--pos', r().toFixed(3));
+    reveal(art);
     return art;
+  }
+
+  // Comments fade and rise into view as you scroll to them, one at a time.
+  let revealer = null;
+  function reveal(el) {
+    if (reduced || !('IntersectionObserver' in window)) { el.classList.add('shown'); return; }
+    if (!revealer) {
+      revealer = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          e.target.classList.add('shown');
+          revealer.unobserve(e.target);
+        }
+      }, { rootMargin: '0px 0px -12% 0px', threshold: 0.15 });
+    }
+    el.classList.add('reveal');
+    revealer.observe(el);
   }
 
   // Journal look: short comments are written bigger, long ones smaller.
