@@ -51,7 +51,7 @@
             "BKZs90_fkt4"
           ],
           "audio": {
-            "videoId": "KO6fvJrsTsE",
+            "videoId": "BKZs90_fkt4",
             "start": 0,
             "end": null
           },
@@ -131,7 +131,7 @@
       "sounds": [
         {
           "id": "0000-bank00-751",
-          "label": "0000 bank00 [751]",
+          "label": "Overdrive",
           "file": "sounds/ffx/0000-bank00-751.wav"
         }
       ]
