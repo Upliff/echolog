@@ -1107,6 +1107,8 @@
     media.stuckAt = 0;
     media.tapTried = false;
     media.musicWait = false;
+    media.musicTapShown = false;
+    stage.classList.remove('music-tap');
     clearTimeout(media.wakeTimer);
     if (!opts.keepExtra) media.extra = 0;
     stageMsg.hidden = true;
@@ -1278,6 +1280,7 @@
     if (!plan) return;
     if (role === 'music' && s === YT_STATE.PLAYING) {
       media.musicStarted = true;
+      showMusicForTap(false);
       if (media.musicWait) { media.musicWait = false; clearTimeout(media.wakeTimer); media.lock = true; applyAudio(); }
     }
     if (s === YT_STATE.PLAYING) noCaptions(media[role]);
@@ -1384,12 +1387,28 @@
     media.wakeTimer = setTimeout(function giveUp() {
       if (token !== media.token || media.musicStarted || !media.musicWait) return;
       if (media.musicAd) { media.wakeTimer = setTimeout(giveUp, 2000); return; }
+      // Still "not started" after our tap: on iPhones that's what an ad waiting for a tap looks like
+      // (a tap on our button doesn't count as a tap on YouTube's player). Show the music player
+      // itself so it can be tapped. Only if that doesn't work after a while, use the scene's sound.
+      if (media.music && media.ready.music && !media.musicTapShown) {
+        showMusicForTap(true);
+        media.wakeTimer = setTimeout(giveUp, 30000);
+        return;
+      }
+      showMusicForTap(false);
       media.musicWait = false;
       // Unmuting the scene now (not from a tap) would make the phone pause it, so it stays muted
       // and "Tap for sound" comes back; that tap turns on the scene's own sound.
       media.soundOk = false;
       dropMusic("The music didn't start on this phone, so this is the scene's own sound.");
     }, 4000);
+  }
+  // The hidden music player brought up over the scene, so a tap goes straight to YouTube's player.
+  function showMusicForTap(on) {
+    if (on) media.musicTapShown = true;
+    stage.classList.toggle('music-tap', on);
+    $('adLabel').textContent = on ? 'Tap the video to start the music. An ad may play first.' : 'Ad playing. The song starts after it.';
+    if (on) sceneDo('pause');
   }
   const touchScreen = () => window.matchMedia('(pointer: coarse)').matches;
 
@@ -1624,7 +1643,7 @@
       return `${role}: ${names[st] || st} ${t.toFixed(1)}s / ${(safe(() => p.getDuration()) || 0).toFixed(0)}s${safe(() => p.isMuted()) ? ' muted' : ''} [${vd.video_id || '?'}]`;
     };
     debugBox.textContent = [line('scene'), line('music'),
-      `ad ${!!media.musicAd}  gate ${media.gate ? 'on' : 'off'}  wait ${!!media.musicWait}  lock ${!!media.lock}  tapped ${!!media.tapTried}`,
+      `ad ${!!media.musicAd}  tapShown ${!!media.musicTapShown}  gate ${media.gate ? 'on' : 'off'}  wait ${!!media.musicWait}  lock ${!!media.lock}  tapped ${!!media.tapTried}`,
       `musicStarted ${!!media.musicStarted}  soundOk ${!!media.soundOk}  plan music ${!!(media.plan && media.plan.music)}`].join('\n');
   }
 
