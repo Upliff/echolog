@@ -83,6 +83,7 @@ data/hidden.txt          ids of stories to never show
 - **Times with milliseconds (added 1 Nov 2026):** every start and end box takes `1:23.456`, `83.456`, `1:02:03.5` or `1m23.456s` and saves decimal seconds rounded to the millisecond (`83.456`). Boxes show them back as `1:23.456` (trailing zeros dropped). Pasting a YouTube `?t=` link still gives whole seconds. Seconds over 59 in `m:ss` (e.g. `1:75`) are rejected.
 - **Comments per scene (added 1 Nov 2026):** under each scene, "Comments for this scene (optional)" has its own "Videos to pull comments from" box (hint: "Leave empty to use the song's comments."), saved as `commentVideos` on that scene in `moments`. Empty means it's left out. A song can skip its own comment videos only if every scene has its own. The `moment` copy never includes the scene's `commentVideos` or `audio`.
 - **Fade in / fade out (added 1 Nov 2026):** two boxes per song under Starting volume, in seconds (decimals ok, 0 to 30; empty or 0 = no fade). Saved as `fadeIn` / `fadeOut` on the song. Import files can set them too.
+- **Every save starts "Collect stories" (1 Nov 2026):** the "Fetch comments after saving" tick box is gone (it had been left unticked, which is why Mohad's 9:58 save never reached the site). Game saves, imports, approved comments and Site tab saves all start the collector, try twice, and say in the status line if it didn't start (a 403 means the token is missing Actions: Read and write). "Fetch comments now" at the top still starts it by hand.
 - **Import tab (added 1 Nov 2026):** drop or paste one or more import files (format in `docs/IMPORT.md`). Shows a preview per game: new game or adds to existing, each song as New or Already there (skipped unless "Replace the one already there" is ticked), thumbnails of each scene and music video linked to YouTube at the start time, the number of comment videos, the file's `note`, and warnings (unreadable links or times, no comment videos, no scene). Import merges in one save (with the same retry as other saves) and starts the collector. New games need cover art added in the Games tab.
 
 ### Admin page requests
@@ -90,7 +91,6 @@ data/hidden.txt          ids of stories to never show
 Other chats add what they need from the admin page here. The admin chat builds it and then removes the line.
 
 - Sounds editor in the game editor (see the Sounds line above). The site and collector already support `sounds`.
-- **Check that every save starts "Collect stories"** (asked 1 Nov 2026): Mohad saved The Other Promise at 9:58 and no collector run started after it (the last one was 9:50). Maybe "Fetch comments after saving" was off, or the start request failed without saying so. If starting the run fails, show it in the status line.
 
 **Quota:** YouTube allows 10,000 units a day, and each page of 100 comments costs 1 unit. At 5 pages per video, that's roughly 5 units per video per run, so there's plenty of room.
 
