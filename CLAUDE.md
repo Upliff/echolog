@@ -133,6 +133,14 @@ A scene with its own `commentVideos` gets its own `stories` list in `moments` (s
 
 ## Front end
 
+**Only one chat edits the site: the site chat** (Mohad's chat for the front end, which rebuilt it on 31 Oct 2026). The site files are `index.html`, everything in `assets/`, `preview.bat`, `preview.ps1` and `.nojekyll`. Every other chat (the admin chat included) must not change them, not even a small fix. If another chat's work needs something on the site (a new field shown, a new setting used), it adds a line to "Site requests" below and tells Mohad to take it to the site chat. Data the admin page and collector write (`config/`, `data/`, `covers/`, `sounds/`) isn't site code and is fine for them to change. Added 1 Nov 2026, after the admin chat's fade change to `app.js` landed while the site chat was mid-change (both versions were merged by hand).
+
+### Site requests
+
+Other chats add what they need from the site here. The site chat builds it and then removes the line.
+
+- (none)
+
 Plain HTML, CSS and JS, no build step. It lives at the repo root, so GitHub Pages serves it as-is:
 
 ```
