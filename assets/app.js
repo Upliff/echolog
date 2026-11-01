@@ -464,9 +464,9 @@
     return art;
   }
 
-  // Journal look: short echoes are written bigger, long ones smaller.
+  // Journal look: short comments are written bigger, long ones smaller.
   const sizeClass = (t) => (t.length < 110 ? 'c-short' : t.length < 320 ? 'c-mid' : 'c-long');
-  // A small repeatable random number generator, so each echo always gets the same tilt and place.
+  // A small repeatable random number generator, so each comment always gets the same tilt and place.
   function seeded(str) {
     let x = 2166136261;
     for (let i = 0; i < str.length; i++) { x ^= str.charCodeAt(i); x = Math.imul(x, 16777619); }
@@ -482,9 +482,9 @@
   // One list, most liked first.
   function commentsSection(stories) {
     const sorted = [...stories].sort((a, b) => (b.likes || 0) - (a.likes || 0));
-    return h('section', { class: 'comments', id: 'comments', 'aria-label': 'Echoes' },
-      h('div', { class: 'sort' }, h('span', null, plural(stories.length, 'echo', 'echoes'))),
-      stories.length ? commentList(sorted) : h('p', { class: 'empty' }, 'No echoes yet.'));
+    // No heading and no count: the comments just sit under the video.
+    return h('section', { class: 'comments', id: 'comments', 'aria-label': 'Comments' },
+      stories.length ? commentList(sorted) : h('p', { class: 'empty' }, 'Nothing here yet.'));
   }
 
   /* ---------- what to play for a song ----------
@@ -648,9 +648,9 @@
   // The comment count at the end of the strip; scrolls down to the comments.
   function moreButton(n) {
     return h('button', {
-      class: 'peek-more', type: 'button', 'aria-label': `${plural(n, 'echo', 'echoes')}, scroll down`,
+      class: 'peek-more', type: 'button', 'aria-label': 'Scroll down to the comments',
       onclick: () => $('comments').scrollIntoView({ behavior: scrollBehavior }),
-    }, h('span', null, n.toLocaleString('en')), h('span', { class: 'pm-word' }, n === 1 ? 'echo' : 'echoes'), svg('down', 16));
+    }, svg('down', 20));
   }
 
   // A scene with its own comments shows those; otherwise the song's.
