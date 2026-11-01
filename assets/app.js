@@ -1390,9 +1390,10 @@
       // Still "not started" after our tap: on iPhones that's what an ad waiting for a tap looks like
       // (a tap on our button doesn't count as a tap on YouTube's player). Show the music player
       // itself so it can be tapped. Only if that doesn't work after a while, use the scene's sound.
+      // It stays up until the music plays (no give-up timer: on iPhones an ad also reports
+      // "not started", so the page can't tell an ad from a player waiting for a tap).
       if (media.music && media.ready.music && !media.musicTapShown) {
         showMusicForTap(true);
-        media.wakeTimer = setTimeout(giveUp, 30000);
         return;
       }
       showMusicForTap(false);
@@ -1407,10 +1408,20 @@
   function showMusicForTap(on) {
     if (on) media.musicTapShown = true;
     stage.classList.toggle('music-tap', on);
-    $('adLabel').textContent = on ? 'Tap the video to start the music. An ad may play first.' : 'Ad playing. The song starts after it.';
+    $('adLabel').textContent = on ? 'Tap the video to start the music.' : 'Ad playing. The song starts after it.';
     if (on) sceneDo('pause');
   }
   const touchScreen = () => window.matchMedia('(pointer: coarse)').matches;
+  // A tap inside YouTube's player moves focus into its frame. Once the music player has been
+  // tapped, whatever plays before the song is an ad, so say so.
+  window.addEventListener('blur', () => {
+    setTimeout(() => {
+      const f = document.activeElement;
+      if (stage.classList.contains('music-tap') && f && f.tagName === 'IFRAME' && f.id === 'ytMusic') {
+        $('adLabel').textContent = 'Ad playing. The song starts after it.';
+      }
+    }, 0);
+  });
 
   function onError(role, code) {
     const plan = media.plan;
