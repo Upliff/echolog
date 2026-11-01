@@ -29,6 +29,8 @@
   // to fill it), blurred by BG_BLUR pixels, then stretched to fill the screen. Bigger BG_DETAIL or
   // smaller BG_BLUR is sharper. (It used to be squashed into a 32 x 32 square, which looked blocky.)
   const BG_DETAIL = 160;
+  // Width of the previous/next strips at the screen edges (desktop).
+  const SIDE_W = 56;
   const BG_BLUR = 2.5;
 
   // Comments longer than this get cut off with "Show more".
@@ -288,12 +290,39 @@
     onPageScroll();
   }
 
+  // Song pages give the video the whole screen: the top bar folds into a small menu button.
+  function setSongPage(on) {
+    document.body.classList.toggle('on-song', on);
+    document.documentElement.classList.toggle('song-page', on);
+    closeMenu();
+  }
+  const topBarEl = $('top');
+  const menuBtn = $('menuBtn');
+  function closeMenu() {
+    topBarEl.classList.remove('open');
+    menuBtn.setAttribute('aria-expanded', 'false');
+  }
+  menuBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = !topBarEl.classList.contains('open');
+    topBarEl.classList.toggle('open', open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('click', (e) => {
+    if (topBarEl.classList.contains('open') && !topBarEl.contains(e.target)) closeMenu();
+    // Close the scene list when tapping anywhere else.
+    for (const w of document.querySelectorAll('.scenes-wrap.open')) {
+      if (!w.contains(e.target)) { w.classList.remove('open'); const b = w.querySelector('.scenes-btn'); if (b) b.setAttribute('aria-expanded', 'false'); }
+    }
+  });
+  topBarEl.addEventListener('click', (e) => { if (e.target.closest('a')) closeMenu(); });
+
   /* ---------- home ---------- */
 
   function renderHome() {
     document.title = 'Echolog';
     setSounds(null);
-    document.body.classList.remove('on-song');
+    setSongPage(false);
     crumb.replaceChildren();
     const games = [...DATA.games].sort((a, b) => String(a.title).localeCompare(String(b.title)));
     setCover(games[0] || null);
@@ -342,7 +371,7 @@
   function renderGame(game) {
     document.title = `${game.title} · Echolog`;
     setSounds(game);
-    document.body.classList.remove('on-song');
+    setSongPage(false);
     crumb.replaceChildren();
     setCover(game);
 
@@ -509,7 +538,7 @@
   function renderSong(game, song, sceneIndex = 0) {
     document.title = `${song.title} · ${game.title} · Echolog`;
     setSounds(game);
-    document.body.classList.add('on-song');
+    setSongPage(true);
     setCover(game);
     crumb.replaceChildren(h('span', { class: 'has-menu crumb-menu' },
       h('a', { href: `#/${encodeURIComponent(game.id)}` }, game.title), songMenu(game, song)));
@@ -531,7 +560,8 @@
       ui.vol = h('input', { class: 'vol', type: 'range', min: '0', max: '100', step: '1', 'aria-label': 'Volume' });
       // The volume slider pops up above the sound button when you hover or tab to it.
       const volWrap = h('span', { class: 'vol-wrap' }, ui.sound, h('span', { class: 'vol-pop' }, ui.vol));
-      ui.repeat = iconBtn('ctl ctl-repeat', 'repeat', 'Repeat this song');
+      ui.repeat = iconBtn('ctl ctl-repeat', 'repeat', 'Repeat (all songs)');
+      ui.repeat.title = 'Repeat. Stays on for every song until you turn it off.';
       ui.play.addEventListener('click', togglePlay);
       ui.sound.addEventListener('click', toggleSound);
       ui.vol.value = String(currentVolume());
@@ -545,19 +575,37 @@
         if (on) hideUpNext();
       });
       ui.barsBox = h('div', { class: 'bars' });
-      const controls = h('div', { class: 'controls' }, ui.play, volWrap, ui.repeat, ui.barsBox);
-
-      // More than one scene: a bar of big buttons above the video, as wide as the video.
+      // More than one scene: a Scenes button next to the other controls, with a pop-up list.
+      // The first time someone opens a song with several scenes, it shows how many there are,
+      // until they open the list. After that it never shows on that song again.
+      let scenesWrap = null;
+      sceneBar.replaceChildren();
       if (scenes.length > 1) {
-        ui.scenes = scenes.map((m, i) => h('a', {
-          class: 'scene-btn',
+        const seenKey = `scenesSeen:${game.id}/${song.id}`;
+        ui.sceneItems = scenes.map((m, i) => h('a', {
+          class: 'scene-item',
           href: `${songHref(game, song)}/${i + 1}`,
           'aria-current': i === plan.index ? 'true' : null,
-        }, m.label || `Scene ${i + 1}`));
-        sceneBar.replaceChildren(...ui.scenes);
-      } else {
-        sceneBar.replaceChildren();
+        }, h('span', { class: 'scene-n' }, String(i + 1)), m.label || `Scene ${i + 1}`));
+        ui.sceneName = h('span', { class: 'scenes-name' }, scenes[plan.index].label || `Scene ${plan.index + 1}`);
+        const badge = saved.get(seenKey) ? null : h('span', { class: 'scenes-badge', 'aria-label': `${scenes.length} scenes` }, String(scenes.length));
+        ui.scenesBtn = h('button', { class: 'ctl scenes-btn', type: 'button', 'aria-expanded': 'false', 'aria-label': `Scenes (${scenes.length})` },
+          svg('film'), ui.sceneName, badge);
+        const pop = h('div', { class: 'scenes-pop', role: 'menu' },
+          h('p', { class: 'scenes-head' }, plural(scenes.length, 'scene', 'scenes')), ...ui.sceneItems);
+        scenesWrap = h('span', { class: 'scenes-wrap' }, ui.scenesBtn, pop);
+        const close = () => { scenesWrap.classList.remove('open'); ui.scenesBtn.setAttribute('aria-expanded', 'false'); };
+        ui.scenesBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const open = !scenesWrap.classList.contains('open');
+          scenesWrap.classList.toggle('open', open);
+          ui.scenesBtn.setAttribute('aria-expanded', String(open));
+          if (open) { saved.set(seenKey, '1'); const b = ui.scenesBtn.querySelector('.scenes-badge'); if (b) b.remove(); }
+        });
+        pop.addEventListener('click', (e) => { if (e.target.closest('a')) close(); });
       }
+      const controls = h('div', { class: 'controls' }, ui.play, volWrap, ui.repeat, scenesWrap, ui.barsBox);
+
       // Previous and next song: big buttons either side of the video.
       setSideBtn(prevBtn, prev, 'left', 'Previous song');
       setSideBtn(nextBtn, next, 'right', 'Next song');
@@ -639,7 +687,8 @@
     if (st.plan && plan.index === st.plan.index && plan.scene.videoId === st.plan.scene.videoId) return;
     const old = st.plan;
     st.plan = plan;
-    if (st.ui.scenes) st.ui.scenes.forEach((b, k) => (k === plan.index ? b.setAttribute('aria-current', 'true') : b.removeAttribute('aria-current')));
+    if (st.ui.sceneItems) st.ui.sceneItems.forEach((b, k) => (k === plan.index ? b.setAttribute('aria-current', 'true') : b.removeAttribute('aria-current')));
+    if (st.ui.sceneName) st.ui.sceneName.textContent = st.scenes[plan.index].label || `Scene ${plan.index + 1}`;
     stageMsg.hidden = true;
     showSceneComments(plan.index);
     const sameMusic = old && old.music && plan.music && sep() && media.ready.music
@@ -679,13 +728,16 @@
     const W = document.documentElement.clientWidth;
     const H = window.innerHeight;
     const css = getComputedStyle(document.documentElement);
-    const top = parseFloat(css.getPropertyValue('--top')) || 56;
+    const topVar = parseFloat(css.getPropertyValue('--top'));
+    const top = Number.isFinite(topVar) ? topVar : 56; // 0 on song pages, so don't treat 0 as missing
     const peek = parseFloat(css.getPropertyValue('--peek')) || 92;
-    // Room for the scene bar above the video, when the song has more than one scene.
-    const bar = songState && songState.scenes && songState.scenes.length > 1 ? (isPhone() ? 44 : 56) : 0;
+    // The scene picker lives in the controls now, so nothing sits above the video.
+    const bar = 0;
     const availH = Math.max(200, H - top - peek - bar);
+    // Desktop keeps the previous/next strips at the screen edges clear of the video.
+    const sides = isPhone() ? 0 : SIDE_W * 2;
 
-    const bw = Math.max(200, Math.min(W, availH * 16 / 9));
+    const bw = Math.max(200, Math.min(W - sides, availH * 16 / 9));
     const bh = bw * 9 / 16;
     const upright = isPhone() && availH > bh * 1.6;
     const big = { left: (W - bw) / 2, top: bar + (upright ? top + 12 : top + (availH - bh) / 2), width: bw, height: bh };
@@ -743,23 +795,21 @@
 
   // The scene bar sits right above the video, and the previous/next buttons either side of it
   // (inside its edges when the screen has no room beside it). They fade out with the small player.
+  // Previous and next are strips flush with the screen edges, top to bottom (on phones, down to
+  // the bottom of the video, so they don't cover the controls). They fade out with the small player.
   function placeExtras(L, r) {
     const show = !mini && !stage.hidden;
-    sceneBar.hidden = !L.bar || !sceneBar.childElementCount;
-    if (!sceneBar.hidden) {
-      Object.assign(sceneBar.style, { left: r.left + 'px', top: (r.top - L.bar) + 'px', width: r.width + 'px', height: L.bar + 'px' });
-      sceneBar.classList.toggle('gone', !show);
-    }
-    const size = isPhone() ? 44 : 60;
-    const gap = 16;
-    const y = r.top + r.height / 2 - size / 2;
-    const outside = r.left >= size + gap * 2;
-    prevBtn.style.left = (outside ? r.left - size - gap : r.left + 10) + 'px';
-    nextBtn.style.left = (outside ? r.left + r.width + gap : r.left + r.width - size - 10) + 'px';
+    sceneBar.hidden = true;
+    const w = isPhone() ? 40 : SIDE_W;
+    const height = isPhone() ? r.top + r.height : L.H;
+    prevBtn.style.left = '0px';
+    nextBtn.style.left = (L.W - w) + 'px';
     for (const b of [prevBtn, nextBtn]) {
-      b.style.top = y + 'px';
+      b.style.top = '0px';
+      b.style.width = w + 'px';
+      b.style.height = height + 'px';
       b.classList.toggle('gone', !show);
-      b.classList.toggle('inside', !outside);
+      b.classList.toggle('inside', isPhone());
     }
   }
 
