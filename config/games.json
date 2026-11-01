@@ -68,6 +68,9 @@
               "end": 1120,
               "label": "Braska's Final Aeon"
             }
+          ],
+          "sounds": [
+            "0000-bank00-751"
           ]
         },
         {
@@ -124,7 +127,14 @@
           ]
         }
       ],
-      "cover": "covers/ffx.jpg"
+      "cover": "covers/ffx.jpg",
+      "sounds": [
+        {
+          "id": "0000-bank00-751",
+          "label": "0000 bank00 [751]",
+          "file": "sounds/ffx/0000-bank00-751.wav"
+        }
+      ]
     },
     {
       "id": "kingdom-hearts-2",
