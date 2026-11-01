@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-01T06:57:50Z",
+  "updated": "2026-11-01T09:48:30Z",
   "settings": {},
   "games": [
     {
@@ -10,7 +10,7 @@
       "sounds": [
         {
           "id": "0000-bank00-751",
-          "label": "0000 bank00 [751]",
+          "label": "Overdrive",
           "file": "sounds/ffx/0000-bank00-751.wav"
         }
       ],
@@ -195,7 +195,7 @@
               "author": "@mirraiidx",
               "authorUrl": "http://www.youtube.com/@mirraiidx",
               "text": "\"Yuna... i have to go...\"\ni'm a proud 43 gamer dad, i followed my 20 years son in the journey into FFX: i saw him getting upset, getting emotional, enjoying and struggling, laughing, crying... as i did years ago. Thank you.",
-              "likes": 2645,
+              "likes": 2646,
               "date": "2020-06-17",
               "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugzez8fe8x6eXbCy7Sx4AaABAg",
               "videoId": "PSjTN8WSGNk",
@@ -490,6 +490,18 @@
               "score": 7.15
             },
             {
+              "id": "yt:Ugz_G6cbXs85K3fZF614AaABAg",
+              "source": "youtube",
+              "author": "@deucedeuce333",
+              "authorUrl": "http://www.youtube.com/@deucedeuce333",
+              "text": "Idk what it is but nothing makes me tear up like this song. Lol I'm 34 and it's from a video game but man when Yuna runs through him, gets up and says \"I love you\" for the first and only time, I suddenly get something in my eye lol. Swear to God I never cry, not at my kids births, after any breakup in my past, after a relative or pet passing, or anything else. But this song gets me almost every time.",
+              "likes": 0,
+              "date": "2022-02-20",
+              "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=Ugz_G6cbXs85K3fZF614AaABAg",
+              "videoId": "PSjTN8WSGNk",
+              "score": 7.14
+            },
+            {
               "id": "yt:Ugy6D-3ZYmCoa4LOw9x4AaABAg",
               "source": "youtube",
               "author": "@lvportalzl",
@@ -730,6 +742,18 @@
               "score": 5.98
             },
             {
+              "id": "yt:UgznDNvVuVHEAi3kVJ54AaABAg",
+              "source": "youtube",
+              "author": "@trionghost",
+              "authorUrl": "http://www.youtube.com/@trionghost",
+              "text": "Go now, if you want it. \nAn otherworld awaits you.\nDon't you give up on it. \nYou bite the hand that feeds you\n\nAll alone cold fields you wander,\nMemories of it cloud your sight.\nFills your dreams, disturbs your slumber,\nLost your way a fallen knight\n\nHold now, aim is steady. \nAn otherworld awaits you.\nOne thousand years--you ready? \nThe otherworld it takes you.\n\nGo, go into the sand and the dust and the sky,\nGo now, no better plan than to do or to die.\nFree me, pray to the faith in the face of the light\nFeed me, fill me with sin, now get ready to fight\nYou know you will,\nYou know you will.\nYou know you know you know you know that you will,\nYou know you know you know you know that you will.\nYou know you will.\n\nFight fight fight\nFight fight fight\nFight fight fight\nFight fight fight\n\nHope dies and you wander. \nThe otherworld it makes you.\nDreams they rip asunder. \nThe otherworld it hates you.\nFree now, ride up on it. \nUp to the heights it takes you.\nGo now if you want it. \nAn otherworld awaits you.",
+              "likes": 0,
+              "date": "2026-07-29",
+              "url": "https://www.youtube.com/watch?v=mWYwmM23Sqs&lc=UgznDNvVuVHEAi3kVJ54AaABAg",
+              "videoId": "mWYwmM23Sqs",
+              "score": 5.97
+            },
+            {
               "id": "yt:UgwPBNkwlk2ab6cLT254AaABAg",
               "source": "youtube",
               "author": "@bkeith1005",
@@ -740,30 +764,6 @@
               "url": "https://www.youtube.com/watch?v=PSjTN8WSGNk&lc=UgwPBNkwlk2ab6cLT254AaABAg",
               "videoId": "PSjTN8WSGNk",
               "score": 5.96
-            },
-            {
-              "id": "yt:UgwNEdr86h5Lm2euHMZ4AaABAg",
-              "source": "youtube",
-              "author": "@omarm-510",
-              "authorUrl": "http://www.youtube.com/@omarm-510",
-              "text": "This game was truly a masterpiece and reminds me so much of my childhood. It was one of the first games I played that made me reflect on life. Art is beautiful because it makes us feel what it is to be human",
-              "likes": 1,
-              "date": "2026-03-28",
-              "url": "https://www.youtube.com/watch?v=sy-nrLiAwZI&lc=UgwNEdr86h5Lm2euHMZ4AaABAg",
-              "videoId": "sy-nrLiAwZI",
-              "score": 5.79
-            },
-            {
-              "id": "yt:UgxquvdnG9LDgISgSk94AaABAg",
-              "source": "youtube",
-              "author": "@RayChow-m3h",
-              "authorUrl": "http://www.youtube.com/@RayChow-m3h",
-              "text": "'Listen to my story. This may be our last chance'\n\n20 years ago we might don't know what does this mean.. Now i recall back and i finally understand the meaning of this quote..\n\nFF10 was the last story that we gone through.. Because most of us stop our FF childhood after FF10 as FF11 is going online 💔",
-              "likes": 0,
-              "date": "2026-01-25",
-              "url": "https://www.youtube.com/watch?v=sy-nrLiAwZI&lc=UgxquvdnG9LDgISgSk94AaABAg",
-              "videoId": "sy-nrLiAwZI",
-              "score": 5.61
             }
           ]
         },
@@ -774,7 +774,7 @@
           "volume": null,
           "fadeIn": null,
           "fadeOut": null,
-          "length": 196,
+          "length": 198,
           "moment": {
             "videoId": "4umidcc_8rU",
             "start": 15,
@@ -796,14 +796,14 @@
             }
           ],
           "audio": {
-            "videoId": "KO6fvJrsTsE",
+            "videoId": "BKZs90_fkt4",
             "start": 0,
             "end": null
           },
           "sounds": [
             {
               "id": "0000-bank00-751",
-              "label": "0000 bank00 [751]",
+              "label": "Overdrive",
               "file": "sounds/ffx/0000-bank00-751.wav"
             }
           ],
@@ -2417,18 +2417,6 @@
               "score": 11.1
             },
             {
-              "id": "yt:UgxkcB6xFnzLFJTqgtl4AaABAg",
-              "source": "youtube",
-              "author": "@XxStarFoxWolfFalcoxX",
-              "authorUrl": "http://www.youtube.com/@XxStarFoxWolfFalcoxX",
-              "text": "Weird how Sora is now in Smash and I have it already. I like his moves and his final smash which is cool. Before he came in Smash... This game was one of my childhood games I never forget to play tbh this was my first Kingdom Hearts game before the 1st game. To this day I own all Kingdom Hearts on my PS2 and PS3. I still play 'em, trying to beat the hardest difficult and find more secrets in the game too. Including Kingdom Hearts 3 on my Xbox One, it may not be the best but it's still the greatest game and worth the wait for the third game come out. Ya know it's hard to say this but they might make a 4th game because they're still more stories to go for Sora and the rest or least more side stories before the 4th game which is in my opinion, don't you agree? Whether you agree or not it's still the most greatest games ever in the series. So yeah I want to thank Sora for saving my childhood throughout the years.",
-              "likes": 0,
-              "date": "2021-11-12",
-              "url": "https://www.youtube.com/watch?v=gUQuBBBzx-I&lc=UgxkcB6xFnzLFJTqgtl4AaABAg",
-              "videoId": "gUQuBBBzx-I",
-              "score": 11.07
-            },
-            {
               "id": "yt:UgzHkoEH16YMFSUbnWh4AaABAg",
               "source": "youtube",
               "author": "@wjsnactivist6141",
@@ -2703,6 +2691,18 @@
               "url": "https://www.youtube.com/watch?v=gUQuBBBzx-I&lc=UgzCbeqPw4BYWc-TkJd4AaABAg",
               "videoId": "gUQuBBBzx-I",
               "score": 9.42
+            },
+            {
+              "id": "yt:UgwIif79eCwVoe5NmNZ4AaABAg",
+              "source": "youtube",
+              "author": "@Charred_Orpheus",
+              "authorUrl": "http://www.youtube.com/@Charred_Orpheus",
+              "text": "I used to live in a coastal town growing up, so I kinda relate to the nostalgia some of the characters have for the beach and the sound of the waves.\n\nOnce, during a particularly difficult time in my life, I went back to that very same beach and sat in front of the waves for a while whilst listening to this song. Ever since then hearing this song in the menu with the wave sounds has always brought me back to that time, like a safe space in my mind that's only ever a few clicks away.\n\nThank you to the one who uploaded this video and to the Alkahest YT channel, though sadly no longer around, for all its Dearly Beloved extensions. Thank you to Yoko Shimomura for composing this wonderful song and the feelings it's given me over the years, and finally, thank you to you for reading this far. I wish you much love and kindness as you continue moving ahead in this crazy thing called life. \n\nMay your heart be your guiding key~ 🤍🗝",
+              "likes": 3,
+              "date": "2024-06-22",
+              "url": "https://www.youtube.com/watch?v=4It2Prl5E-Q&lc=UgwIif79eCwVoe5NmNZ4AaABAg",
+              "videoId": "4It2Prl5E-Q",
+              "score": 9.31
             }
           ]
         },
@@ -3403,18 +3403,6 @@
               "score": 12.65
             },
             {
-              "id": "yt:UgyyEprJd08d3I9GXih4AaABAg",
-              "source": "youtube",
-              "author": "@markmamon4274",
-              "authorUrl": "http://www.youtube.com/@markmamon4274",
-              "text": "All I remember is when I was young I would come home from school and watch my older brother play KH and with the soundtrack and that plot of the game made me move. It was so easy back then with no stress and sweat. (I was like 7 or 8 , and my brother was 10) now listening to this makes me  remember the peaceful times back then( 19 years now) timeflies....",
-              "likes": 1,
-              "date": "2018-06-03",
-              "url": "https://www.youtube.com/watch?v=CSdNxXGUaRU&lc=UgyyEprJd08d3I9GXih4AaABAg",
-              "videoId": "CSdNxXGUaRU",
-              "score": 11.09
-            },
-            {
               "id": "yt:UgwpXkdvav2s9_Ud_mF4AaABAg",
               "source": "youtube",
               "author": "@MrBlitzpunk",
@@ -3459,6 +3447,18 @@
               "likes": 1,
               "date": "2026-07-06",
               "url": "https://www.youtube.com/watch?v=CSdNxXGUaRU&lc=Ugy5pPB_OlIfvcFAwpZ4AaABAg",
+              "videoId": "CSdNxXGUaRU",
+              "score": 10.74
+            },
+            {
+              "id": "yt:Ugxi6uW5WjQlBQyAhHZ4AaABAg",
+              "source": "youtube",
+              "author": "@chandrakurniawan157",
+              "authorUrl": "http://www.youtube.com/@chandrakurniawan157",
+              "text": "Suddenly I missed all the music from Kingdom Hearts 1 and 2 that I played when I was studying in college. On weekends, I went to my Grandma's house and had a chat with one of my nanny/house maid. Now, I'm working as salaryman and both my grandma and nanny had passed away. R.I.P. 😢",
+              "likes": 0,
+              "date": "2023-02-23",
+              "url": "https://www.youtube.com/watch?v=CSdNxXGUaRU&lc=Ugxi6uW5WjQlBQyAhHZ4AaABAg",
               "videoId": "CSdNxXGUaRU",
               "score": 10.74
             },
@@ -3871,18 +3871,6 @@
               "score": 7.94
             },
             {
-              "id": "yt:UgyQ64jK9T_V1pUCNzp4AaABAg",
-              "source": "youtube",
-              "author": "@djoloflevidenis1738",
-              "authorUrl": "http://www.youtube.com/@djoloflevidenis1738",
-              "text": "Ya know i loved the times when i used to see my brother playing kingdom hearts and I'm like can i play and hes like okay just wait a little longer and then it was like 2 hours later and then he hops off and then I get on siton the comfy chair best day ever I'll never get that day back if I could go back in time I would but I cant I kinda wanna Invent somthing that could get us back in time but I'm too stupid what good am i",
-              "likes": 2,
-              "date": "2023-04-23",
-              "url": "https://www.youtube.com/watch?v=CSdNxXGUaRU&lc=UgyQ64jK9T_V1pUCNzp4AaABAg",
-              "videoId": "CSdNxXGUaRU",
-              "score": 7.9
-            },
-            {
               "id": "yt:Ugyaj7F6KsbNPSuu3Gd4AaABAg",
               "source": "youtube",
               "author": "@Stevezftw",
@@ -3965,6 +3953,18 @@
               "url": "https://www.youtube.com/watch?v=pRudm5jCXrs&lc=UggRV389zDbfkngCoAEC",
               "videoId": "pRudm5jCXrs",
               "score": 7.53
+            },
+            {
+              "id": "yt:UgycgnoxfLhFMgtfZUR4AaABAg",
+              "source": "youtube",
+              "author": "@SpikyAd",
+              "authorUrl": "http://www.youtube.com/@SpikyAd",
+              "text": "I remember when I used to live with my parents back at home and I was playing kingdom hearts 2. I was at this part in the game and I loved it, it was sunny weather back then and I remember playing this game while drinking lemonade. I am looking forward to Sep the 13th for KH1.5 HD remix because I am going to be playing all the kingdom hearts games I own again. My advice in life is to make these moments count as they don't always come around the corner.",
+              "likes": 0,
+              "date": "2013-09-06",
+              "url": "https://www.youtube.com/watch?v=CSdNxXGUaRU&lc=UgycgnoxfLhFMgtfZUR4AaABAg",
+              "videoId": "CSdNxXGUaRU",
+              "score": 7.52
             },
             {
               "id": "yt:UgzTCq0m9BXnXBasFSJ4AaABAg",
@@ -4063,16 +4063,16 @@
               "score": 7.19
             },
             {
-              "id": "yt:Ugw-kIrQ4q0s_FbpoMN4AaABAg",
+              "id": "yt:Ugyr5uPI3Lm9OBb8vAZ4AaABAg",
               "source": "youtube",
-              "author": "@angbandsbane",
-              "authorUrl": "http://www.youtube.com/@angbandsbane",
-              "text": "Roxas: \"Man, I'm so glad people liked me so much. I remember at first everyone was about ready to murder me since I wasn't the player character from the first game.\"\nArthur Morgan: \"Sure. I can relate.\"",
-              "likes": 12,
-              "date": "2024-12-13",
-              "url": "https://www.youtube.com/watch?v=pRudm5jCXrs&lc=Ugw-kIrQ4q0s_FbpoMN4AaABAg",
-              "videoId": "pRudm5jCXrs",
-              "score": 6.99
+              "author": "@papandreu223",
+              "authorUrl": "http://www.youtube.com/@papandreu223",
+              "text": "It is curious. If this music already evokes nostalgia, for the people who played the game when was released it hits different. It does not evoke just abstract nostalgia, but nostalgia for the first time we played this game, as kids, 17 years ago.",
+              "likes": 1,
+              "date": "2022-08-20",
+              "url": "https://www.youtube.com/watch?v=CSdNxXGUaRU&lc=Ugyr5uPI3Lm9OBb8vAZ4AaABAg",
+              "videoId": "CSdNxXGUaRU",
+              "score": 7.12
             }
           ]
         }
@@ -4088,7 +4088,7 @@
     "ffx/otherworld/zhYW3dY1hgM: 192 comments",
     "ffx/otherworld/4umidcc_8rU: 500 comments",
     "ffx/otherworld/BKZs90_fkt4: 74 comments",
-    "ffx/besaid-island/RC1VmGXiEFw: 187 comments",
+    "ffx/besaid-island/RC1VmGXiEFw: 188 comments",
     "ffx/besaid-island/IKGc_wtQKC8: 28 comments",
     "ffx/suteki-da-ne/Vl20g-tBaKc: 500 comments",
     "ffx/suteki-da-ne/zXpm8DPYuTc: 102 comments",
