@@ -67,7 +67,7 @@ data/hidden.txt          ids of stories to never show
 - **Scenes:** each song has a list of scenes (link, start, end, label), which you can add, remove and reorder. Each scene can have its own music under "Different music for this scene". It saves `moments` and also writes `moment` as a copy of the first scene, so the site works before it supports `moments`.
 - **Music track:** a link, a start and an **end**. The end cuts off dead air at the end of a song (added 31 Oct 2026). The site already passes `end` to YouTube as `endSeconds`.
 - An end time before its start is caught before saving.
-- **Sounds (game editor), NOT BUILT in the admin page (another chat's version was lost). Listed in "Admin page requests":** a list of sounds per game: a name (shown on the button) and an audio file (mp3, ogg, wav or m4a, up to 1.5 MB). Saving uploads new files to `sounds/<game id>/<name>.<ext>` and saves `sounds: [{ "label", "file" }]` on the game. Each row has Play, Replace and Remove.
+- **Sounds (game editor, built 1 Nov 2026):** under Cover art, a list of sounds per game: a name (shown on the button) and an audio file (mp3, ogg, wav or m4a, up to 1.5 MB). Each row has Play, Replace (or Choose file) and Remove; "+ Add sound" adds a row. New files upload on Save to `sounds/<game id>/<name>.<ext>` (name made from the label, `-2` added if taken), then `sounds: [{ "label", "file" }]` is saved on the game. Removing a sound deletes its file from the repo on the next Save. A row without a name or file stops the save with a message.
 - **Song volume (song editor):** "Starting volume" slider per song, saved as `volume` (0 to 100) on the song. "Use site default" removes it. Added 31 Oct 2026.
 - **Site tab:** settings for everyone who visits, saved as `settings` in `config/games.json`: default starting volume for songs without their own (0 to 100, default 80) and how many seconds before the end "Next" shows (default 8, 0 turns auto next off). Saving starts the collector, which copies `settings` into `stories.json`.
 - Pasting a YouTube link with `?t=` fills in the start time.
@@ -91,7 +91,6 @@ data/hidden.txt          ids of stories to never show
 
 Other chats add what they need from the admin page here. The admin chat builds it and then removes the line.
 
-- Sounds editor in the game editor (see the Sounds line above). The site and collector already support `sounds`.
 
 **Quota:** YouTube allows 10,000 units a day, and each page of 100 comments costs 1 unit. At 5 pages per video, that's roughly 5 units per video per run, so there's plenty of room.
 
