@@ -295,28 +295,18 @@
   function setSongPage(on) {
     document.body.classList.toggle('on-song', on);
     document.documentElement.classList.toggle('song-page', on);
-    closeMenu();
   }
-  const topBarEl = $('top');
-  const menuBtn = $('menuBtn');
-  function closeMenu() {
-    topBarEl.classList.remove('open');
-    menuBtn.setAttribute('aria-expanded', 'false');
+  // Song pages: home, about (?) and a record that goes back to the game's songs.
+  $('navAbout').addEventListener('click', () => $('aboutBtn').click());
+  function setSongNav(game) {
+    const link = $('navGame');
+    link.href = `#/${encodeURIComponent(game.id)}`;
+    link.title = `All ${game.title} songs`;
+    link.setAttribute('aria-label', `All ${game.title} songs`);
+    const label = $('vinylLabel');
+    label.style.backgroundImage = '';
+    loadCover(game).then((img) => { if (img && songState && songState.game === game) label.style.backgroundImage = `url("${img.src}")`; });
   }
-  menuBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const open = !topBarEl.classList.contains('open');
-    topBarEl.classList.toggle('open', open);
-    menuBtn.setAttribute('aria-expanded', String(open));
-  });
-  document.addEventListener('click', (e) => {
-    if (topBarEl.classList.contains('open') && !topBarEl.contains(e.target)) closeMenu();
-    // Close the scene list when tapping anywhere else.
-    for (const w of document.querySelectorAll('.scenes-wrap.open')) {
-      if (!w.contains(e.target)) { w.classList.remove('open'); const b = w.querySelector('.scenes-btn'); if (b) b.setAttribute('aria-expanded', 'false'); }
-    }
-  });
-  topBarEl.addEventListener('click', (e) => { if (e.target.closest('a')) closeMenu(); });
 
   /* ---------- home ---------- */
 
@@ -371,7 +361,7 @@
 
   function renderGame(game) {
     document.title = `${game.title} · Echolog`;
-    setSounds(game);
+    setSounds(null);
     setSongPage(false);
     crumb.replaceChildren();
     setCover(game);
@@ -571,7 +561,7 @@
 
   function renderSong(game, song, sceneIndex = 0) {
     document.title = `${song.title} · ${game.title} · Echolog`;
-    setSounds(game);
+    setSounds(Array.isArray(song.sounds) ? song.sounds : []);
     setSongPage(true);
     setCover(game);
     crumb.replaceChildren(h('span', { class: 'has-menu crumb-menu' },
@@ -586,6 +576,7 @@
     const view = h('section', { class: 'view song' });
     songState = { game, song, plan, next, prev, scenes, stories, ui: {}, ended: false, stayed: false };
     setBarRows(plan ? (plan.music ? 2 : 1) : 0);
+    setSongNav(game);
 
     if (plan) {
       const ui = songState.ui;
@@ -650,7 +641,8 @@
         h('div', { class: 'peek rise', style: '--i:2' },
           h('div', { class: 'peek-title' }, h('h1', null, song.title), sub),
           controls,
-          songState.ui.more = moreButton(n)),
+          songState.ui.more = moreButton(n),
+          soundsBtn),
         commentsSection(stories));
     } else {
       view.append(
@@ -1889,31 +1881,48 @@
 
   /* ---------- sounds: short game sounds played over the music ---------- */
 
-  const soundsBtn = $('soundsBtn');
   const soundsPanel = $('soundsPanel');
+  const soundsPads = $('soundsPads');
+  // The Sounds button: a round gold button with a little burst. It lives in the strip under the video.
+  const soundsBtn = h('button', { class: 'fx-btn', type: 'button', 'aria-label': 'Sounds', title: 'Sounds', 'aria-expanded': 'false', 'aria-controls': 'soundsPanel', hidden: true });
+  soundsBtn.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 10v4h3l4 3.5v-11L7 10H4z" fill="currentColor"/><path d="M15 9.5a3.5 3.5 0 0 1 0 5M18 7a7 7 0 0 1 0 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M19.5 3.5l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z" fill="currentColor"/></svg>';
   const soundCache = new Map();
-  let soundsGame = null;
 
   // Called on every page: the button only shows for a game that has sounds.
-  function setSounds(game) {
-    const list = game && Array.isArray(game.sounds) ? game.sounds.filter((x) => x && x.file) : [];
+  // Sounds: a song's own list (the ones ticked for it in the admin page). The button sits at the
+  // right end of the strip under the video, only on songs that have sounds, and opens a panel of
+  // pads from the right. Each pad lights up while its sound plays. Sounds play over each other.
+  const FX_COLOURS = ['#e8c27a', '#7fd1c7', '#e89a9a', '#a99be8', '#9fd47f', '#e8b07a'];
+  let soundsList = [];
+  function setSounds(list) {
     closeSounds();
-    if (!list.length) { soundsBtn.hidden = true; soundsGame = null; return; }
-    soundsBtn.hidden = false;
-    if (soundsGame === game) return;
-    soundsGame = game;
-    soundsPanel.replaceChildren(...list.map((snd) => h('button', {
-      type: 'button', class: 'sound', onclick: () => playSound(snd.file),
-    }, snd.label || 'Sound')));
+    soundsList = (list || []).filter((x) => x && x.file);
+    soundsBtn.hidden = !soundsList.length;
+    soundsPads.replaceChildren(...soundsList.map((snd, i) => {
+      const pad = h('button', { type: 'button', class: 'fx-pad', style: `--fx:${FX_COLOURS[i % FX_COLOURS.length]}` },
+        h('span', { class: 'fx-wave', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'), h('i')),
+        h('span', { class: 'fx-name' }, snd.label || 'Sound'));
+      pad.addEventListener('click', (e) => { e.stopPropagation(); playSound(snd.file, pad); });
+      return pad;
+    }));
   }
 
-  function playSound(file) {
+  function playSound(file, pad) {
     let base = soundCache.get(file);
     if (!base) { base = new Audio(file); base.preload = 'auto'; soundCache.set(file, base); }
     // A copy each time, so pressing quickly plays them over each other.
     const a = base.cloneNode();
     a.volume = Math.max(0.05, currentVolume() / 100);
-    a.play().catch(() => {});
+    if (pad) {
+      pad.classList.remove('hit');
+      void pad.offsetWidth; // restart the press ring
+      pad.classList.add('hit', 'playing');
+      pad.dataset.n = String((Number(pad.dataset.n) || 0) + 1);
+      const done = () => { pad.dataset.n = String(Math.max(0, (Number(pad.dataset.n) || 1) - 1)); if (pad.dataset.n === '0') pad.classList.remove('playing'); };
+      a.addEventListener('ended', done, { once: true });
+      a.addEventListener('error', done, { once: true });
+    }
+    a.play().catch(() => { if (pad) pad.classList.remove('playing'); });
   }
 
   function closeSounds() {
@@ -1926,11 +1935,17 @@
     soundsPanel.hidden = !open;
     soundsBtn.setAttribute('aria-expanded', String(open));
     // Load them now so the first press plays straight away.
-    if (open && soundsGame) for (const snd of soundsGame.sounds || []) if (snd.file && !soundCache.has(snd.file)) {
+    if (open) for (const snd of soundsList) if (!soundCache.has(snd.file)) {
       const a = new Audio(snd.file); a.preload = 'auto'; soundCache.set(snd.file, a);
     }
   });
-  document.addEventListener('click', (e) => { if (!soundsPanel.hidden && !soundsPanel.contains(e.target)) closeSounds(); });
+  document.addEventListener('click', (e) => {
+    if (!soundsPanel.hidden && !soundsPanel.contains(e.target)) closeSounds();
+    // Close the scene list when tapping anywhere else.
+    for (const w of document.querySelectorAll('.scenes-wrap.open')) {
+      if (!w.contains(e.target)) { w.classList.remove('open'); const b = w.querySelector('.scenes-btn'); if (b) b.setAttribute('aria-expanded', 'false'); }
+    }
+  });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !soundsPanel.hidden) { closeSounds(); soundsBtn.focus(); } });
 
   const about = $('about');

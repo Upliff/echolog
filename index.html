@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://www.youtube.com">
 <!-- Fonts load without holding up the page. -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Karla:wght@400;600&display=swap" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="assets/style.css?v=20">
+<link rel="stylesheet" href="assets/style.css?v=21">
 </head>
 <body>
 <div class="backdrop" aria-hidden="true">
@@ -20,21 +20,32 @@
 </div>
 
 <header class="top" id="top">
-  <button class="menu-btn" type="button" id="menuBtn" aria-label="Menu" aria-expanded="false">
-    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-  </button>
+  <!-- Song pages: three small buttons instead of the top bar. -->
+  <nav class="song-nav" aria-label="Site">
+    <a class="nav-btn" id="navHome" href="#/" aria-label="Home" title="Home">
+      <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M4 11l8-7 8 7M6 9.5V20h4.5v-5.5h3V20H18V9.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <button class="nav-btn nav-q" id="navAbout" type="button" aria-label="About" title="About">?</button>
+    <a class="nav-btn nav-vinyl" id="navGame" href="#/" aria-label="All songs" title="All songs">
+      <span class="vinyl" aria-hidden="true"><span class="vinyl-label" id="vinylLabel"></span></span>
+    </a>
+  </nav>
   <nav class="crumbs" aria-label="Breadcrumb">
     <a class="brand" href="#/">Echolog</a>
     <span class="crumb" id="crumb"></span>
   </nav>
   <div class="top-right">
-    <button class="about-btn" type="button" id="soundsBtn" aria-expanded="false" aria-controls="soundsPanel" hidden>Sounds</button>
     <button class="about-btn" type="button" id="aboutBtn">About</button>
   </div>
-  <div class="sounds" id="soundsPanel" role="group" aria-label="Sounds" hidden></div>
 </header>
 
 <main id="app" tabindex="-1"></main>
+
+<!-- Sounds for the song playing: a panel of pads that opens from the right. -->
+<div class="fx-panel" id="soundsPanel" role="group" aria-label="Sounds" hidden>
+  <p class="fx-head">Sounds</p>
+  <div class="fx-pads" id="soundsPads"></div>
+</div>
 
 <div class="stage" id="stage" hidden>
   <div class="layer-music" id="musicWrap"></div>
@@ -81,6 +92,6 @@
   <form method="dialog"><button type="submit">Close</button></form>
 </dialog>
 
-<script src="assets/app.js?v=24" defer></script>
+<script src="assets/app.js?v=25" defer></script>
 </body>
 </html>

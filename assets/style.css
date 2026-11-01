@@ -507,7 +507,8 @@ body.mini .upnext { left: auto; right: 20px; transform: none; bottom: 300px; }
 /* The players stay visible under the loading screen (which is solid, so nothing shows through).
    iPhones won't start a video that's see-through, so they must never be hidden with opacity. */
 .peek .controls, .peek .controls > *, .peek-more, .scenebar, .side-btn { transition: opacity 0.9s ease; }
-body.media-loading .peek .controls, body.media-loading .peek .controls > *, body.media-loading .peek-more,
+.peek .fx-btn { transition: opacity 0.9s ease, transform 0.25s var(--ease), box-shadow 0.25s ease; }
+body.media-loading .peek .controls, body.media-loading .peek .controls > *, body.media-loading .peek-more, body.media-loading .peek .fx-btn,
 body.media-loading .scenebar, body.media-loading .side-btn { opacity: 0; pointer-events: none; }
 
 /* Phones: scrub bars on their own row. */
@@ -528,40 +529,43 @@ body.media-loading .scenebar, body.media-loading .side-btn { opacity: 0; pointer
 }
 
 /* ---------- song pages: the video gets the screen ----------
-   The top bar folds into a small menu button in the top-left corner. */
-.menu-btn { display: none; }
+   The top bar is replaced by three small buttons in the top-left corner:
+   home, about (?) and a record with the game's cover on its label (back to the game's songs). */
+.song-nav { display: none; }
 html.song-page { --top: 0px; }
 html.song-page .top {
   left: max(10px, env(safe-area-inset-left)); top: 10px; right: auto; height: auto; padding: 0;
-  display: block; background: none; box-shadow: none; pointer-events: none;
+  display: block; background: none !important; box-shadow: none !important; pointer-events: none;
 }
-html.song-page .menu-btn {
-  display: flex; align-items: center; justify-content: center; pointer-events: auto;
-  width: 40px; height: 40px; border: 0; border-radius: 50%;
-  background: rgba(14, 16, 20, 0.7); color: var(--muted); box-shadow: 0 0 0 1px var(--line);
-}
-html.song-page .menu-btn:hover, html.song-page .top.open .menu-btn { color: var(--ink); background: rgba(14, 16, 20, 0.95); }
 html.song-page .top .crumbs, html.song-page .top .top-right { display: none; }
-html.song-page .top.open {
-  pointer-events: auto; min-width: 240px; padding: 10px 18px 12px;
-  background: rgba(14, 16, 20, 0.97); border-radius: 14px;
-  box-shadow: 0 0 0 1px var(--line), 0 16px 40px rgba(0, 0, 0, 0.55);
-  animation: fade 0.15s ease;
+html.song-page .song-nav { display: flex; flex-direction: column; gap: 8px; pointer-events: auto; }
+.nav-btn {
+  width: 38px; height: 38px; flex: none; display: flex; align-items: center; justify-content: center;
+  border: 0; border-radius: 50%; padding: 0;
+  background: rgba(14, 16, 20, 0.62); color: var(--muted); box-shadow: 0 0 0 1px var(--line);
+  text-decoration: none; transition: color 0.2s ease, background-color 0.2s ease, transform 0.25s var(--ease);
 }
-html.song-page .top.open .menu-btn { margin: 0 0 8px -8px; box-shadow: none; }
-html.song-page .top.open .crumbs { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
-html.song-page .top.open .crumb::before { display: none; }
-html.song-page .top.open .crumb { font-size: 15px; }
-html.song-page .top.open .top-right { display: flex; flex-direction: column; align-items: flex-start; gap: 0; margin-top: 8px; border-top: 1px solid var(--line); padding-top: 4px; }
-html.song-page .top.open .about-btn { padding: 8px 0; font-size: 15px; }
-html.song-page .sounds { position: static; margin-top: 6px; animation: none; }
-html.song-page .crumb-menu > .menu { left: 100%; top: 0; margin: 0 0 0 14px; transform: translate(6px, 0); }
-html.song-page .crumb-menu:hover > .menu, html.song-page .crumb-menu:focus-within > .menu { transform: none; }
-html.song-page .crumb-menu > .menu::before { top: 0; bottom: 0; left: -16px; right: auto; width: 16px; height: auto; }
+.nav-btn:hover, .nav-btn:focus-visible { color: var(--ink); background: rgba(14, 16, 20, 0.92); transform: scale(1.06); }
+.nav-q { font-family: var(--serif); font-size: 21px; line-height: 1; padding-bottom: 2px; }
+/* The record: dark grooves, the game's cover in the middle, a small hole. Spins once on hover. */
+.nav-vinyl { background: none; box-shadow: none; }
+.vinyl {
+  position: relative; width: 38px; height: 38px; border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 0 35%, rgba(255,255,255,0.07) 36%, transparent 38%, transparent 47%, rgba(255,255,255,0.06) 48%, transparent 50%, transparent 59%, rgba(255,255,255,0.05) 60%, transparent 62%),
+    radial-gradient(circle at 32% 28%, #3a3d44 0%, #121418 55%, #07080a 100%);
+  box-shadow: 0 0 0 1px var(--line), 0 4px 12px rgba(0, 0, 0, 0.5);
+  transition: transform 0.8s var(--ease);
+}
+.vinyl-label {
+  position: absolute; inset: 11px; border-radius: 50%;
+  background: var(--acc) center / cover no-repeat;
+}
+.vinyl-label::after { content: ""; position: absolute; inset: 6.5px; border-radius: 50%; background: #07080a; }
+.nav-vinyl:hover .vinyl, .nav-vinyl:focus-visible .vinyl { transform: rotate(360deg); }
 @media (max-width: 639px) {
   html.song-page { --top: 60px; }
-  html.song-page .crumb-menu > .menu { left: 0; top: 100%; margin: 6px 0 0; }
-  html.song-page .crumb-menu > .menu::before { left: 0; right: 0; top: -8px; width: auto; height: 8px; }
+  html.song-page .song-nav { flex-direction: row; }
 }
 
 /* Previous and next: strips flush with the screen edges, top to bottom. */
@@ -661,4 +665,69 @@ html.song-page .crumb-menu > .menu::before { top: 0; bottom: 0; left: -16px; rig
 @media (max-width: 639px) {
   .cloud p { font-size: 20px; }
   .cloud { padding: 8px 12px; }
+}
+
+/* ---------- sounds ----------
+   A round gold button at the right end of the strip under the video. It opens a panel of pads
+   from the right. Each pad has its own colour, a ring when pressed and a little wave while playing. */
+.fx-btn {
+  width: 46px; height: 46px; flex: none; border: 0; border-radius: 50%; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center; margin-left: 6px;
+  color: #1a1206;
+  background: radial-gradient(circle at 35% 30%, #fff1cf 0%, #e8c27a 45%, #b98a3e 100%);
+  box-shadow: 0 0 0 1px rgba(255, 230, 170, 0.35), 0 6px 18px rgba(232, 194, 122, 0.28);
+  transition: transform 0.25s var(--ease), box-shadow 0.25s ease;
+}
+.fx-btn[hidden] { display: none; }
+.fx-btn:hover, .fx-btn:focus-visible { transform: rotate(-8deg) scale(1.08); box-shadow: 0 0 0 1px rgba(255, 230, 170, 0.5), 0 8px 24px rgba(232, 194, 122, 0.45); }
+.fx-btn:active { transform: scale(0.94); }
+.fx-btn[aria-expanded="true"] { transform: rotate(-8deg) scale(1.04); }
+
+.fx-panel {
+  position: fixed; z-index: 30; right: max(16px, env(safe-area-inset-right));
+  bottom: calc(var(--peek) + 10px);
+  width: min(340px, calc(100vw - 32px)); max-height: 60vh; overflow-y: auto;
+  padding: 14px; border-radius: 18px;
+  background: rgba(14, 16, 20, 0.97);
+  box-shadow: 0 0 0 1px var(--line), 0 20px 50px rgba(0, 0, 0, 0.6);
+  transform-origin: bottom right;
+  animation: fx-in 0.28s var(--ease) both;
+}
+.fx-panel[hidden] { display: none; }
+@keyframes fx-in { from { opacity: 0; transform: translateX(24px) scale(0.96); } }
+.fx-head { margin: 0 4px 10px; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.fx-pads { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fx-pad {
+  position: relative; overflow: hidden; min-height: 74px; padding: 12px; border-radius: 14px;
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 8px;
+  text-align: left; color: var(--ink);
+  border: 1px solid color-mix(in srgb, var(--fx) 45%, transparent);
+  background: linear-gradient(160deg, color-mix(in srgb, var(--fx) 22%, #14161b) 0%, #101216 100%);
+  transition: transform 0.15s var(--ease), border-color 0.2s ease;
+}
+.fx-pad:hover, .fx-pad:focus-visible { transform: translateY(-2px); border-color: var(--fx); }
+.fx-pad:active { transform: scale(0.95); }
+.fx-name { font-family: var(--serif); font-size: 18px; line-height: 1.15; overflow-wrap: anywhere; }
+/* Press ring */
+.fx-pad::after {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 120%; aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--fx) 45%, transparent) 0%, transparent 65%);
+  transform: translate(-50%, -50%) scale(0); opacity: 0; pointer-events: none;
+}
+.fx-pad.hit::after { animation: fx-ring 0.6s ease-out; }
+@keyframes fx-ring { from { transform: translate(-50%, -50%) scale(0.2); opacity: 1; } to { transform: translate(-50%, -50%) scale(1.4); opacity: 0; } }
+/* Little wave bars: still, then bouncing while the sound plays */
+.fx-wave { display: flex; align-items: flex-end; gap: 3px; height: 16px; }
+.fx-wave i { width: 3px; height: 100%; border-radius: 2px; background: var(--fx); opacity: 0.55; transform: scaleY(0.35); transform-origin: bottom; }
+.fx-wave i:nth-child(2) { transform: scaleY(0.6); }
+.fx-wave i:nth-child(3) { transform: scaleY(0.45); }
+.fx-pad.playing { border-color: var(--fx); box-shadow: 0 0 22px color-mix(in srgb, var(--fx) 30%, transparent); }
+.fx-pad.playing .fx-wave i { opacity: 1; animation: fx-bounce 0.7s ease-in-out infinite alternate; }
+.fx-pad.playing .fx-wave i:nth-child(2) { animation-delay: -0.2s; }
+.fx-pad.playing .fx-wave i:nth-child(3) { animation-delay: -0.45s; }
+.fx-pad.playing .fx-wave i:nth-child(4) { animation-delay: -0.1s; }
+@keyframes fx-bounce { from { transform: scaleY(0.25); } to { transform: scaleY(1); } }
+@media (max-width: 639px) {
+  .fx-btn { width: 42px; height: 42px; }
+  .fx-panel { bottom: calc(var(--peek) + 8px); }
 }
