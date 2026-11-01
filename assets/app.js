@@ -832,6 +832,8 @@
   // Taps on the video go to us, not to YouTube, so the scene and the music always pause and play
   // together. Tap the big video: pause or play. Tap the small player: make it big again.
   // The bottom-right corner is left open so YouTube's "Skip ad" button can still be pressed.
+  $('soundPill').addEventListener('click', (e) => { e.stopPropagation(); toggleSound(); });
+  $('slPlay').addEventListener('click', (e) => { e.stopPropagation(); startByTap(); });
   $('stageTap').addEventListener('click', () => {
     if (mini) window.scrollTo({ top: 0, behavior: scrollBehavior });
     else togglePlay();
@@ -891,11 +893,35 @@
     if (title != null) $('slTitle').textContent = title;
   }
 
+  // The loading screen stays up until the video is actually playing, then everything fades in.
+  // If nothing has started after a while (phones often won't start a video on their own),
+  // the loading screen shows our own Play button, so YouTube's own button never shows.
   function setLoading(on, videoOnly) {
     clearTimeout(media.loadTimer);
     stage.classList.toggle('loading', on);
+    stage.classList.remove('stuck');
     document.body.classList.toggle('media-loading', on && !videoOnly);
-    if (on) media.loadTimer = setTimeout(() => setLoading(false), 12000);
+    if (on) media.loadTimer = setTimeout(showStart, touchScreen() ? 5000 : 12000);
+  }
+
+  // Only once the players have loaded, so pressing it can actually start them.
+  function showStart() {
+    if (!stage.classList.contains('loading')) return;
+    const ready = media.ready.scene && (!media.plan || !media.plan.music || media.ready.music);
+    if (!ready) { media.loadTimer = setTimeout(showStart, 1000); return; }
+    stage.classList.add('stuck');
+  }
+
+  // Our Play button on the loading screen.
+  function startByTap() {
+    stage.classList.remove('stuck');
+    if (media.gate) { clearGate(); media.lock = sep(); }
+    applyAudio();
+    if (sep() && media.music) safe(() => media.music.playVideo());
+    sceneDo('play');
+    setTimeout(checkAutoplay, 1500);
+    clearTimeout(media.loadTimer);
+    media.loadTimer = setTimeout(showStart, 6000);
   }
 
   // Turn captions off. YouTube has no official switch for this, so this is best effort.
@@ -1025,20 +1051,20 @@
   }
 
   // Everything's ready: show the video, then play.
+  // Everything's ready: play, still under the loading screen. The screen fades away once it's
+  // really playing (see onState). If it hasn't started in a few seconds, show our Play button.
   function openGate(token) {
     if (token !== media.token || !media.gate) return;
     clearGate();
     if (media.music && media.ready.music) safe(() => media.music.seekTo(media.at.music, true));
     if (media.scene && media.ready.scene) safe(() => media.scene.seekTo(media.at.scene, true));
-    setLoading(false);
-    setTimeout(() => {
-      if (token !== media.token) return;
-      media.lock = sep();
-      applyAudio();
-      if (sep()) safe(() => media.music.playVideo());
-      sceneDo('play');
-      setTimeout(() => { if (token === media.token) checkAutoplay(); }, 1500);
-    }, reduced ? 0 : 450);
+    media.lock = sep();
+    applyAudio();
+    if (sep()) safe(() => media.music.playVideo());
+    sceneDo('play');
+    setTimeout(() => { if (token === media.token) checkAutoplay(); }, 1500);
+    clearTimeout(media.loadTimer);
+    media.loadTimer = setTimeout(() => { if (token === media.token) showStart(); }, touchScreen() ? 4000 : 6000);
   }
 
   // A different scene with the same music: only the picture changes, and it opens where the song is up to.
@@ -1237,7 +1263,7 @@
     if (audible && audibleReady) {
       safe(() => {
         audible.setVolume(vol);
-        if (media.userMuted || vol === 0) audible.mute(); else audible.unMute();
+        if (media.userMuted || vol === 0 || (touchScreen() && !media.soundOk)) audible.mute(); else audible.unMute();
       });
     }
   }
@@ -1277,6 +1303,7 @@
     if (!p) return;
     const muted = safe(() => p.isMuted());
     media.userMuted = !muted;
+    if (muted) media.soundOk = true;
     if (muted) {
       if (currentVolume() === 0) setVolume(60);
       safe(() => p.unMute());
@@ -1438,6 +1465,8 @@
       setIcon(ui.sound, muted ? 'muted' : 'sound', muted ? 'Turn sound on' : 'Mute');
       ui.sound.classList.toggle('nudge', muted && !media.userMuted && currentVolume() > 0);
     }
+    // Phones: a "Tap for sound" button over the video while the sound is off because the phone wanted it off.
+    stage.classList.toggle('need-sound', touchScreen() && playing && muted && !media.userMuted && currentVolume() > 0);
     for (const bar of ui.bars || []) drawBar(bar);
     const { pos, len } = clipPos(p, masterSpec());
     if (playing && repeatOn() && len > 3 && len - pos < 0.35) repeatSong();

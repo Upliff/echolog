@@ -436,7 +436,7 @@ body.mini .upnext { left: auto; right: 20px; transform: none; bottom: 300px; }
 .stage-loading {
   position: absolute; inset: 0; z-index: 4; overflow: hidden; pointer-events: none;
   display: grid; place-items: center; background: #05070b;
-  opacity: 0; transition: opacity 0.45s ease;
+  opacity: 0; transition: opacity 0.9s ease;
 }
 /* A still from the scene, dimmed, slowly drifting closer while it loads. */
 .sl-still {
@@ -463,6 +463,23 @@ body.mini .upnext { left: auto; right: 20px; transform: none; bottom: 300px; }
 @keyframes sl-glide { from { transform: translateX(-46px); } to { transform: translateX(140px); } }
 .sl-word { font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
 .stage.mini .sl-title, .stage.mini .sl-word { display: none; }
+/* Our own Play button, shown on the loading screen only when nothing started on its own. */
+.sl-play {
+  display: none; pointer-events: auto;
+  height: 48px; padding: 0 28px; border-radius: 999px; border: 0;
+  background: var(--ink); color: #0b0d10; font-size: 15px; font-weight: 600; letter-spacing: 0.04em;
+}
+.stage.stuck .stage-loading { pointer-events: auto; }
+.stage.stuck .sl-play { display: inline-flex; align-items: center; }
+.stage.stuck .sl-word, .stage.stuck .sl-line { display: none; }
+/* Phones: "Tap for sound" while the phone has the sound off. */
+.sound-pill {
+  position: absolute; left: 50%; bottom: 14px; z-index: 6; transform: translateX(-50%);
+  height: 40px; padding: 0 18px; border-radius: 999px; border: 0;
+  background: rgba(232, 194, 122, 0.95); color: #0b0d10; font-size: 14px; font-weight: 600;
+  opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+}
+.stage.need-sound:not(.loading):not(.mini) .sound-pill { opacity: 1; pointer-events: auto; }
 /* Short note at the bottom of the video, e.g. when the music track couldn't play. */
 .stage-note {
   position: absolute; left: 12px; bottom: 12px; z-index: 5; margin: 0; max-width: calc(100% - 24px);
@@ -475,7 +492,7 @@ body.mini .upnext { left: auto; right: 20px; transform: none; bottom: 300px; }
 .layer-scene { transition: opacity 0.6s ease; }
 /* The players stay visible under the loading screen (which is solid, so nothing shows through).
    iPhones won't start a video that's see-through, so they must never be hidden with opacity. */
-.peek .controls, .peek .controls > *, .peek-more { transition: opacity 0.6s ease; }
+.peek .controls, .peek .controls > *, .peek-more, .scenebar, .side-btn { transition: opacity 0.9s ease; }
 body.media-loading .peek .controls, body.media-loading .peek .controls > *, body.media-loading .peek-more,
 body.media-loading .scenebar, body.media-loading .side-btn { opacity: 0; pointer-events: none; }
 

@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://www.youtube.com">
 <!-- Fonts load without holding up the page. -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Karla:wght@400;600&display=swap" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="assets/style.css?v=14">
+<link rel="stylesheet" href="assets/style.css?v=15">
 </head>
 <body>
 <div class="backdrop" aria-hidden="true">
@@ -43,8 +43,10 @@
       <p class="sl-title" id="slTitle"></p>
       <span class="sl-line"><span></span></span>
       <span class="sl-word">Loading</span>
+      <button class="sl-play" id="slPlay" type="button">Play</button>
     </div>
   </div>
+  <button class="sound-pill" id="soundPill" type="button">Tap for sound</button>
   <p class="stage-msg" id="stageMsg" hidden></p>
 </div>
 
@@ -73,6 +75,6 @@
   <form method="dialog"><button type="submit">Close</button></form>
 </dialog>
 
-<script src="assets/app.js?v=17" defer></script>
+<script src="assets/app.js?v=18" defer></script>
 </body>
 </html>
