@@ -29,7 +29,7 @@ Owner: Mohad. Repo: https://github.com/Upliff/echolog (public).
 - **Requests:** visitors can request a game, a song or a fix. Mohad sees them in the admin page and can accept one, which opens the game/song editor filled in. (Planned.)
 - **Hide names:** a switch on the site that hides commenters' names. (Planned.)
 - **Several scenes per song:** when a song plays more than once in a game, it can have several scenes and people can swap between them. (Built, see "More than one scene per song".)
-- **Sounds:** a "Sounds" button in the top bar opens a panel of short game sounds for the current game, which play over the music. Mohad uploads them in the admin page. The files are game audio, so hosting them publicly carries the same copyright risk as the clips (Mohad's choice).
+- **Sounds:** a "Sounds" button in the top bar opens a panel of short game sounds, which play over the music. Each game has one bank of sounds (each file uploaded once), and each song picks which of them it shows (e.g. battle sounds only on battle themes). Decided 1 Nov 2026. Mohad uploads and picks them in the admin page. The files are game audio, so hosting them publicly carries the same copyright risk as the clips (Mohad's choice).
 - **Inbox:** comments and requests go to a private GitHub repo as issues, through a free Cloudflare Worker. Decided 31 Oct 2026 over a Google Form.
 
 ## Accounts and setup status
@@ -67,7 +67,8 @@ data/hidden.txt          ids of stories to never show
 - **Scenes:** each song has a list of scenes (link, start, end, label), which you can add, remove and reorder. Each scene can have its own music under "Different music for this scene". It saves `moments` and also writes `moment` as a copy of the first scene, so the site works before it supports `moments`.
 - **Music track:** a link, a start and an **end**. The end cuts off dead air at the end of a song (added 31 Oct 2026). The site already passes `end` to YouTube as `endSeconds`.
 - An end time before its start is caught before saving.
-- **Sounds (game editor, built 1 Nov 2026):** under Cover art, a list of sounds per game: a name (shown on the button) and an audio file (mp3, ogg, wav or m4a, up to 1.5 MB). Each row has Play, Replace (or Choose file) and Remove; "+ Add sound" adds a row. New files upload on Save to `sounds/<game id>/<name>.<ext>` (name made from the label, `-2` added if taken), then `sounds: [{ "label", "file" }]` is saved on the game. Removing a sound deletes its file from the repo on the next Save. A row without a name or file stops the save with a message.
+- **Sounds (game editor, built 1 Nov 2026):** under Cover art, a list of sounds per game: a name (shown on the button) and an audio file (mp3, ogg, wav or m4a, up to 1.5 MB). Each row has Play, Replace (or Choose file) and Remove; "+ Add sound" adds a row. New files upload on Save to `sounds/<game id>/<name>.<ext>` (name made from the label, `-2` added if taken), then `sounds: [{ "label", "file" }]` is saved on the game. Removing a sound deletes its file from the repo on the next Save and unticks it from every song. A row without a name or file stops the save with a message. Each sound gets an `id` on first save (made from its name, never changes after), and the file is named after it.
+- **Sounds for this song (song editor, added 1 Nov 2026):** a tick box for each sound in the game's bank. Saved as `sounds: ["save-point", ...]` (sound ids) on the song; none ticked means it's left out and the song has no Sounds button. Sounds added but not saved yet can already be ticked.
 - **Song volume (song editor):** "Starting volume" slider per song, saved as `volume` (0 to 100) on the song. "Use site default" removes it. Added 31 Oct 2026.
 - **Site tab:** settings for everyone who visits, saved as `settings` in `config/games.json`: default starting volume for songs without their own (0 to 100, default 80) and how many seconds before the end "Next" shows (default 8, 0 turns auto next off). Saving starts the collector, which copies `settings` into `stories.json`.
 - Pasting a YouTube link with `?t=` fills in the start time.
@@ -108,9 +109,10 @@ Other chats add what they need from the admin page here. The admin chat builds i
   "settings": { "volume": 80, "upNextSeconds": 8 },
   "games": [{
     "id": "ffx", "title": "Final Fantasy X", "year": 2001, "cover": "covers/ffx.jpg", "steamAppId": 359870,
-    "sounds": [{ "label": "Save point", "file": "sounds/ffx/save-point.mp3" }],
+    "sounds": [{ "id": "save-point", "label": "Save point", "file": "sounds/ffx/save-point.mp3" }],
     "songs": [{
       "id": "to-zanarkand", "title": "To Zanarkand", "composer": "Nobuo Uematsu", "volume": 70,
+      "sounds": [{ "id": "save-point", "label": "Save point", "file": "sounds/ffx/save-point.mp3" }],
       "moment": { "videoId": "kilrRiclUFY", "start": 0, "end": null, "label": "Opening, the campfire" },
       "audio": null,
       "stories": [{ "id": "yt:...", "source": "youtube", "author": "@name", "authorUrl": "...",
@@ -122,7 +124,7 @@ Other chats add what they need from the admin page here. The admin chat builds i
 }
 ```
 
-A scene with its own `commentVideos` gets its own `stories` list in `moments` (same shape as the song's, kept from the last run if YouTube can't be reached). Each song also gets `length` (seconds): its music track's end minus start, or its first scene's if there's no music track. Missing ends use the YouTube video's length, which the collector fetches each run (`videos?part=contentDetails`, 1 quota unit per 50 videos). The collector drops comments whose text is the same as one already kept (people often paste the same lyrics). Song `stories` come from YouTube, with approved own comments (`source: "echolog"`) first. Game-level `stories` are for Steam reviews, which are empty while Steam is off. `audio` is passed straight through from `config/games.json`.
+A scene with its own `commentVideos` gets its own `stories` list in `moments` (same shape as the song's, kept from the last run if YouTube can't be reached). Each song also gets `length` (seconds): its music track's end minus start, or its first scene's if there's no music track. Missing ends use the YouTube video's length, which the collector fetches each run (`videos?part=contentDetails`, 1 quota unit per 50 videos). The collector drops comments whose text is the same as one already kept (people often paste the same lyrics). Song `stories` come from YouTube, with approved own comments (`source: "echolog"`) first. Game-level `stories` are for Steam reviews, which are empty while Steam is off. `audio` is passed straight through from `config/games.json`. Game `sounds` is the whole bank; each song's `sounds` is just the ones ticked for it, already looked up (id, label, file), empty if none.
 
 ## FFX songs to check
 
@@ -138,7 +140,7 @@ A scene with its own `commentVideos` gets its own `stories` list in `moments` (s
 
 Other chats add what they need from the site here. The site chat builds it and then removes the line.
 
-- (none)
+- **Sounds per song (from the admin chat, 1 Nov 2026):** on a song page, the Sounds button and panel should use that song's own `song.sounds` (already a list of `{ id, label, file }`) instead of `game.sounds`. A song with an empty list has no Sounds button. `game.sounds` is now the game's whole bank and shouldn't be shown on song pages. Other pages: no Sounds button (or the site chat's call).
 
 Plain HTML, CSS and JS, no build step. It lives at the repo root, so GitHub Pages serves it as-is:
 

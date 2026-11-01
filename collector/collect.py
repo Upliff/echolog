@@ -64,6 +64,25 @@ JUNK = [
 TIMESTAMP = re.compile(r"\b\d{1,2}:\d{2}\b")
 
 
+
+def sound_id(s):
+    """A bank sound's id: its own id, or its file name without the extension."""
+    if s.get("id"):
+        return s["id"]
+    return os.path.splitext(os.path.basename(s.get("file") or ""))[0]
+
+
+def song_sounds(game, song):
+    """The game's sounds this song uses, in the bank's order, as {id, label, file}."""
+    want = set(song.get("sounds") or [])
+    if not want:
+        return []
+    out = []
+    for s in game.get("sounds") or []:
+        if s.get("file") and sound_id(s) in want:
+            out.append({"id": sound_id(s), "label": s.get("label", ""), "file": s["file"]})
+    return out
+
 def fetch_json(url, tries=3):
     for attempt in range(tries):
         try:
@@ -338,6 +357,7 @@ def main():
                 "moment": song.get("moment") or ({k: v for k, v in moments[0].items() if k not in ("stories", "commentVideos")} if moments else None),
                 "moments": moments,
                 "audio": song.get("audio"),
+                "sounds": song_sounds(game, song),
                 "stories": stories,
             })
 
