@@ -989,7 +989,8 @@
     const ready = media.ready.scene && (!media.plan || !media.plan.music || media.ready.music);
     if (!ready) { media.loadTimer = setTimeout(showStart, 1000); return; }
     // Phones: only when even the scene won't start by itself. Music trouble is handled by musicWatch.
-    if (touchScreen() && safe(() => media.scene.getPlayerState()) === YT_STATE.PLAYING) return;
+    if (touchScreen() && (safe(() => media.scene.getPlayerState()) === YT_STATE.PLAYING
+        || (media.gate && media.gate.scene) || (sep() && !media.musicStarted))) return;
     stage.classList.add('stuck');
   }
 
@@ -1380,8 +1381,9 @@
     }
     sceneDo('play');
     clearTimeout(media.wakeTimer);
-    media.wakeTimer = setTimeout(() => {
+    media.wakeTimer = setTimeout(function giveUp() {
       if (token !== media.token || media.musicStarted || !media.musicWait) return;
+      if (media.musicAd) { media.wakeTimer = setTimeout(giveUp, 2000); return; }
       media.musicWait = false;
       // Unmuting the scene now (not from a tap) would make the phone pause it, so it stays muted
       // and "Tap for sound" comes back; that tap turns on the scene's own sound.
@@ -1593,7 +1595,8 @@
       if (!playing) { a.t = -1; a.since = 0; continue; }
       const t = safe(() => p.getCurrentTime()) || 0;
       if (Math.abs(t - a.t) > 0.01) { a.t = t; a.since = Date.now(); continue; }
-      if (Date.now() - a.since > 2000) { any = true; if (role === 'music') musicAd = true; }
+      const wait = role === 'music' && touchScreen() ? 1200 : 2000;
+      if (Date.now() - a.since > wait) { any = true; if (role === 'music') musicAd = true; }
     }
     if (musicAd && !media.musicAd) sceneDo('pause');
     if (!musicAd && media.musicAd && sep() && media.playing) sceneDo('play');
@@ -1617,10 +1620,11 @@
       if (!media.ready[role]) return `${role}: loading`;
       const st = safe(() => p.getPlayerState());
       const t = safe(() => p.getCurrentTime()) || 0;
-      return `${role}: ${names[st] || st} ${t.toFixed(1)}s${safe(() => p.isMuted()) ? ' muted' : ''}`;
+      const vd = safe(() => p.getVideoData()) || {};
+      return `${role}: ${names[st] || st} ${t.toFixed(1)}s / ${(safe(() => p.getDuration()) || 0).toFixed(0)}s${safe(() => p.isMuted()) ? ' muted' : ''} [${vd.video_id || '?'}]`;
     };
     debugBox.textContent = [line('scene'), line('music'),
-      `gate ${media.gate ? 'on' : 'off'}  wait ${!!media.musicWait}  lock ${!!media.lock}  tapped ${!!media.tapTried}`,
+      `ad ${!!media.musicAd}  gate ${media.gate ? 'on' : 'off'}  wait ${!!media.musicWait}  lock ${!!media.lock}  tapped ${!!media.tapTried}`,
       `musicStarted ${!!media.musicStarted}  soundOk ${!!media.soundOk}  plan music ${!!(media.plan && media.plan.music)}`].join('\n');
   }
 
