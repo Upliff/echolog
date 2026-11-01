@@ -473,8 +473,8 @@ body.mini .upnext { left: auto; right: 20px; transform: none; bottom: 300px; }
 .stage-note.on { opacity: 1; }
 .stage.loading .stage-loading { opacity: 1; }
 .layer-scene { transition: opacity 0.6s ease; }
-/* Both players stay hidden while loading; otherwise the music player's YouTube title shows through. */
-.stage.loading .layer-scene, .stage.loading .layer-music { opacity: 0; }
+/* The players stay visible under the loading screen (which is solid, so nothing shows through).
+   iPhones won't start a video that's see-through, so they must never be hidden with opacity. */
 .peek .controls, .peek .controls > *, .peek-more { transition: opacity 0.6s ease; }
 body.media-loading .peek .controls, body.media-loading .peek .controls > *, body.media-loading .peek-more,
 body.media-loading .scenebar, body.media-loading .side-btn { opacity: 0; pointer-events: none; }

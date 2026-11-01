@@ -963,6 +963,8 @@
     media.plan = plan;
     media.playing = false;
     media.lock = false;
+    media.musicStarted = false;
+    media.stuckAt = 0;
     if (!opts.keepExtra) media.extra = 0;
     stageMsg.hidden = true;
     if (!opts.quiet) { fillLoading(plan, songState ? songState.song.title : ''); setLoading(true); }
@@ -1131,6 +1133,7 @@
   function onState(role, s) {
     const plan = media.plan;
     if (!plan) return;
+    if (role === 'music' && s === YT_STATE.PLAYING) media.musicStarted = true;
     if (s === YT_STATE.PLAYING) noCaptions(media[role]);
     if (media.gate) { gateState(role, s); return; }
     const isMaster = role === (sep() ? 'music' : 'scene');
@@ -1170,20 +1173,44 @@
     }
   }
 
+  // Give up on the music track and play the scene with its own sound, saying why.
+  function dropMusic(note) {
+    const plan = media.plan;
+    if (!plan || !plan.music) return;
+    const token = media.token;
+    stageNote(note);
+    clearGate();
+    dropPlayer('music');
+    plan.music = null;
+    media.lock = false;
+    refreshBars();
+    applyAudio();
+    sceneDo('play');
+    setTimeout(() => { if (token === media.token) checkAutoplay(); }, 1500);
+  }
+
+  // Phones: if the music won't start on its own (iPhones often refuse to start a second video),
+  // fall back to the scene's own sound after a few seconds, instead of nothing playing at all.
+  function musicWatch() {
+    if (!touchScreen() || !sep() || media.musicStarted || !media.ready.music || !media.ready.scene) { media.stuckAt = 0; return; }
+    if (media.gate && !media.gate.scene) { media.stuckAt = 0; return; }
+    if (safe(() => media.music.getPlayerState()) === YT_STATE.BUFFERING) { media.stuckAt = 0; return; }
+    if (!media.stuckAt) { media.stuckAt = Date.now(); return; }
+    if (Date.now() - media.stuckAt > 4000) {
+      media.stuckAt = 0;
+      dropMusic("The music didn't start on this phone, so this is the scene's own sound.");
+    }
+  }
+  const touchScreen = () => window.matchMedia('(pointer: coarse)').matches;
+
   function onError(role, code) {
     const plan = media.plan;
     if (!plan) return;
     if (role === 'music') {
       // Music track gone: fall back to the scene's own sound, and say why.
-      stageNote(code === 101 || code === 150
+      dropMusic(code === 101 || code === 150
         ? "The music video can't be played on other sites, so this is the scene's own sound."
         : "The music video couldn't be played, so this is the scene's own sound.");
-      clearGate();
-      dropPlayer('music');
-      plan.music = null;
-      refreshBars();
-      applyAudio();
-      sceneDo('play');
       return;
     }
     setLoading(false);
@@ -1357,6 +1384,7 @@
 
   function tick() {
     if (document.hidden) return;
+    musicWatch();
     const plan = media.plan;
     // Same for the music track (YouTube can start it from 0:00 after an ad).
     if (plan && !media.gate && sep() && media.ready.music && plan.music.start
