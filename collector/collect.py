@@ -23,7 +23,7 @@ Files:
   data/submitted.json      approved own comments
   data/index.json          list of games for the home page, plus the run status
   data/games/<id>.json     one game with its songs and comments
-  data/stories.json        everything in one file (old format, while the site still uses it)
+  data/stories.json        everything in one file (old format; off since 2 Nov 2026, WRITE_STORIES_JSON)
   POOL_DIR/state.json      when each video and game was last fetched, quota used today
   POOL_DIR/videos/<id>.json.gz   comment pool for one video
 
@@ -87,7 +87,7 @@ RUN_MINUTES = 40              # stop starting new deep pulls after this long
 WORKERS = 6                   # videos fetched at the same time
 MAX_STORIES_PER_SONG = 60     # comments shown per song when Mohad hasn't picked
 MAX_PICKS = 200               # most comments shown when Mohad has picked
-WRITE_STORIES_JSON = True     # keep writing data/stories.json until the site reads data/games/
+WRITE_STORIES_JSON = False    # the site reads data/index.json and data/games/ since 2 Nov 2026
 
 STEAM_PAGES = 10              # 100 reviews per page
 MAX_STORIES_PER_GAME = 40     # Steam reviews, per game

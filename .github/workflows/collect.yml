@@ -65,7 +65,7 @@ jobs:
         run: |
           git config user.name "echolog-bot"
           git config user.email "echolog-bot@users.noreply.github.com"
-          git add data/stories.json data/index.json data/games
+          git add -A data/index.json data/games
           if git diff --cached --quiet; then
             echo "No changes"
           else
