@@ -134,7 +134,11 @@
           "label": "Overdrive",
           "file": "sounds/ffx/0000-bank00-751.wav"
         }
-      ]
+      ],
+      "intro": {
+        "effect": "shatter",
+        "sound": "0000-bank00-751"
+      }
     },
     {
       "id": "kingdom-hearts-2",
