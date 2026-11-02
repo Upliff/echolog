@@ -402,8 +402,8 @@
     const cy = y == null ? vh / 2 : y;
 
     // Triangles from a nudged grid: small and many, like the reference.
-    const cols = vw > 700 ? 8 : 5;
-    const rows = vw > 700 ? 5 : 9;
+    const cols = vw > 700 ? 7 : 4;
+    const rows = vw > 700 ? 4 : 8;
     const pts = [];
     for (let r = 0; r <= rows; r++) {
       pts.push([]);
@@ -421,6 +421,9 @@
       }
     }
 
+    // How thick each piece of glass is, and how many slices make up its edge.
+    const THICK = vw > 700 ? 16 : 12;
+    const THICK_SLICES = 2;
     const layer = h('div', { class: 'intro-layer', 'aria-hidden': 'true' });
     const black = h('div', { class: 'intro-black' });
     // The pieces sit in one sheet so the whole break can slowly push in towards the viewer.
@@ -475,29 +478,37 @@
       fx.strokeStyle = 'rgba(255,255,255,0.5)'; fx.lineWidth = 1.4; fx.stroke();
       fx.restore();
       fx.strokeStyle = 'rgba(0,0,0,0.8)'; fx.lineWidth = 1.2; fx.stroke();
-      // back: the same piece seen through dark green-grey glass, mirrored
-      const bq = Math.min(dpr, 0.75); // the back is dark and mostly seen moving, so half the detail is plenty
-      const [back, bx] = face(bq);
-      bx.save();
-      bx.clip();
-      bx.fillStyle = '#0d1a1c'; bx.fillRect(0, 0, w, hh);
-      bx.globalAlpha = 0.35;
-      bx.translate(w, 0); bx.scale(-1, 1);
-      bx.drawImage(snap, minX * dpr, minY * dpr, w * dpr, hh * dpr, 0, 0, w, hh);
-      bx.setTransform(bq, 0, 0, bq, 0, 0);
-      bx.globalAlpha = 1;
-      band(bx, 0.18 + Math.random() * 0.2);
-      bx.strokeStyle = 'rgba(160,215,220,0.45)'; bx.lineWidth = 3; bx.stroke();
-      bx.restore();
+      const bq = Math.min(dpr, 0.75); // the edge slices are plain glass, so half the detail is plenty
       front.className = 'intro-face';
-      back.className = 'intro-face intro-back';
       const el = h('div', { class: 'intro-shard' });
       el.style.cssText = `left:${minX}px;top:${minY}px;width:${w}px;height:${hh}px;`;
       const mx = (t[0][0] + t[1][0] + t[2][0]) / 3;
       const my = (t[0][1] + t[1][1] + t[2][1]) / 3;
       el.style.transformOrigin = `${mx - minX}px ${my - minY}px`;
-      back.style.transformOrigin = `${mx - minX}px ${my - minY}px`;
-      el.append(back, front);
+      // The thickness: a few thin glass-coloured slices of the same shape between the faces,
+      // so a piece seen edge-on shows a solid green-grey edge like a real slab.
+      const poly = t.map(([px, py]) => `${(px - minX).toFixed(1)}px ${(py - minY).toFixed(1)}px`).join(',');
+      for (let k = 1; k <= THICK_SLICES; k++) {
+        const z = -(THICK * k) / THICK_SLICES;
+        // drawn as small bitmaps (not clip-paths), so moving them costs the browser nothing
+        const [sl, sx2] = face(bq);
+        const g2 = sx2.createLinearGradient(0, 0, w, hh);
+        g2.addColorStop(0, 'rgba(150,205,210,0.8)');
+        g2.addColorStop(0.5, 'rgba(70,120,125,0.8)');
+        g2.addColorStop(1, 'rgba(160,215,215,0.8)');
+        sx2.fillStyle = g2;
+        sx2.fill();
+        if (k === THICK_SLICES) {
+          // the far side: dark glass with a pale rim, seen when the piece turns over
+          sx2.fillStyle = 'rgba(10,24,26,0.92)';
+          sx2.fill();
+          sx2.strokeStyle = 'rgba(160,215,220,0.5)'; sx2.lineWidth = 2.5; sx2.stroke();
+        }
+        sl.className = 'intro-face intro-edge';
+        sl.style.transform = `translateZ(${z.toFixed(1)}px)`;
+        el.append(sl);
+      }
+      el.append(front);
       glass.append(el);
       pieces.push({ cv: el, mx, my });
     }
