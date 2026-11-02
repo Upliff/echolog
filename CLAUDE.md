@@ -20,7 +20,7 @@ Owner: Mohad. Repo: https://github.com/Upliff/echolog (public).
 - **Sources:** YouTube comments on soundtrack videos. Reddit is out: Reddit stopped taking new API requests on 31 Oct 2026. Steam is off for now: Steam shut its public review endpoint in Oct 2026, and the replacement needs a publisher key. The Steam code stays in `collect.py` behind `STEAM_ENABLED = False`. People can also send their own comments (see below).
 - **No home server, no local AI model.** Everything runs on GitHub: a GitHub Actions job runs nightly, and the site will be hosted on GitHub Pages.
 - **Collecting at 100 games (2 Nov 2026):** Mohad plans about 100 games (FFX alone could have 80 songs) before going live. Fetching everything every run would need about 37,000 units a day, so the collector now works from a queue: a deep pull once per new video, then a weekly check of each game for new comments only, and the comments on the site fetched again by id. Saves only fetch new videos. Mohad can choose which comments show (the filter chooses until he does). See "Collector" under How it works.
-- **Filtering:** a free keyword and score filter (`collector/collect.py`). There's no AI scoring for now; paid AI could be added later if needed. To remove a bad comment, add its id to `data/hidden.txt`. Mohad can also choose a song's comments himself (`data/picks.json`, planned in the admin page).
+- **Filtering:** a free keyword and score filter (`collector/collect.py`). There's no AI scoring for now; paid AI could be added later if needed. To remove a bad comment, add its id to `data/hidden.txt`. Mohad can also choose a song's comments himself (`data/picks.json`, Choose comments in the admin page).
 - **Front end:** plain HTML/CSS/JS at the repo root (see "Front end" below). Reads `data/index.json` and `data/games/<id>.json`.
 - **First game:** Final Fantasy X, with 5 songs (see `config/games.json`).
 - **Feel:** snappy and quiet. Only the video and the comments. No heavy effects.
@@ -50,8 +50,8 @@ collector/collect.py     fetches comments, filters them, writes the data below
 data/index.json          list of games and song names for the home page, plus the last run's status and log
 data/games/<id>.json     one game with its songs and comments (same shape as a game in stories.json)
 data/stories.json        everything in one file, the old format (the site only uses it if index.json is missing; to be retired)
-data/picks.json          comments Mohad chose per song or scene (admin page writes, planned)
-data/repull.txt          videos to deep pull again (admin page writes, planned)
+data/picks.json          comments Mohad chose per song or scene (admin page writes)
+data/repull.txt          videos to deep pull again (admin page writes)
 data/sample-stories.json fake data so the design has something to show
 data/hidden.txt          ids of stories to never show
 .github/workflows/collect.yml   runs daily ~3am Sydney, on every admin save, or by hand from the Actions tab
@@ -317,4 +317,4 @@ Mohad asked for this on 31 Oct 2026: a song can have several scenes (it often pl
 4. Turn on GitHub Pages: Settings, then Pages, then Deploy from a branch, main, / (root). The site will be at https://upliff.github.io/echolog/.
 5. Own comments, requests and hide names: create the private inbox repo, write the Worker, add the site forms and the switch. (The admin Inbox tab and the collector merge are done.) Mohad: make a Cloudflare account and get a Turnstile site key.
 6. Give the scenes labels in the admin page (Otherworld's two scenes show as "Scene 1" and "Scene 2" for now).
-7. Collector at scale: take the comment chooser, "Fetch a video again" and collector status to the admin chat, (loading one game at a time on the site is done, v42). Then add games; the queue fills in their comments over the following days.
+7. Collector at scale: the comment chooser, "Fetch again" and collector status are in the admin page, and the site loads one game at a time (v42). Next: add games; the queue fills in their comments over the following days.
