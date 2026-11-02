@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-02T09:49:34Z",
+  "updated": "2026-11-02T09:56:42Z",
   "settings": {},
   "games": [
     {
@@ -9,13 +9,18 @@
       "cover": "covers/ffx.jpg",
       "intro": {
         "effect": "shatter",
-        "sound": "0000-bank00-751"
+        "sound": "battle-start"
       },
       "sounds": [
         {
           "id": "0000-bank00-751",
           "label": "Overdrive",
           "file": "sounds/ffx/0000-bank00-751.wav"
+        },
+        {
+          "id": "battle-start",
+          "label": "Battle Start",
+          "file": "sounds/ffx/battle-start.wav"
         }
       ],
       "steamAppId": 359870,
