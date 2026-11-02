@@ -402,8 +402,8 @@
     const cy = y == null ? vh / 2 : y;
 
     // Triangles from a nudged grid: small and many, like the reference.
-    const cols = vw > 700 ? 9 : 6;
-    const rows = vw > 700 ? 6 : 10;
+    const cols = vw > 700 ? 8 : 5;
+    const rows = vw > 700 ? 5 : 9;
     const pts = [];
     for (let r = 0; r <= rows; r++) {
       pts.push([]);
@@ -432,43 +432,74 @@
       const minY = Math.floor(Math.min(t[0][1], t[1][1], t[2][1])) - 1;
       const w = Math.ceil(Math.max(t[0][0], t[1][0], t[2][0])) + 1 - minX;
       const hh = Math.ceil(Math.max(t[0][1], t[1][1], t[2][1])) + 1 - minY;
-      const cv = document.createElement('canvas');
-      cv.width = Math.ceil(w * dpr);
-      cv.height = Math.ceil(hh * dpr);
-      const ctx = cv.getContext('2d');
-      ctx.scale(dpr, dpr);
-      ctx.beginPath();
-      t.forEach(([px, py], k) => (k ? ctx.lineTo(px - minX, py - minY) : ctx.moveTo(px - minX, py - minY)));
-      ctx.closePath();
-      ctx.save();
-      ctx.clip();
-      ctx.drawImage(snap, minX * dpr, minY * dpr, w * dpr, hh * dpr, 0, 0, w, hh);
-      // the glass: a light band across each piece at its own angle, like a mirror catching light
-      const ang = Math.random() * Math.PI;
-      const len = Math.hypot(w, hh) / 2;
-      const gx = Math.cos(ang) * len;
-      const gy = Math.sin(ang) * len;
-      const g = ctx.createLinearGradient(w / 2 - gx, hh / 2 - gy, w / 2 + gx, hh / 2 + gy);
-      const peak = 0.1 + Math.random() * 0.22;
-      const at = 0.25 + Math.random() * 0.5;
-      g.addColorStop(0, 'rgba(255,255,255,0)');
-      g.addColorStop(Math.max(0, at - 0.16), 'rgba(255,255,255,0.02)');
-      g.addColorStop(at, `rgba(255,255,255,${peak})`);
-      g.addColorStop(Math.min(1, at + 0.2), 'rgba(255,255,255,0.01)');
-      g.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, w, hh);
-      ctx.restore();
-      // the cracks: a dark line with a thin bright rim inside it
-      ctx.strokeStyle = 'rgba(0,0,0,0.85)'; ctx.lineWidth = 1.6; ctx.stroke();
-      ctx.strokeStyle = 'rgba(255,255,255,0.28)'; ctx.lineWidth = 0.6; ctx.stroke();
-      cv.className = 'intro-shard';
-      cv.style.cssText = `left:${minX}px;top:${minY}px;width:${w}px;height:${hh}px;`;
+      // Each piece is a slab of glass: a front face (the page, with a light band and a bevelled
+      // rim) and a darker back face set a few pixels behind it, so a piece that turns over shows
+      // its back and a sliver of thickness.
+      const path = (ctx) => {
+        ctx.beginPath();
+        t.forEach(([px, py], k) => (k ? ctx.lineTo(px - minX, py - minY) : ctx.moveTo(px - minX, py - minY)));
+        ctx.closePath();
+      };
+      const face = (q = dpr) => {
+        const c = document.createElement('canvas');
+        c.width = Math.ceil(w * q);
+        c.height = Math.ceil(hh * q);
+        const x = c.getContext('2d');
+        x.scale(q, q);
+        path(x);
+        return [c, x];
+      };
+      const band = (ctx, peak) => {
+        const ang = Math.random() * Math.PI;
+        const len = Math.hypot(w, hh) / 2;
+        const gx = Math.cos(ang) * len;
+        const gy = Math.sin(ang) * len;
+        const g = ctx.createLinearGradient(w / 2 - gx, hh / 2 - gy, w / 2 + gx, hh / 2 + gy);
+        const at = 0.25 + Math.random() * 0.5;
+        g.addColorStop(0, 'rgba(255,255,255,0)');
+        g.addColorStop(Math.max(0, at - 0.16), 'rgba(255,255,255,0.02)');
+        g.addColorStop(at, `rgba(255,255,255,${peak})`);
+        g.addColorStop(Math.min(1, at + 0.2), 'rgba(255,255,255,0.01)');
+        g.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, hh);
+      };
+      // front
+      const [front, fx] = face();
+      fx.save();
+      fx.clip();
+      fx.drawImage(snap, minX * dpr, minY * dpr, w * dpr, hh * dpr, 0, 0, w, hh);
+      band(fx, 0.1 + Math.random() * 0.22);
+      // bevel: a soft bright rim just inside the edge, like light caught in the thickness
+      fx.strokeStyle = 'rgba(200,235,240,0.32)'; fx.lineWidth = 4; fx.stroke();
+      fx.strokeStyle = 'rgba(255,255,255,0.5)'; fx.lineWidth = 1.4; fx.stroke();
+      fx.restore();
+      fx.strokeStyle = 'rgba(0,0,0,0.8)'; fx.lineWidth = 1.2; fx.stroke();
+      // back: the same piece seen through dark green-grey glass, mirrored
+      const bq = Math.min(dpr, 0.75); // the back is dark and mostly seen moving, so half the detail is plenty
+      const [back, bx] = face(bq);
+      bx.save();
+      bx.clip();
+      bx.fillStyle = '#0d1a1c'; bx.fillRect(0, 0, w, hh);
+      bx.globalAlpha = 0.35;
+      bx.translate(w, 0); bx.scale(-1, 1);
+      bx.drawImage(snap, minX * dpr, minY * dpr, w * dpr, hh * dpr, 0, 0, w, hh);
+      bx.setTransform(bq, 0, 0, bq, 0, 0);
+      bx.globalAlpha = 1;
+      band(bx, 0.18 + Math.random() * 0.2);
+      bx.strokeStyle = 'rgba(160,215,220,0.45)'; bx.lineWidth = 3; bx.stroke();
+      bx.restore();
+      front.className = 'intro-face';
+      back.className = 'intro-face intro-back';
+      const el = h('div', { class: 'intro-shard' });
+      el.style.cssText = `left:${minX}px;top:${minY}px;width:${w}px;height:${hh}px;`;
       const mx = (t[0][0] + t[1][0] + t[2][0]) / 3;
       const my = (t[0][1] + t[1][1] + t[2][1]) / 3;
-      cv.style.transformOrigin = `${mx - minX}px ${my - minY}px`;
-      glass.append(cv);
-      pieces.push({ cv, mx, my });
+      el.style.transformOrigin = `${mx - minX}px ${my - minY}px`;
+      back.style.transformOrigin = `${mx - minX}px ${my - minY}px`;
+      el.append(back, front);
+      glass.append(el);
+      pieces.push({ cv: el, mx, my });
     }
     // The page as it was, on top at first, so the break starts from exactly what was on screen.
     const whole = snap;
