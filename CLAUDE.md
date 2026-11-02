@@ -49,7 +49,7 @@ config/games.json        games, songs, clip for each song, videos to pull commen
 collector/collect.py     fetches comments, filters them, writes the data below
 data/index.json          list of games and song names for the home page, plus the last run's status and log
 data/games/<id>.json     one game with its songs and comments (same shape as a game in stories.json)
-data/stories.json        everything in one file, the old format the site still reads (to be retired)
+data/stories.json        everything in one file, the old format (the site only uses it if index.json is missing; to be retired)
 data/picks.json          comments Mohad chose per song or scene (admin page writes, planned)
 data/repull.txt          videos to deep pull again (admin page writes, planned)
 data/sample-stories.json fake data so the design has something to show
@@ -123,7 +123,7 @@ Built so the quota holds at about 100 games (about 2,500 songs and 7,500 comment
 - A comment video taken off a song in `config/games.json` leaves the pool on the next run, and its comments leave the site.
 - Tested 2 Nov 2026 against a fake YouTube (31 checks: first pull, saves costing nothing, a new video costing 16, picks, hidden, weekly new-only check, deleted comments, comments turned off, the budget stopping and continuing next day, the 30-day drop). Not run against real YouTube from Claude's side yet.
 
-**Saves only show on the site after a collector run.** The site reads `data/stories.json`, not `config/games.json`, so a change made in the admin page appears once "Collect stories" has run (about 30 seconds) and GitHub Pages has republished (a minute or two). The collector's push now retries up to 5 times, pulling in anything saved meanwhile: on 1 Nov 2026 a run failed because an admin save landed while it was running, so Kingdom Hearts II changes didn't show until it was run again.
+**Saves only show on the site after a collector run.** The site reads `data/index.json` and `data/games/<id>.json`, not `config/games.json`, so a change made in the admin page appears once "Collect stories" has run (about 30 seconds) and GitHub Pages has republished (a minute or two). The collector's push now retries up to 5 times, pulling in anything saved meanwhile: on 1 Nov 2026 a run failed because an admin save landed while it was running, so Kingdom Hearts II changes didn't show until it was run again.
 
 **Run log:** each run writes a `log` list into `data/index.json` (and `data/stories.json`) showing what each video gave, or why it failed. GitHub's own job logs can't be read from Claude's side, so check this instead. A video that gives `403` has comments turned off, so swap it for another.
 
@@ -317,4 +317,4 @@ Mohad asked for this on 31 Oct 2026: a song can have several scenes (it often pl
 4. Turn on GitHub Pages: Settings, then Pages, then Deploy from a branch, main, / (root). The site will be at https://upliff.github.io/echolog/.
 5. Own comments, requests and hide names: create the private inbox repo, write the Worker, add the site forms and the switch. (The admin Inbox tab and the collector merge are done.) Mohad: make a Cloudflare account and get a Turnstile site key.
 6. Give the scenes labels in the admin page (Otherworld's two scenes show as "Scene 1" and "Scene 2" for now).
-7. Collector at scale: take the comment chooser, "Fetch a video again" and collector status to the admin chat, and loading one game at a time to the site chat (see the requests). Then add games; the queue fills in their comments over the following days.
+7. Collector at scale: take the comment chooser, "Fetch a video again" and collector status to the admin chat, (loading one game at a time on the site is done, v42). Then add games; the queue fills in their comments over the following days.
