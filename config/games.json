@@ -133,11 +133,16 @@
           "id": "0000-bank00-751",
           "label": "Overdrive",
           "file": "sounds/ffx/0000-bank00-751.wav"
+        },
+        {
+          "id": "battle-start",
+          "label": "Battle Start",
+          "file": "sounds/ffx/battle-start.wav"
         }
       ],
       "intro": {
         "effect": "shatter",
-        "sound": "0000-bank00-751"
+        "sound": "battle-start"
       }
     },
     {
