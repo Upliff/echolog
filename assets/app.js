@@ -1,10 +1,12 @@
-/* Echolog front end. Plain JS, no build step. Reads data/stories.json. */
+/* Echolog front end. Plain JS, no build step. Reads data/index.json, then data/games/<id>.json per game. */
 (() => {
   'use strict';
 
   /* ---------- settings ---------- */
 
-  const DATA_URL = 'data/stories.json';
+  const INDEX_URL = 'data/index.json';       // home page: every game, with song names only
+  const GAME_URL = (id) => `data/games/${encodeURIComponent(id)}.json`; // one whole game
+  const OLD_URL = 'data/stories.json';       // everything in one file, used if index.json is missing
   const COVER_DIR = 'covers/';
   const COVER_EXTS = ['jpg', 'jpeg', 'png', 'webp'];
 
@@ -60,6 +62,20 @@
   const isPhone = () => window.innerWidth < 640;
 
   let DATA = null;
+  // Whole games, loaded when a game or song page opens (or ahead, on hover). `ready` has the finished ones.
+  const gameLoads = new Map();
+  const ready = new Map();
+  function loadGame(id) {
+    if (ready.has(id)) return Promise.resolve(ready.get(id));
+    if (!gameLoads.has(id)) {
+      gameLoads.set(id, fetch(GAME_URL(id), { cache: 'no-cache' })
+        .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then((g) => { if (!g || !Array.isArray(g.songs)) throw new Error('bad data'); ready.set(id, g); return g; })
+        .catch((err) => { gameLoads.delete(id); throw err; }));
+    }
+    return gameLoads.get(id);
+  }
+  const preload = (g) => { if (g) loadGame(g.id).catch(() => {}); };
   const setting = (k) => {
     const v = DATA && DATA.settings ? Number(DATA.settings[k]) : NaN;
     return Number.isFinite(v) ? v : DEFAULTS[k];
@@ -265,9 +281,17 @@
     };
   }
 
-  function route() {
+  let routeSeq = 0;
+  async function route() {
+    const seq = ++routeSeq;
     const { gameId, songId, scene } = parseHash();
-    const game = gameId ? DATA.games.find((g) => g.id === gameId) : null;
+    const brief = gameId ? DATA.games.find((g) => g.id === gameId) : null;
+    let game = null;
+    let failed = false;
+    if (brief) {
+      try { game = ready.get(brief.id) || await loadGame(brief.id); } catch (_) { failed = true; }
+      if (seq !== routeSeq) return; // the person has already moved on
+    }
     const song = game && songId ? (game.songs || []).find((s) => s.id === songId) : null;
 
     // Same song, different scene: just swap the video. Comments, scroll and clouds stay.
@@ -281,7 +305,11 @@
     app.replaceChildren();
     window.scrollTo(0, 0);
 
-    if (song) renderSong(game, song, scene);
+    document.body.classList.toggle('on-home', !gameId || (!brief && !failed));
+    if (failed) {
+      setSongPage(false);
+      app.append(h('div', { class: 'notice' }, h('p', null, "Couldn't load this game. Try again later.")));
+    } else if (song) renderSong(game, song, scene);
     else if (game && !songId) renderGame(game);
     else {
       if (gameId) history.replaceState(null, '', '#/');
@@ -318,6 +346,7 @@
   const INTRO_TEST = new URLSearchParams(location.search).get('intro');
   function introFor(game) {
     if (!game) return null;
+    game = ready.get(game.id) || game; // the sound list is in the whole game file
     let intro = game.intro && game.intro.effect ? game.intro : null;
     if (INTRO_TEST !== null) intro = { effect: 'shatter', sound: INTRO_TEST || (intro && intro.sound) };
     if (!intro) return null;
@@ -352,7 +381,7 @@
     // backdrop: the dark base, the blurred cover, the vignette
     let g = ctx.createRadialGradient(vw * 0.3, vh * 0.3, 0, vw * 0.3, vh * 0.3, Math.max(vw, vh) * 0.6 * 0.7);
     g.addColorStop(0, '#18202c'); g.addColorStop(1, '#05070b');
-    ctx.fillStyle = g; ctx.fillRect(0, 0, vw, vh);
+    ctx.fillStyle = document.body.classList.contains('on-home') ? '#000' : g; ctx.fillRect(0, 0, vw, vh);
     const bd = document.querySelector('.bd-layer.on');
     if (bd) { try { ctx.drawImage(bd, -vw * 0.06, -vh * 0.06, vw * 1.12, vh * 1.12); } catch (_) { /* ignore */ } }
     ctx.save();
@@ -573,12 +602,16 @@
     setSongPage(false);
     crumb.replaceChildren();
     const games = [...DATA.games].sort((a, b) => String(a.title).localeCompare(String(b.title)));
-    setCover(games[0] || null);
+    // Black until a game is hovered, focused or matched.
+    setCover(null);
+    // Games with an opening animation are loaded now, so the click has its sound ready.
+    for (const g of games) if (g.intro && g.intro.effect) preload(g);
 
     // A search box over a plain list. It matches game names and song names.
     const items = games.map((g, i) => {
-      const li = h('li', { class: 'rise', style: `--i:${Math.min(i + 1, 12)}`, onmouseenter: () => setCover(g) },
-        h('a', { href: `#/${encodeURIComponent(g.id)}`, onfocus: () => setCover(g),
+      const li = h('li', { class: 'rise', style: `--i:${Math.min(i + 1, 12)}`, onmouseenter: () => { setCover(g); preload(g); } },
+        h('a', { href: `#/${encodeURIComponent(g.id)}`, onfocus: () => { setCover(g); preload(g); },
+          ontouchstart: () => preload(g),
           onclick: (e) => { loadCover(g); playIntro(g, e.clientX || null, e.clientY || null); } }, g.title));
       const words = [g.title, ...(g.songs || []).map((s) => s.title)].join(' ').toLowerCase();
       return { g, li, words };
@@ -601,7 +634,7 @@
       }
       none.hidden = shown > 0;
       const first = items.find((x) => !x.li.hidden);
-      if (q && first) setCover(first.g);
+      if (q && first) { setCover(first.g); preload(first.g); }
     });
     search.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter') return;
@@ -2396,15 +2429,25 @@
   /* ---------- start ---------- */
 
   async function start() {
-    try {
-      const res = await fetch(DATA_URL, { cache: 'no-cache' });
+    const get = async (url) => {
+      const res = await fetch(url, { cache: 'no-cache' });
       if (!res.ok) throw new Error(res.status);
-      DATA = await res.json();
-      if (!DATA || !Array.isArray(DATA.games)) throw new Error('bad data');
-    } catch (err) {
-      app.replaceChildren(h('div', { class: 'notice' },
-        h('p', null, `Couldn't load ${DATA_URL}. This page needs to run from a web server (GitHub Pages works), not straight from a file.`)));
-      return;
+      const d = await res.json();
+      if (!d || !Array.isArray(d.games)) throw new Error('bad data');
+      return d;
+    };
+    try {
+      DATA = await get(INDEX_URL);
+    } catch (_) {
+      try {
+        // Older data: everything in one file, so every game is already whole.
+        DATA = await get(OLD_URL);
+        for (const g of DATA.games) ready.set(g.id, g);
+      } catch (err) {
+        app.replaceChildren(h('div', { class: 'notice' },
+          h('p', null, `Couldn't load ${INDEX_URL}. This page needs to run from a web server (GitHub Pages works), not straight from a file.`)));
+        return;
+      }
     }
     window.addEventListener('hashchange', route);
     route();

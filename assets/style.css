@@ -38,6 +38,8 @@ main:focus { outline: none; }
   position: fixed; inset: 0; z-index: -1; overflow: hidden;
   background: radial-gradient(60% 60% at 30% 30%, #18202c 0%, var(--bg) 70%);
 }
+/* Home page: plain black until a game is hovered, focused or matched. */
+body.on-home .backdrop { background: #000; }
 .bd-layer {
   position: absolute; inset: -6%; width: 112%; height: 112%;
   opacity: 0; transition: opacity 0.7s ease;
