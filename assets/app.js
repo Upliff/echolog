@@ -2428,7 +2428,40 @@
 
   /* ---------- start ---------- */
 
+  /* Old copies after an update: browsers can keep index.html for up to 10 minutes, so someone can
+     get an old page with new data. The page as it is on the server says which app.js it wants; if
+     that isn't this one, reload once with ?r=<version> so the browser has to fetch everything fresh. */
+  const MY_VERSION = (() => {
+    const src = (document.currentScript && document.currentScript.src) || '';
+    const m = src.match(/[?&]v=([^&]+)/);
+    return m ? m[1] : null;
+  })();
+  async function checkForUpdate() {
+    if (!MY_VERSION || location.protocol === 'file:') return;
+    const q = new URLSearchParams(location.search);
+    try {
+      const res = await fetch('index.html?check=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) return;
+      const m = (await res.text()).match(/app\.js\?v=([^"'&\s>]+)/);
+      if (!m) return;
+      const latest = m[1];
+      if (latest === MY_VERSION) {
+        // Fresh: tidy ?r= out of the address bar.
+        if (q.has('r')) {
+          q.delete('r');
+          const rest = q.toString();
+          history.replaceState(history.state, '', location.pathname + (rest ? '?' + rest : '') + location.hash);
+        }
+        return;
+      }
+      if (q.get('r') === latest) return; // already tried once; don't loop
+      q.set('r', latest);
+      location.replace(location.pathname + '?' + q.toString() + location.hash);
+    } catch (_) { /* offline or blocked: carry on with what we have */ }
+  }
+
   async function start() {
+    checkForUpdate();
     const get = async (url) => {
       const res = await fetch(url, { cache: 'no-cache' });
       if (!res.ok) throw new Error(res.status);
