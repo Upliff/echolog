@@ -342,86 +342,120 @@
     ready.then((img) => { if (img && img.naturalWidth && performance.now() - t0 < 150) shatter(img, x, y); });
   }
 
-  function shatter(img, x, y) {
+  /* The shards are drawn ahead of time (when the game is hovered, focused or touched) as small
+     canvases, one per triangle. At the click nothing is drawn or decoded: the pieces are already
+     bitmaps, so the browser only has to move them, which keeps it smooth on phones too. */
+  const shardCache = new Map();
+  function buildShards(img) {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const cx = x == null ? vw / 2 : x;
-    const cy = y == null ? vh / 2 : y;
-    // The cover laid out like a photo set to "cover".
+    const key = `${img.src}|${vw}x${vh}`;
+    if (shardCache.has(key)) return shardCache.get(key);
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     const sc = Math.max(vw / img.naturalWidth, vh / img.naturalHeight);
     const dw = img.naturalWidth * sc;
     const dh = img.naturalHeight * sc;
     const ox = (vw - dw) / 2;
     const oy = (vh - dh) / 2;
-
-    // Points on a rough grid, nudged about, then each cell cut into two triangles.
-    const cols = vw > 700 ? 8 : 5;
-    const rows = vw > 700 ? 6 : 9;
+    // A rough grid of points, nudged about, each cell cut into two triangles.
+    const cols = vw > 700 ? 6 : 4;
+    const rows = vw > 700 ? 4 : 7;
     const pts = [];
     for (let r = 0; r <= rows; r++) {
       pts.push([]);
       for (let c = 0; c <= cols; c++) {
-        const edgeX = c === 0 || c === cols;
-        const edgeY = r === 0 || r === rows;
-        const jx = edgeX ? 0 : (Math.random() - 0.5) * (vw / cols) * 0.8;
-        const jy = edgeY ? 0 : (Math.random() - 0.5) * (vh / rows) * 0.8;
+        const jx = c === 0 || c === cols ? 0 : (Math.random() - 0.5) * (vw / cols) * 0.75;
+        const jy = r === 0 || r === rows ? 0 : (Math.random() - 0.5) * (vh / rows) * 0.75;
         pts[r].push([(c / cols) * vw + jx, (r / rows) * vh + jy]);
       }
     }
-    const tris = [];
+    const shards = [];
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const a = pts[r][c]; const b = pts[r][c + 1]; const d = pts[r + 1][c]; const e = pts[r + 1][c + 1];
-        if (Math.random() < 0.5) tris.push([a, b, e], [a, e, d]);
-        else tris.push([a, b, d], [b, e, d]);
+        const pair = Math.random() < 0.5 ? [[a, b, e], [a, e, d]] : [[a, b, d], [b, e, d]];
+        for (const t of pair) {
+          const minX = Math.floor(Math.min(t[0][0], t[1][0], t[2][0])) - 1;
+          const minY = Math.floor(Math.min(t[0][1], t[1][1], t[2][1])) - 1;
+          const w = Math.ceil(Math.max(t[0][0], t[1][0], t[2][0])) + 1 - minX;
+          const hh = Math.ceil(Math.max(t[0][1], t[1][1], t[2][1])) + 1 - minY;
+          const cv = document.createElement('canvas');
+          cv.width = Math.ceil(w * dpr);
+          cv.height = Math.ceil(hh * dpr);
+          const ctx = cv.getContext('2d');
+          ctx.scale(dpr, dpr);
+          ctx.beginPath();
+          t.forEach(([px, py], k) => (k ? ctx.lineTo(px - minX, py - minY) : ctx.moveTo(px - minX, py - minY)));
+          ctx.closePath();
+          ctx.clip();
+          ctx.drawImage(img, ox - minX, oy - minY, dw, dh);
+          // a faint bright edge, like the rim of broken glass
+          ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          cv.className = 'intro-shard';
+          cv.style.cssText = `left:${minX}px;top:${minY}px;width:${w}px;height:${hh}px;`;
+          shards.push({ cv, mx: (t[0][0] + t[1][0] + t[2][0]) / 3, my: (t[0][1] + t[1][1] + t[2][1]) / 3, minX, minY });
+        }
       }
     }
+    shardCache.clear();
+    shardCache.set(key, shards);
+    return shards;
+  }
+  // Draw them ahead of time, in a quiet moment, once the cover is in.
+  function prepareIntro(game) {
+    if (reduced || !introFor(game)) return;
+    loadCover(game).then((img) => {
+      if (!img || !img.naturalWidth) return;
+      const run = () => { try { buildShards(img); } catch (_) { /* ignore */ } };
+      if (window.requestIdleCallback) requestIdleCallback(run, { timeout: 400 }); else setTimeout(run, 30);
+    });
+  }
 
+  function shatter(img, x, y) {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const cx = x == null ? vw / 2 : x;
+    const cy = y == null ? vh / 2 : y;
+    const shards = buildShards(img);
     const layer = h('div', { class: 'intro-layer', 'aria-hidden': 'true' });
     const flash = h('div', { class: 'intro-flash' });
-    const maxD = Math.hypot(Math.max(cx, vw - cx), Math.max(cy, vh - cy));
-    let longest = 0;
-    for (const t of tris) {
-      const minX = Math.floor(Math.min(t[0][0], t[1][0], t[2][0])) - 1;
-      const minY = Math.floor(Math.min(t[0][1], t[1][1], t[2][1])) - 1;
-      const maxX = Math.ceil(Math.max(t[0][0], t[1][0], t[2][0])) + 1;
-      const maxY = Math.ceil(Math.max(t[0][1], t[1][1], t[2][1])) + 1;
-      const mx = (t[0][0] + t[1][0] + t[2][0]) / 3;
-      const my = (t[0][1] + t[1][1] + t[2][1]) / 3;
-      const poly = t.map(([px, py]) => `${(px - minX).toFixed(1)}px ${(py - minY).toFixed(1)}px`).join(',');
-      const el = h('div', { class: 'intro-shard' });
-      el.style.cssText = `left:${minX}px;top:${minY}px;width:${maxX - minX}px;height:${maxY - minY}px;`
-        + `background-image:url("${img.src}");background-size:${dw}px ${dh}px;`
-        + `background-position:${ox - minX}px ${oy - minY}px;clip-path:polygon(${poly});`
-        + `transform-origin:${mx - minX}px ${my - minY}px;`;
-      layer.append(el);
-      // Shards near where it was clicked go first and fastest.
-      const dx = mx - cx;
-      const dy = my - cy;
-      const dist = Math.hypot(dx, dy);
-      const k = dist / maxD;
-      const len = dist || 1;
-      const push = (0.35 + Math.random() * 0.5) * Math.max(vw, vh);
-      const tx = (dx / len) * push;
-      const ty = (dy / len) * push + vh * (0.25 + Math.random() * 0.3);
-      const rot = (Math.random() - 0.5) * 240;
-      const tilt = (Math.random() - 0.5) * 70;
-      const grow = 1.25 + Math.random() * 0.8 - k * 0.3;
-      const delay = 260 + k * 280 + Math.random() * 60;
-      const dur = 760 + Math.random() * 260;
-      longest = Math.max(longest, delay + dur);
-      el.animate([
-        { transform: 'translate(0,0) rotate(0deg) scale(1)', opacity: 1 },
-        // cracks: each shard shrinks a hair, so thin gaps open between them
-        { transform: `translate(${(dx / len) * 3}px,${(dy / len) * 3}px) rotate(${rot * 0.02}deg) scale(0.985)`, opacity: 1, offset: 0.12 },
-        { transform: `perspective(900px) translate(${tx}px,${ty}px) rotate(${rot}deg) rotateX(${tilt}deg) scale(${grow})`, opacity: 0 },
-      ], { duration: dur, delay, easing: 'cubic-bezier(.55,0,.8,.3)', fill: 'both' });
-    }
+    for (const s of shards) { s.cv.getAnimations().forEach((a) => a.cancel()); layer.append(s.cv); }
     layer.append(flash);
     document.body.append(layer);
-    flash.animate([{ opacity: 0 }, { opacity: 0.9, offset: 0.25 }, { opacity: 0 }],
-      { duration: 380, delay: 60, easing: 'ease-out', fill: 'both' });
-    setTimeout(() => layer.remove(), longest + 80);
+    const maxD = Math.hypot(Math.max(cx, vw - cx), Math.max(cy, vh - cy));
+    let longest = 0;
+    // Start on the next frame, once the layer is on screen, so the first frames aren't spent setting up.
+    requestAnimationFrame(() => {
+      flash.animate([{ opacity: 0 }, { opacity: 0.85, offset: 0.2 }, { opacity: 0 }],
+        { duration: 420, easing: 'ease-out', fill: 'both' });
+      for (const s of shards) {
+        const dx = s.mx - cx;
+        const dy = s.my - cy;
+        const len = Math.hypot(dx, dy) || 1;
+        const k = len / maxD;
+        const ux = dx / len;
+        const uy = dy / len;
+        const push = (0.45 + Math.random() * 0.45) * Math.max(vw, vh);
+        const tx = ux * push;
+        const ty = uy * push + vh * (0.2 + Math.random() * 0.25);
+        const rot = (Math.random() - 0.5) * 200;
+        const grow = 1.3 + Math.random() * 0.6 - k * 0.25;
+        const delay = 220 + k * 220;
+        const dur = 900 + Math.random() * 200;
+        longest = Math.max(longest, delay + dur);
+        s.cv.style.transformOrigin = `${s.mx - s.minX}px ${s.my - s.minY}px`;
+        s.cv.animate([
+          { transform: 'translate3d(0,0,0) rotate(0deg) scale(1)', opacity: 1 },
+          // the crack: a small push apart so thin gaps open between the pieces
+          { transform: `translate3d(${ux * 4}px,${uy * 4}px,0) rotate(0deg) scale(0.99)`, opacity: 1, offset: 0.1 },
+          { transform: `translate3d(${tx * 0.35}px,${ty * 0.3}px,0) rotate(${rot * 0.35}deg) scale(${1 + (grow - 1) * 0.4})`, opacity: 1, offset: 0.45 },
+          { transform: `translate3d(${tx}px,${ty}px,0) rotate(${rot}deg) scale(${grow})`, opacity: 0 },
+        ], { duration: dur, delay, easing: 'cubic-bezier(.4,0,.7,1)', fill: 'both' });
+      }
+      setTimeout(() => layer.remove(), longest + 60);
+    });
   }
 
   /* ---------- home ---------- */
@@ -437,7 +471,8 @@
     // A search box over a plain list. It matches game names and song names.
     const items = games.map((g, i) => {
       const li = h('li', { class: 'rise', style: `--i:${Math.min(i + 1, 12)}`, onmouseenter: () => setCover(g) },
-        h('a', { href: `#/${encodeURIComponent(g.id)}`, onfocus: () => setCover(g),
+        h('a', { href: `#/${encodeURIComponent(g.id)}`, onfocus: () => { setCover(g); prepareIntro(g); },
+          onpointerenter: () => prepareIntro(g), ontouchstart: () => prepareIntro(g),
           onclick: (e) => { loadCover(g); playIntro(g, e.clientX || null, e.clientY || null); } }, g.title));
       const words = [g.title, ...(g.songs || []).map((s) => s.title)].join(' ').toLowerCase();
       return { g, li, words };
