@@ -1,0 +1,98 @@
+{
+  "updated": "2026-11-02T10:32:33Z",
+  "settings": {},
+  "games": [
+    {
+      "id": "ffx",
+      "title": "Final Fantasy X",
+      "year": 2001,
+      "cover": "covers/ffx.jpg",
+      "intro": {
+        "effect": "shatter",
+        "sound": "battle-start"
+      },
+      "songs": [
+        {
+          "id": "to-zanarkand",
+          "title": "To Zanarkand",
+          "composer": "Nobuo Uematsu"
+        },
+        {
+          "id": "otherworld",
+          "title": "Otherworld",
+          "composer": "Nobuo Uematsu"
+        },
+        {
+          "id": "besaid-island",
+          "title": "Besaid Island",
+          "composer": "Nobuo Uematsu"
+        },
+        {
+          "id": "suteki-da-ne",
+          "title": "Suteki da Ne",
+          "composer": "Nobuo Uematsu"
+        }
+      ]
+    },
+    {
+      "id": "kingdom-hearts-2",
+      "title": "Kingdom Hearts II",
+      "year": 2005,
+      "cover": "covers/kingdom-hearts-2.jpg",
+      "intro": null,
+      "songs": [
+        {
+          "id": "dearly-beloved",
+          "title": "Dearly Beloved",
+          "composer": "Yoko Shimomura"
+        },
+        {
+          "id": "the-other-promise",
+          "title": "The Other Promise",
+          "composer": "Yoko Shimomura"
+        },
+        {
+          "id": "roxas",
+          "title": "Roxas",
+          "composer": "Yoko Shimomura"
+        }
+      ]
+    }
+  ],
+  "status": {
+    "mode": "saves",
+    "quotaDay": "2026-11-02",
+    "quotaUsedToday": 130,
+    "quotaUsedThisRun": 130,
+    "budget": 8000,
+    "deepPullsDone": 20,
+    "deepPullsWaiting": 0,
+    "problems": []
+  },
+  "log": [
+    "mode: saves",
+    "deep pulls waiting: 20",
+    "sy-nrLiAwZI: deep pull, 228 comments, 77 in pool",
+    "PSjTN8WSGNk: deep pull, 1118 comments, 300 in pool",
+    "mWYwmM23Sqs: deep pull, 713 comments, 300 in pool",
+    "zhYW3dY1hgM: deep pull, 292 comments, 124 in pool",
+    "4umidcc_8rU: deep pull, 625 comments, 300 in pool",
+    "BKZs90_fkt4: deep pull, 154 comments, 47 in pool",
+    "RC1VmGXiEFw: deep pull, 289 comments, 104 in pool",
+    "IKGc_wtQKC8: deep pull, 57 comments, 21 in pool",
+    "Vl20g-tBaKc: deep pull, 833 comments, 300 in pool",
+    "zXpm8DPYuTc: deep pull, 202 comments, 59 in pool",
+    "Zbv6KrO_13A: deep pull, 212 comments, 67 in pool",
+    "gUQuBBBzx-I: deep pull, 1080 comments, 300 in pool",
+    "4It2Prl5E-Q: deep pull, 591 comments, 300 in pool",
+    "l2ztZc5kzGg: deep pull, 120 comments, 37 in pool",
+    "s9XljBWGrRQ: deep pull, 729 comments, 300 in pool",
+    "KyrWRgg_6KE: deep pull, 916 comments, 300 in pool",
+    "DMznuxvovkY: deep pull, 879 comments, 300 in pool",
+    "CSdNxXGUaRU: deep pull, 1082 comments, 300 in pool",
+    "pRudm5jCXrs: deep pull, 1068 comments, 300 in pool",
+    "73ZjSYHRdkA: deep pull, 522 comments, 287 in pool",
+    "lengths: 12 videos",
+    "quota: 130 units this run, 130 of 8000 today"
+  ]
+}
