@@ -335,126 +335,175 @@
       a.play().catch(() => {});
     }
     if (reduced || intro.effect !== 'shatter') return;
-    const ready = coverCache.has(game.id) ? loadCover(game) : null;
-    if (!ready) return;
-    // Only if the cover is already loaded (it is once the game has been hovered); never wait for it.
-    const t0 = performance.now();
-    ready.then((img) => { if (img && img.naturalWidth && performance.now() - t0 < 150) shatter(img, x, y); });
+    try { shatterPage(x, y); } catch (_) { /* never block the page change */ }
   }
 
-  /* The shards are drawn ahead of time (when the game is hovered, focused or touched) as small
-     canvases, one per triangle. At the click nothing is drawn or decoded: the pieces are already
-     bitmaps, so the browser only has to move them, which keeps it smooth on phones too. */
-  const shardCache = new Map();
-  function buildShards(img) {
+  /* Shatter (v37): the page as it is on screen breaks like glass. A picture of the page is drawn
+     into a canvas (backdrop, vignette, then each piece of text where it sits), cut into triangles
+     with a glassy sheen and dark cracks, held for a moment, then the pieces slide off towards one
+     side, picked at random each time, over a black screen. The next page fades in from black.
+     Everything moves with transform and opacity only, so it runs on the graphics card. */
+  function snapshotPage(vw, vh, dpr) {
+    const cv = document.createElement('canvas');
+    cv.width = Math.round(vw * dpr);
+    cv.height = Math.round(vh * dpr);
+    const ctx = cv.getContext('2d');
+    ctx.scale(dpr, dpr);
+    // backdrop: the dark base, the blurred cover, the vignette
+    let g = ctx.createRadialGradient(vw * 0.3, vh * 0.3, 0, vw * 0.3, vh * 0.3, Math.max(vw, vh) * 0.6 * 0.7);
+    g.addColorStop(0, '#18202c'); g.addColorStop(1, '#05070b');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, vw, vh);
+    const bd = document.querySelector('.bd-layer.on');
+    if (bd) { try { ctx.drawImage(bd, -vw * 0.06, -vh * 0.06, vw * 1.12, vh * 1.12); } catch (_) { /* ignore */ } }
+    ctx.save();
+    ctx.translate(vw * 0.5, vh * 0.42);
+    ctx.scale(1, (vh * 0.75) / (vw * 0.85));
+    g = ctx.createRadialGradient(0, 0, 0, 0, 0, vw * 0.85);
+    g.addColorStop(0, 'rgba(5,7,11,0.15)'); g.addColorStop(0.85, 'rgba(5,7,11,0.88)'); g.addColorStop(1, 'rgba(5,7,11,0.88)');
+    ctx.fillStyle = g;
+    ctx.fillRect(-vw, -vw * 2, vw * 2, vw * 4);
+    ctx.restore();
+    // the search box, the list and the top bar, drawn where they are
+    const els = document.querySelectorAll('.home .search, .games > li:not([hidden]) > a, .home .empty:not([hidden]), .top .brand, .top .crumb, .top .about-btn');
+    for (const el of els) {
+      const r = el.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > vh || r.width === 0) continue;
+      const cs = getComputedStyle(el);
+      if (el.classList.contains('search')) {
+        const rad = Math.min(r.height / 2, 999);
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(r.left, r.top, r.width, r.height, rad); else ctx.rect(r.left, r.top, r.width, r.height);
+        ctx.fillStyle = 'rgba(14,16,20,0.92)'; ctx.fill();
+        ctx.strokeStyle = cs.borderTopColor; ctx.lineWidth = 1; ctx.stroke();
+      }
+      if (parseFloat(cs.borderBottomWidth) > 0 && !el.classList.contains('search')) {
+        ctx.fillStyle = cs.borderBottomColor;
+        ctx.fillRect(r.left, r.bottom - 1, r.width, 1);
+      }
+      const text = el.value || el.textContent || el.placeholder || '';
+      if (!text.trim()) continue;
+      ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      ctx.fillStyle = el.value || el.tagName !== 'INPUT' ? cs.color : 'rgba(255,255,255,0.45)';
+      ctx.textBaseline = 'middle';
+      const pl = parseFloat(cs.paddingLeft) || 0;
+      const pt = parseFloat(cs.paddingTop) || 0;
+      const pb = parseFloat(cs.paddingBottom) || 0;
+      ctx.fillText(text.trim(), r.left + pl, r.top + pt + (r.height - pt - pb) / 2);
+    }
+    return cv;
+  }
+
+  function shatterPage(x, y) {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const key = `${img.src}|${vw}x${vh}`;
-    if (shardCache.has(key)) return shardCache.get(key);
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-    const sc = Math.max(vw / img.naturalWidth, vh / img.naturalHeight);
-    const dw = img.naturalWidth * sc;
-    const dh = img.naturalHeight * sc;
-    const ox = (vw - dw) / 2;
-    const oy = (vh - dh) / 2;
-    // A rough grid of points, nudged about, each cell cut into two triangles.
-    const cols = vw > 700 ? 6 : 4;
-    const rows = vw > 700 ? 4 : 7;
+    const snap = snapshotPage(vw, vh, dpr);
+    const cx = x == null ? vw / 2 : x;
+    const cy = y == null ? vh / 2 : y;
+
+    // Triangles from a nudged grid: small and many, like the reference.
+    const cols = vw > 700 ? 9 : 6;
+    const rows = vw > 700 ? 6 : 10;
     const pts = [];
     for (let r = 0; r <= rows; r++) {
       pts.push([]);
       for (let c = 0; c <= cols; c++) {
-        const jx = c === 0 || c === cols ? 0 : (Math.random() - 0.5) * (vw / cols) * 0.75;
-        const jy = r === 0 || r === rows ? 0 : (Math.random() - 0.5) * (vh / rows) * 0.75;
+        const jx = c === 0 || c === cols ? 0 : (Math.random() - 0.5) * (vw / cols) * 0.85;
+        const jy = r === 0 || r === rows ? 0 : (Math.random() - 0.5) * (vh / rows) * 0.85;
         pts[r].push([(c / cols) * vw + jx, (r / rows) * vh + jy]);
       }
     }
-    const shards = [];
+    const tris = [];
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const a = pts[r][c]; const b = pts[r][c + 1]; const d = pts[r + 1][c]; const e = pts[r + 1][c + 1];
-        const pair = Math.random() < 0.5 ? [[a, b, e], [a, e, d]] : [[a, b, d], [b, e, d]];
-        for (const t of pair) {
-          const minX = Math.floor(Math.min(t[0][0], t[1][0], t[2][0])) - 1;
-          const minY = Math.floor(Math.min(t[0][1], t[1][1], t[2][1])) - 1;
-          const w = Math.ceil(Math.max(t[0][0], t[1][0], t[2][0])) + 1 - minX;
-          const hh = Math.ceil(Math.max(t[0][1], t[1][1], t[2][1])) + 1 - minY;
-          const cv = document.createElement('canvas');
-          cv.width = Math.ceil(w * dpr);
-          cv.height = Math.ceil(hh * dpr);
-          const ctx = cv.getContext('2d');
-          ctx.scale(dpr, dpr);
-          ctx.beginPath();
-          t.forEach(([px, py], k) => (k ? ctx.lineTo(px - minX, py - minY) : ctx.moveTo(px - minX, py - minY)));
-          ctx.closePath();
-          ctx.clip();
-          ctx.drawImage(img, ox - minX, oy - minY, dw, dh);
-          // a faint bright edge, like the rim of broken glass
-          ctx.strokeStyle = 'rgba(255,255,255,0.35)';
-          ctx.lineWidth = 1.5;
-          ctx.stroke();
-          cv.className = 'intro-shard';
-          cv.style.cssText = `left:${minX}px;top:${minY}px;width:${w}px;height:${hh}px;`;
-          shards.push({ cv, mx: (t[0][0] + t[1][0] + t[2][0]) / 3, my: (t[0][1] + t[1][1] + t[2][1]) / 3, minX, minY });
-        }
+        if (Math.random() < 0.5) tris.push([a, b, e], [a, e, d]); else tris.push([a, b, d], [b, e, d]);
       }
     }
-    shardCache.clear();
-    shardCache.set(key, shards);
-    return shards;
-  }
-  // Draw them ahead of time, in a quiet moment, once the cover is in.
-  function prepareIntro(game) {
-    if (reduced || !introFor(game)) return;
-    loadCover(game).then((img) => {
-      if (!img || !img.naturalWidth) return;
-      const run = () => { try { buildShards(img); } catch (_) { /* ignore */ } };
-      if (window.requestIdleCallback) requestIdleCallback(run, { timeout: 400 }); else setTimeout(run, 30);
-    });
-  }
 
-  function shatter(img, x, y) {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const cx = x == null ? vw / 2 : x;
-    const cy = y == null ? vh / 2 : y;
-    const shards = buildShards(img);
     const layer = h('div', { class: 'intro-layer', 'aria-hidden': 'true' });
+    const black = h('div', { class: 'intro-black' });
+    layer.append(black);
+    const pieces = [];
+    for (const t of tris) {
+      const minX = Math.floor(Math.min(t[0][0], t[1][0], t[2][0])) - 1;
+      const minY = Math.floor(Math.min(t[0][1], t[1][1], t[2][1])) - 1;
+      const w = Math.ceil(Math.max(t[0][0], t[1][0], t[2][0])) + 1 - minX;
+      const hh = Math.ceil(Math.max(t[0][1], t[1][1], t[2][1])) + 1 - minY;
+      const cv = document.createElement('canvas');
+      cv.width = Math.ceil(w * dpr);
+      cv.height = Math.ceil(hh * dpr);
+      const ctx = cv.getContext('2d');
+      ctx.scale(dpr, dpr);
+      ctx.beginPath();
+      t.forEach(([px, py], k) => (k ? ctx.lineTo(px - minX, py - minY) : ctx.moveTo(px - minX, py - minY)));
+      ctx.closePath();
+      ctx.save();
+      ctx.clip();
+      ctx.drawImage(snap, minX * dpr, minY * dpr, w * dpr, hh * dpr, 0, 0, w, hh);
+      // the glass: a light band across each piece at its own angle, like a mirror catching light
+      const ang = Math.random() * Math.PI;
+      const len = Math.hypot(w, hh) / 2;
+      const gx = Math.cos(ang) * len;
+      const gy = Math.sin(ang) * len;
+      const g = ctx.createLinearGradient(w / 2 - gx, hh / 2 - gy, w / 2 + gx, hh / 2 + gy);
+      const peak = 0.1 + Math.random() * 0.22;
+      const at = 0.25 + Math.random() * 0.5;
+      g.addColorStop(0, 'rgba(255,255,255,0)');
+      g.addColorStop(Math.max(0, at - 0.16), 'rgba(255,255,255,0.02)');
+      g.addColorStop(at, `rgba(255,255,255,${peak})`);
+      g.addColorStop(Math.min(1, at + 0.2), 'rgba(255,255,255,0.01)');
+      g.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, hh);
+      ctx.restore();
+      // the cracks: a dark line with a thin bright rim inside it
+      ctx.strokeStyle = 'rgba(0,0,0,0.85)'; ctx.lineWidth = 1.6; ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,0.28)'; ctx.lineWidth = 0.6; ctx.stroke();
+      cv.className = 'intro-shard';
+      cv.style.cssText = `left:${minX}px;top:${minY}px;width:${w}px;height:${hh}px;`;
+      const mx = (t[0][0] + t[1][0] + t[2][0]) / 3;
+      const my = (t[0][1] + t[1][1] + t[2][1]) / 3;
+      cv.style.transformOrigin = `${mx - minX}px ${my - minY}px`;
+      layer.append(cv);
+      pieces.push({ cv, mx, my });
+    }
+    // The page as it was, on top at first, so the break starts from exactly what was on screen.
+    const whole = snap;
+    whole.className = 'intro-whole';
     const flash = h('div', { class: 'intro-flash' });
-    for (const s of shards) { s.cv.getAnimations().forEach((a) => a.cancel()); layer.append(s.cv); }
-    layer.append(flash);
+    layer.append(whole, flash);
     document.body.append(layer);
-    const maxD = Math.hypot(Math.max(cx, vw - cx), Math.max(cy, vh - cy));
-    let longest = 0;
-    // Start on the next frame, once the layer is on screen, so the first frames aren't spent setting up.
+
+    const diag = Math.hypot(vw, vh);
+    const side = Math.random() * Math.PI * 2; // the way everything goes this time
+    let end = 0;
     requestAnimationFrame(() => {
-      flash.animate([{ opacity: 0 }, { opacity: 0.85, offset: 0.2 }, { opacity: 0 }],
-        { duration: 420, easing: 'ease-out', fill: 'both' });
-      for (const s of shards) {
-        const dx = s.mx - cx;
-        const dy = s.my - cy;
-        const len = Math.hypot(dx, dy) || 1;
-        const k = len / maxD;
-        const ux = dx / len;
-        const uy = dy / len;
-        const push = (0.45 + Math.random() * 0.45) * Math.max(vw, vh);
-        const tx = ux * push;
-        const ty = uy * push + vh * (0.2 + Math.random() * 0.25);
-        const rot = (Math.random() - 0.5) * 200;
-        const grow = 1.3 + Math.random() * 0.6 - k * 0.25;
-        const delay = 220 + k * 220;
-        const dur = 900 + Math.random() * 200;
-        longest = Math.max(longest, delay + dur);
-        s.cv.style.transformOrigin = `${s.mx - s.minX}px ${s.my - s.minY}px`;
-        s.cv.animate([
+      flash.animate([{ opacity: 0 }, { opacity: 0.3, offset: 0.35 }, { opacity: 0 }], { duration: 380, easing: 'ease-out', fill: 'both' });
+      whole.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, delay: 120, easing: 'ease-out', fill: 'both' });
+      for (const p of pieces) {
+        // a little settle as the glass cracks, then the fall
+        const jx = (p.mx - cx) / diag * 6;
+        const jy = (p.my - cy) / diag * 6;
+        const a = side + (Math.random() - 0.5) * 0.9;
+        const dist = diag * (0.75 + Math.random() * 0.6);
+        const tx = Math.cos(a) * dist;
+        const ty = Math.sin(a) * dist;
+        const rot = (Math.random() < 0.5 ? -1 : 1) * (40 + Math.random() * 120);
+        const sc = 0.8 + Math.random() * 0.45;
+        const delay = 120 + Math.random() * 520;
+        const dur = 1300 + Math.random() * 500;
+        end = Math.max(end, delay + dur);
+        p.cv.animate([
           { transform: 'translate3d(0,0,0) rotate(0deg) scale(1)', opacity: 1 },
-          // the crack: a small push apart so thin gaps open between the pieces
-          { transform: `translate3d(${ux * 4}px,${uy * 4}px,0) rotate(0deg) scale(0.99)`, opacity: 1, offset: 0.1 },
-          { transform: `translate3d(${tx * 0.35}px,${ty * 0.3}px,0) rotate(${rot * 0.35}deg) scale(${1 + (grow - 1) * 0.4})`, opacity: 1, offset: 0.45 },
-          { transform: `translate3d(${tx}px,${ty}px,0) rotate(${rot}deg) scale(${grow})`, opacity: 0 },
-        ], { duration: dur, delay, easing: 'cubic-bezier(.4,0,.7,1)', fill: 'both' });
+          { transform: `translate3d(${jx}px,${jy}px,0) rotate(0deg) scale(0.995)`, opacity: 1, offset: 0.3 },
+          { transform: `translate3d(${jx + tx * 0.18}px,${jy + ty * 0.18}px,0) rotate(${rot * 0.2}deg) scale(${1 + (sc - 1) * 0.3})`, opacity: 1, offset: 0.55 },
+          { transform: `translate3d(${tx}px,${ty}px,0) rotate(${rot}deg) scale(${sc})`, opacity: 0 },
+        ], { duration: dur, delay, easing: 'cubic-bezier(.5,0,.75,.5)', fill: 'both' });
       }
-      setTimeout(() => layer.remove(), longest + 60);
+      // then from black into the next page
+      black.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 550, delay: end - 150, easing: 'ease-in-out', fill: 'both' });
+      setTimeout(() => layer.remove(), end + 450);
     });
   }
 
@@ -471,8 +520,7 @@
     // A search box over a plain list. It matches game names and song names.
     const items = games.map((g, i) => {
       const li = h('li', { class: 'rise', style: `--i:${Math.min(i + 1, 12)}`, onmouseenter: () => setCover(g) },
-        h('a', { href: `#/${encodeURIComponent(g.id)}`, onfocus: () => { setCover(g); prepareIntro(g); },
-          onpointerenter: () => prepareIntro(g), ontouchstart: () => prepareIntro(g),
+        h('a', { href: `#/${encodeURIComponent(g.id)}`, onfocus: () => setCover(g),
           onclick: (e) => { loadCover(g); playIntro(g, e.clientX || null, e.clientY || null); } }, g.title));
       const words = [g.title, ...(g.songs || []).map((s) => s.title)].join(' ').toLowerCase();
       return { g, li, words };
