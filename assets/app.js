@@ -920,7 +920,7 @@
 
   /* ---------- YouTube players ---------- */
 
-  const YT_STATE = { ENDED: 0, PLAYING: 1, PAUSED: 2, BUFFERING: 3 };
+  const YT_STATE = { ENDED: 0, PLAYING: 1, PAUSED: 2, BUFFERING: 3, CUED: 5 };
   let ytPromise = null;
   function loadYT() {
     if (window.YT && window.YT.Player) return Promise.resolve(window.YT);
@@ -1154,6 +1154,9 @@
     if (s !== YT_STATE.PLAYING || g[role]) return;
     g[role] = true;
     const p = media[role];
+    // Phones: never pause or move the music player while loading. "Playing" there may be ads, and
+    // stopping ads part way leaves the player stuck (seen on Mohad's iPhone: an ad stopped at 3.8s).
+    if (role === 'music' && touchScreen()) { if (g.scene && g.music) openGate(media.token); return; }
     if (role === 'scene') media.sceneExpect = { action: 'pause', at: Date.now() };
     safe(() => { p.pauseVideo(); p.seekTo(media.at[role], true); });
     if (g.scene && g.music) openGate(media.token);
@@ -1180,7 +1183,7 @@
   function openGate(token) {
     if (token !== media.token || !media.gate) return;
     clearGate();
-    if (media.music && media.ready.music) safe(() => media.music.seekTo(media.at.music, true));
+    if (media.music && media.ready.music && !touchScreen()) safe(() => media.music.seekTo(media.at.music, true));
     if (media.scene && media.ready.scene) safe(() => media.scene.seekTo(media.at.scene, true));
     media.lock = sep();
     applyAudio();
@@ -1350,7 +1353,7 @@
   // Phones: if the music won't start on its own (iPhones often refuse to start a second video),
   // show our Play button after a few seconds. If a tap doesn't start it either, use the scene's own sound.
   function musicWatch() {
-    if (!touchScreen() || !sep() || media.musicStarted || media.musicWait || !media.ready.scene) { media.stuckAt = 0; return; }
+    if (!touchScreen() || !sep() || media.musicStarted || media.musicWait || media.musicAd || !media.ready.scene) { media.stuckAt = 0; return; }
     if (media.gate && !media.gate.scene) { media.stuckAt = 0; return; }
     if (media.ready.music && safe(() => media.music.getPlayerState()) === YT_STATE.BUFFERING) { media.stuckAt = 0; return; }
     if (!media.stuckAt) { media.stuckAt = Date.now(); return; }
@@ -1364,9 +1367,9 @@
     clearGate();
     media.musicWait = true;
     media.lock = false;
-    safe(() => media.music.pauseVideo());
+    // The music player is left alone (it may be playing ads, muted); see music-peek in tick.
     applyAudio();
-    sceneDo('play');
+    if (!media.musicAd) sceneDo('play');
     clearTimeout(media.loadTimer);
     media.loadTimer = setTimeout(showStart, 5000);
     sync();
@@ -1386,9 +1389,12 @@
       let to = (plan.music.start || 0) + Math.max(0, st - (plan.scene.start || 0));
       const mEnd = plan.music.end || safe(() => media.music.getDuration()) || 0;
       if (mEnd && to > mEnd - 3) to = plan.music.start || 0;
-      safe(() => { media.music.seekTo(to, true); media.music.setVolume(fadedVolume()); media.music.unMute(); media.music.playVideo(); });
+      // Only move it if it's sitting paused on the song; if it hasn't started it may be on ads.
+      const ms = safe(() => media.music.getPlayerState());
+      if (ms === YT_STATE.PAUSED || ms === YT_STATE.CUED) safe(() => media.music.seekTo(to, true));
+      safe(() => { media.music.setVolume(fadedVolume()); media.music.unMute(); media.music.playVideo(); });
     }
-    sceneDo('play');
+    if (!media.musicAd) sceneDo('play');
     clearTimeout(media.wakeTimer);
     media.wakeTimer = setTimeout(function giveUp() {
       if (token !== media.token || media.musicStarted || !media.musicWait) return;
@@ -1630,7 +1636,7 @@
      playing while the video's own time doesn't move for 2 seconds is almost always showing an ad.
      Then a small "Ad playing" label shows. If it's the hidden music player, it's brought up over
      the scene so the ad can be seen and skipped, and the scene waits. */
-  const adSeen = { scene: { t: -1, since: 0 }, music: { t: -1, since: 0 } };
+  const adSeen = { scene: { t: -1, since: 0, u: -1 }, music: { t: -1, since: 0, u: -1 } };
   function adWatch() {
     let any = false;
     let musicAd = false;
@@ -1638,7 +1644,20 @@
     for (const role of ['scene', 'music']) {
       const p = media[role];
       const a = adSeen[role];
-      const playing = p && media.ready[role] && !media.gate && safe(() => p.getPlayerState()) === YT_STATE.PLAYING;
+      const st = p && media.ready[role] ? safe(() => p.getPlayerState()) : null;
+      // iPhones: during ads the player says "not started" while its time counts up (the ad's own
+      // clock). Seen in Mohad's screen recording, 2 Nov 2026.
+      if (st === -1) {
+        const t = safe(() => p.getCurrentTime()) || 0;
+        if (a.u >= 0 && t > a.u + 0.05) { a.moved = a.moved || Date.now(); a.still = 0; }
+        else if (a.u >= 0) { a.still = a.still || Date.now(); if (Date.now() - a.still > 1500) a.moved = 0; }
+        a.u = t;
+        a.t = -1; a.since = 0;
+        if (a.moved && Date.now() - a.moved > 700) { any = true; if (role === 'music') musicAd = true; else sceneAd = true; }
+        continue;
+      }
+      a.u = -1; a.moved = 0; a.still = 0;
+      const playing = st === YT_STATE.PLAYING && !media.gate;
       if (!playing) { a.t = -1; a.since = 0; continue; }
       const t = safe(() => p.getCurrentTime()) || 0;
       if (Math.abs(t - a.t) > 0.01) { a.t = t; a.since = Date.now(); continue; }
@@ -1649,6 +1668,11 @@
       if (Date.now() - a.since > wait) { any = true; if (role === 'music') musicAd = true; else sceneAd = true; }
     }
     // Ads on the music: the scene waits. Ads on the scene (with a separate music track): the music waits.
+    // Still loading: stop loading and show them (they keep playing, muted until "Tap for sound").
+    if (any && stage.classList.contains('loading')) {
+      if (media.gate && sep() && musicAd) { clearGate(); media.musicWait = touchScreen(); media.lock = false; }
+      setLoading(false);
+    }
     if (musicAd && !media.musicAd) sceneDo('pause');
     if (!musicAd && media.musicAd && sep() && media.playing) sceneDo('play');
     const holdMusic = sceneAd && sep() && !musicAd;
@@ -1692,6 +1716,13 @@
     if (document.hidden) return;
     musicWatch();
     adWatch();
+    // Phones, music not started yet: show its player small in the top right instead of hiding it,
+    // so any ads on it play where they can be seen (muted until "Tap for sound").
+    const peek = touchScreen() && sep() && !!media.musicWait && !media.musicTapShown && !media.musicAd;
+    if (peek !== stage.classList.contains('music-peek')) {
+      stage.classList.toggle('music-peek', peek);
+      if (peek) adLabel('Music loading. Ads may play first.');
+    }
     const plan = media.plan;
     // Same for the music track (YouTube can start it from 0:00 after an ad).
     if (plan && !media.gate && sep() && media.ready.music && plan.music.start
@@ -1763,7 +1794,8 @@
     }
     // Phones: a "Tap for sound" button over the video while the sound is off because the phone wanted it off.
     stage.classList.toggle('need-sound', touchScreen() && playing && muted && !media.userMuted && currentVolume() > 0);
-    for (const bar of ui.bars || []) drawBar(bar);
+    // During ads the music player reports the ad's time, so the bars stay put.
+    if (!media.musicAd && !media.sceneAd) for (const bar of ui.bars || []) drawBar(bar);
     const { pos, len } = clipPos(p, masterSpec());
     if (playing && repeatOn() && len > 3 && len - pos < 0.35) repeatSong();
     // Ends can have milliseconds; YouTube only stops on whole seconds, so stop it ourselves.

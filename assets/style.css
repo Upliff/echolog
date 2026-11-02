@@ -503,6 +503,9 @@ body.mini .upnext { left: auto; right: 20px; transform: none; bottom: 300px; }
 .stage.music-ad .layer-music, .stage.music-tap .layer-music { width: 100%; height: 100%; z-index: 3; }
 .stage.music-ad .stage-tap, .stage.music-tap .stage-tap { display: none; }
 .stage.music-tap:not(.loading):not(.mini) .ad-label { opacity: 1; }
+/* Phones, music not started: its player sits small in the top right, so ads on it can be seen. */
+.stage.music-peek:not(.mini) .layer-music { left: auto; bottom: auto; right: 10px; top: 10px; width: 40%; height: auto; aspect-ratio: 16 / 9; z-index: 3; border-radius: 8px; overflow: hidden; box-shadow: 0 0 0 1px rgba(232, 194, 122, 0.6), 0 6px 18px rgba(0, 0, 0, 0.5); }
+.stage.music-peek:not(.mini):not(.loading) .ad-label { opacity: 1; }
 /* Phones: the scene won't start by itself. Its own player is shown so it can be tapped. */
 .stage.scene-tap .stage-loading { opacity: 0 !important; pointer-events: none; }
 .stage.scene-tap .stage-tap { display: none; }
