@@ -378,6 +378,7 @@ def main():
             "title": game["title"],
             "year": game.get("year"),
             "cover": game.get("cover"),
+            "intro": game.get("intro"),
             "sounds": game.get("sounds") or [],
             "steamAppId": game.get("steamAppId"),
             "songs": songs_out,

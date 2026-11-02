@@ -69,6 +69,7 @@ data/hidden.txt          ids of stories to never show
 - An end time before its start is caught before saving.
 - **Sounds (game editor, built 1 Nov 2026):** under Cover art, a list of sounds per game: a name (shown on the button) and an audio file (mp3, ogg, wav or m4a, up to 1.5 MB). Each row has Play, Replace (or Choose file) and Remove; "+ Add sound" adds a row. New files upload on Save to `sounds/<game id>/<name>.<ext>` (name made from the label, `-2` added if taken), then `sounds: [{ "label", "file" }]` is saved on the game. Removing a sound deletes its file from the repo on the next Save and unticks it from every song. A row without a name or file stops the save with a message. Each sound gets an `id` on first save (made from its name, never changes after), and the file is named after it.
 - **Sounds for this song (song editor, added 1 Nov 2026):** a tick box for each sound in the game's bank. Saved as `sounds: ["save-point", ...]` (sound ids) on the song; none ticked means it's left out and the song has no Sounds button. Sounds added but not saved yet can already be ticked.
+- **Opening animation (game editor, added 2 Nov 2026):** under Sounds, "Opening animation" (None or Shatter) and "Opening sound" (No sound, or one of the game's sounds; greyed out while the animation is None). Saved as `intro: { "effect": "shatter", "sound": "<sound id>" }` on the game; None leaves `intro` out. A sound added but not saved yet can already be picked. Removing that sound from the bank clears the opening sound but keeps the animation. The collector passes `intro` through to `stories.json`.
 - **Song volume (song editor):** "Starting volume" slider per song, saved as `volume` (0 to 100) on the song. "Use site default" removes it. Added 31 Oct 2026.
 - **Site tab:** settings for everyone who visits, saved as `settings` in `config/games.json`: default starting volume for songs without their own (0 to 100, default 80) and how many seconds before the end "Next" shows (default 8, 0 turns auto next off). Saving starts the collector, which copies `settings` into `stories.json`.
 - Pasting a YouTube link with `?t=` fills in the start time.
@@ -92,7 +93,6 @@ data/hidden.txt          ids of stories to never show
 
 Other chats add what they need from the admin page here. The admin chat builds it and then removes the line.
 
-- **Opening animation per game (site chat, 2 Nov 2026):** in the game editor, an "Opening animation" choice (None / Shatter) and an "Opening sound" picked from that game's sounds. Save as `"intro": { "effect": "shatter", "sound": "<sound id>" }` on the game, or leave `intro` out for None. The collector needs to pass `intro` through to `stories.json` on the game, like `cover` and `sounds`. The site already reads it (v35). Mohad wants it on Final Fantasy X, with the battle start sound he uploads.
 
 
 **Quota:** YouTube allows 10,000 units a day, and each page of 100 comments costs 1 unit. At 5 pages per video, that's roughly 5 units per video per run, so there's plenty of room.
@@ -111,6 +111,7 @@ Other chats add what they need from the admin page here. The admin chat builds i
   "settings": { "volume": 80, "upNextSeconds": 8 },
   "games": [{
     "id": "ffx", "title": "Final Fantasy X", "year": 2001, "cover": "covers/ffx.jpg", "steamAppId": 359870,
+    "intro": { "effect": "shatter", "sound": "battle-start" },
     "sounds": [{ "id": "save-point", "label": "Save point", "file": "sounds/ffx/save-point.mp3" }],
     "songs": [{
       "id": "to-zanarkand", "title": "To Zanarkand", "composer": "Nobuo Uematsu", "volume": 70,
