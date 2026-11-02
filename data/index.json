@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-02T10:32:33Z",
+  "updated": "2026-11-02T11:12:34Z",
   "settings": {},
   "games": [
     {
@@ -63,36 +63,14 @@
     "mode": "saves",
     "quotaDay": "2026-11-02",
     "quotaUsedToday": 130,
-    "quotaUsedThisRun": 130,
+    "quotaUsedThisRun": 0,
     "budget": 8000,
-    "deepPullsDone": 20,
+    "deepPullsDone": 0,
     "deepPullsWaiting": 0,
     "problems": []
   },
   "log": [
     "mode: saves",
-    "deep pulls waiting: 20",
-    "sy-nrLiAwZI: deep pull, 228 comments, 77 in pool",
-    "PSjTN8WSGNk: deep pull, 1118 comments, 300 in pool",
-    "mWYwmM23Sqs: deep pull, 713 comments, 300 in pool",
-    "zhYW3dY1hgM: deep pull, 292 comments, 124 in pool",
-    "4umidcc_8rU: deep pull, 625 comments, 300 in pool",
-    "BKZs90_fkt4: deep pull, 154 comments, 47 in pool",
-    "RC1VmGXiEFw: deep pull, 289 comments, 104 in pool",
-    "IKGc_wtQKC8: deep pull, 57 comments, 21 in pool",
-    "Vl20g-tBaKc: deep pull, 833 comments, 300 in pool",
-    "zXpm8DPYuTc: deep pull, 202 comments, 59 in pool",
-    "Zbv6KrO_13A: deep pull, 212 comments, 67 in pool",
-    "gUQuBBBzx-I: deep pull, 1080 comments, 300 in pool",
-    "4It2Prl5E-Q: deep pull, 591 comments, 300 in pool",
-    "l2ztZc5kzGg: deep pull, 120 comments, 37 in pool",
-    "s9XljBWGrRQ: deep pull, 729 comments, 300 in pool",
-    "KyrWRgg_6KE: deep pull, 916 comments, 300 in pool",
-    "DMznuxvovkY: deep pull, 879 comments, 300 in pool",
-    "CSdNxXGUaRU: deep pull, 1082 comments, 300 in pool",
-    "pRudm5jCXrs: deep pull, 1068 comments, 300 in pool",
-    "73ZjSYHRdkA: deep pull, 522 comments, 287 in pool",
-    "lengths: 12 videos",
-    "quota: 130 units this run, 130 of 8000 today"
+    "quota: 0 units this run, 130 of 8000 today"
   ]
 }
