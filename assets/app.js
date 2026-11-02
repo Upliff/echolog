@@ -988,9 +988,13 @@
     if (!stage.classList.contains('loading')) return;
     const ready = media.ready.scene && (!media.plan || !media.plan.music || media.ready.music);
     if (!ready) { media.loadTimer = setTimeout(showStart, 1000); return; }
-    // Phones: only when even the scene won't start by itself. Music trouble is handled by musicWatch.
-    if (touchScreen() && (safe(() => media.scene.getPlayerState()) === YT_STATE.PLAYING
-        || (media.gate && media.gate.scene) || (sep() && !media.musicStarted))) return;
+    // Phones: only when even the scene won't start by itself (music trouble is handled by musicWatch).
+    // Then the scene player itself is shown to tap, since that's usually ads waiting for a tap.
+    if (touchScreen()) {
+      if (safe(() => media.scene.getPlayerState()) === YT_STATE.PLAYING || (media.gate && media.gate.scene)) return;
+      showSceneForTap(true);
+      return;
+    }
     stage.classList.add('stuck');
   }
 
@@ -1108,7 +1112,8 @@
     media.tapTried = false;
     media.musicWait = false;
     media.musicTapShown = false;
-    stage.classList.remove('music-tap');
+    stage.classList.remove('music-tap', 'scene-tap');
+    media.sceneAd = false;
     clearTimeout(media.wakeTimer);
     if (!opts.keepExtra) media.extra = 0;
     stageMsg.hidden = true;
@@ -1284,6 +1289,7 @@
       if (media.musicWait) { media.musicWait = false; clearTimeout(media.wakeTimer); media.lock = true; applyAudio(); }
     }
     if (s === YT_STATE.PLAYING) noCaptions(media[role]);
+    if (role === 'scene' && s === YT_STATE.PLAYING && stage.classList.contains('scene-tap')) showSceneForTap(false);
     if (media.gate) { gateState(role, s); return; }
     const isMaster = role === (sep() ? 'music' : 'scene');
     if (isMaster) {
@@ -1291,7 +1297,7 @@
       if (sep()) {
         // The scene follows the music: starts with it, pauses with it, waits while it buffers.
         if (s === YT_STATE.PLAYING && !media.musicAd) sceneDo('play');
-        if (s === YT_STATE.PAUSED || s === YT_STATE.BUFFERING) sceneDo('pause');
+        if ((s === YT_STATE.PAUSED || s === YT_STATE.BUFFERING) && !media.sceneAd) sceneDo('pause');
       }
       if (s === YT_STATE.PLAYING) {
         // Fade everything in once it's actually playing (the scene too, when there's a music track).
@@ -1318,7 +1324,7 @@
       // The scene only plays while the music is actually playing (not while it's loading or buffering).
       const ms = safe(() => media.music.getPlayerState());
       if (s === YT_STATE.PLAYING && media.musicWait) { setLoading(false); startClouds(); sync(); return; }
-      if (s === YT_STATE.PLAYING && ms !== YT_STATE.PLAYING) { sceneDo('pause'); return; }
+      if (s === YT_STATE.PLAYING && ms !== YT_STATE.PLAYING && !media.sceneAd) { sceneDo('pause'); return; }
       if (s === YT_STATE.PLAYING) setLoading(false);
     }
   }
@@ -1404,12 +1410,23 @@
       dropMusic("The music didn't start on this phone, so this is the scene's own sound.");
     }, 4000);
   }
+  // The label over the video while ads are on (or may be waiting for a tap).
+  function adLabel(text) { const el = $('adLabel'); if (el.textContent !== text) el.textContent = text; }
+  const ADS_TEXT = 'Ads playing. The song starts after them.';
+
   // The hidden music player brought up over the scene, so a tap goes straight to YouTube's player.
   function showMusicForTap(on) {
     if (on) media.musicTapShown = true;
     stage.classList.toggle('music-tap', on);
-    $('adLabel').textContent = on ? 'Tap the video to start the music.' : 'Ad playing. The song starts after it.';
+    adLabel(on ? 'Tap the video to start the music. Ads may play first.' : ADS_TEXT);
     if (on) sceneDo('pause');
+  }
+
+  // Phones: the scene won't start by itself. Show its own player (loading screen and our tap layer
+  // out of the way) so it can be tapped; ads often play first.
+  function showSceneForTap(on) {
+    stage.classList.toggle('scene-tap', on);
+    adLabel(on ? 'Tap the video to start it. Ads may play first.' : ADS_TEXT);
   }
   const touchScreen = () => window.matchMedia('(pointer: coarse)').matches;
   // A tap inside YouTube's player moves focus into its frame. Once the music player has been
@@ -1417,9 +1434,8 @@
   window.addEventListener('blur', () => {
     setTimeout(() => {
       const f = document.activeElement;
-      if (stage.classList.contains('music-tap') && f && f.tagName === 'IFRAME' && f.id === 'ytMusic') {
-        $('adLabel').textContent = 'Ad playing. The song starts after it.';
-      }
+      if (f && f.tagName === 'IFRAME' && ((stage.classList.contains('music-tap') && f.id === 'ytMusic')
+          || (stage.classList.contains('scene-tap') && f.id === 'ytScene'))) adLabel(ADS_TEXT);
     }, 0);
   });
 
@@ -1618,6 +1634,7 @@
   function adWatch() {
     let any = false;
     let musicAd = false;
+    let sceneAd = false;
     for (const role of ['scene', 'music']) {
       const p = media[role];
       const a = adSeen[role];
@@ -1625,12 +1642,24 @@
       if (!playing) { a.t = -1; a.since = 0; continue; }
       const t = safe(() => p.getCurrentTime()) || 0;
       if (Math.abs(t - a.t) > 0.01) { a.t = t; a.since = Date.now(); continue; }
-      const wait = role === 'music' && touchScreen() ? 1200 : 2000;
-      if (Date.now() - a.since > wait) { any = true; if (role === 'music') musicAd = true; }
+      const wait = touchScreen() ? 1200 : 2000;
+      // A scene standing still while it's locked to the music could just be waiting for the lock;
+      // only count it once the lock has given up moving it (lockStill), or when it isn't locked.
+      if (role === 'scene' && sep() && media.lock && (media.lockStill || 0) < 6 && !media.sceneAd) continue;
+      if (Date.now() - a.since > wait) { any = true; if (role === 'music') musicAd = true; else sceneAd = true; }
     }
+    // Ads on the music: the scene waits. Ads on the scene (with a separate music track): the music waits.
     if (musicAd && !media.musicAd) sceneDo('pause');
     if (!musicAd && media.musicAd && sep() && media.playing) sceneDo('play');
+    const holdMusic = sceneAd && sep() && !musicAd;
+    if (holdMusic && !media.sceneAd) { media.sceneAd = true; media.musicHeld = true; safe(() => media.music.pauseVideo()); }
+    if (!holdMusic && media.sceneAd) {
+      media.sceneAd = false;
+      if (media.musicHeld && sep()) safe(() => media.music.playVideo());
+      media.musicHeld = false;
+    }
     media.musicAd = musicAd;
+    if (any) adLabel('Ads playing. The song starts after them.');
     stage.classList.toggle('ad', any);
     stage.classList.toggle('music-ad', musicAd);
   }
@@ -1654,7 +1683,7 @@
       return `${role}: ${names[st] || st} ${t.toFixed(1)}s / ${(safe(() => p.getDuration()) || 0).toFixed(0)}s${safe(() => p.isMuted()) ? ' muted' : ''} [${vd.video_id || '?'}]`;
     };
     debugBox.textContent = [line('scene'), line('music'),
-      `ad ${!!media.musicAd}  tapShown ${!!media.musicTapShown}  gate ${media.gate ? 'on' : 'off'}  wait ${!!media.musicWait}  lock ${!!media.lock}  tapped ${!!media.tapTried}`,
+      `ad ${!!media.musicAd}/${!!media.sceneAd}  tapShown ${!!media.musicTapShown}  gate ${media.gate ? 'on' : 'off'}  wait ${!!media.musicWait}  lock ${!!media.lock}  tapped ${!!media.tapTried}`,
       `musicStarted ${!!media.musicStarted}  soundOk ${!!media.soundOk}  plan music ${!!(media.plan && media.plan.music)}`].join('\n');
   }
 

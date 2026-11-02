@@ -503,6 +503,11 @@ body.mini .upnext { left: auto; right: 20px; transform: none; bottom: 300px; }
 .stage.music-ad .layer-music, .stage.music-tap .layer-music { width: 100%; height: 100%; z-index: 3; }
 .stage.music-ad .stage-tap, .stage.music-tap .stage-tap { display: none; }
 .stage.music-tap:not(.loading):not(.mini) .ad-label { opacity: 1; }
+/* Phones: the scene won't start by itself. Its own player is shown so it can be tapped. */
+.stage.scene-tap .stage-loading { opacity: 0 !important; pointer-events: none; }
+.stage.scene-tap .stage-tap { display: none; }
+.stage.scene-tap:not(.mini) .ad-label { opacity: 1; }
+.stage.scene-tap .sound-pill { display: none; }
 .stage.music-tap .sound-pill { display: none; }
 .stage.loading .stage-loading { opacity: 1; }
 .layer-scene { transition: opacity 0.6s ease; }
