@@ -423,7 +423,9 @@
 
     const layer = h('div', { class: 'intro-layer', 'aria-hidden': 'true' });
     const black = h('div', { class: 'intro-black' });
-    layer.append(black);
+    // The pieces sit in one sheet so the whole break can slowly push in towards the viewer.
+    const glass = h('div', { class: 'intro-glass' });
+    layer.append(black, glass);
     const pieces = [];
     for (const t of tris) {
       const minX = Math.floor(Math.min(t[0][0], t[1][0], t[2][0])) - 1;
@@ -465,7 +467,7 @@
       const mx = (t[0][0] + t[1][0] + t[2][0]) / 3;
       const my = (t[0][1] + t[1][1] + t[2][1]) / 3;
       cv.style.transformOrigin = `${mx - minX}px ${my - minY}px`;
-      layer.append(cv);
+      glass.append(cv);
       pieces.push({ cv, mx, my });
     }
     // The page as it was, on top at first, so the break starts from exactly what was on screen.
@@ -475,35 +477,49 @@
     layer.append(whole, flash);
     document.body.append(layer);
 
-    const diag = Math.hypot(vw, vh);
-    const side = Math.random() * Math.PI * 2; // the way everything goes this time
+    // v38, matched to the longer clip: crack, a slow push in, then the pieces flip away sideways
+    // (all to the left or all to the right), going see-through as they go. Black shows for a
+    // moment once they've cleared, then the next page fades up while the last pieces fade out.
+    const toRight = Math.random() < 0.5;
+    const dir = toRight ? 1 : -1;
+    const P = 'perspective(800px) ';
+    let lastStart = 0;
     let end = 0;
     requestAnimationFrame(() => {
-      flash.animate([{ opacity: 0 }, { opacity: 0.3, offset: 0.35 }, { opacity: 0 }], { duration: 380, easing: 'ease-out', fill: 'both' });
-      whole.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, delay: 120, easing: 'ease-out', fill: 'both' });
+      flash.animate([{ opacity: 0 }, { opacity: 0.35, offset: 0.3 }, { opacity: 0 }], { duration: 320, easing: 'ease-out', fill: 'both' });
+      whole.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120, delay: 60, easing: 'linear', fill: 'both' });
       for (const p of pieces) {
-        // a little settle as the glass cracks, then the fall
-        const jx = (p.mx - cx) / diag * 6;
-        const jy = (p.my - cy) / diag * 6;
-        const a = side + (Math.random() - 0.5) * 0.9;
-        const dist = diag * (0.75 + Math.random() * 0.6);
-        const tx = Math.cos(a) * dist;
-        const ty = Math.sin(a) * dist;
-        const rot = (Math.random() < 0.5 ? -1 : 1) * (40 + Math.random() * 120);
-        const sc = 0.8 + Math.random() * 0.45;
-        const delay = 120 + Math.random() * 520;
-        const dur = 1300 + Math.random() * 500;
+        // Pieces on the side they're heading to go first, so the screen clears in a sweep.
+        const lead = toRight ? p.mx / vw : 1 - p.mx / vw;
+        const delay = 850 + (1 - lead) * 520 + Math.random() * 160;
+        const dur = 950 + Math.random() * 350;
+        lastStart = Math.max(lastStart, delay);
         end = Math.max(end, delay + dur);
+        const tx = dir * (vw * (0.55 + Math.random() * 0.6));
+        const ty = (Math.random() - 0.5) * vh * 0.22;
+        const tz = 120 + Math.random() * 380;
+        const rx = (Math.random() < 0.5 ? -1 : 1) * (120 + Math.random() * 300);
+        const ry = dir * (160 + Math.random() * 320);
+        const rz = (Math.random() - 0.5) * 120;
+        // the crack opening: a tiny shove apart from the middle
+        const sx = (p.mx - vw / 2) / vw * 6;
+        const sy = (p.my - vh / 2) / vh * 6;
         p.cv.animate([
-          { transform: 'translate3d(0,0,0) rotate(0deg) scale(1)', opacity: 1 },
-          { transform: `translate3d(${jx}px,${jy}px,0) rotate(0deg) scale(0.995)`, opacity: 1, offset: 0.3 },
-          { transform: `translate3d(${jx + tx * 0.18}px,${jy + ty * 0.18}px,0) rotate(${rot * 0.2}deg) scale(${1 + (sc - 1) * 0.3})`, opacity: 1, offset: 0.55 },
-          { transform: `translate3d(${tx}px,${ty}px,0) rotate(${rot}deg) scale(${sc})`, opacity: 0 },
-        ], { duration: dur, delay, easing: 'cubic-bezier(.5,0,.75,.5)', fill: 'both' });
+          { transform: `${P}translate3d(${sx}px,${sy}px,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg)`, opacity: 1 },
+          { transform: `${P}translate3d(${sx + tx * 0.08}px,${sy + ty * 0.08}px,${tz * 0.25}px) rotateX(${rx * 0.12}deg) rotateY(${ry * 0.12}deg) rotateZ(${rz * 0.1}deg)`, opacity: 1, offset: 0.25 },
+          { transform: `${P}translate3d(${sx + tx * 0.45}px,${sy + ty * 0.45}px,${tz * 0.7}px) rotateX(${rx * 0.55}deg) rotateY(${ry * 0.55}deg) rotateZ(${rz * 0.5}deg)`, opacity: 0.75, offset: 0.6 },
+          { transform: `${P}translate3d(${sx + tx}px,${sy + ty}px,${tz}px) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg)`, opacity: 0 },
+        ], { duration: dur, delay, easing: 'cubic-bezier(.45,0,.8,.6)', fill: 'both' });
+        // until it flies, the piece sits just apart from its neighbours
+        p.cv.style.transform = `${P}translate3d(${sx}px,${sy}px,0)`;
       }
-      // then from black into the next page
-      black.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 550, delay: end - 150, easing: 'ease-in-out', fill: 'both' });
-      setTimeout(() => layer.remove(), end + 450);
+      // the whole sheet pushes slowly in while it's breaking
+      glass.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.1)' }],
+        { duration: lastStart + 300, easing: 'cubic-bezier(.2,.6,.35,1)', fill: 'both' });
+      // black for a moment once the screen has mostly cleared, then the next page fades up
+      const blackFrom = lastStart + 650;
+      black.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 650, delay: blackFrom, easing: 'ease-in-out', fill: 'both' });
+      setTimeout(() => layer.remove(), Math.max(end, blackFrom + 650) + 80);
     });
   }
 

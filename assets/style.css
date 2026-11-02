@@ -758,6 +758,7 @@ html.song-page .song-nav { display: flex; flex-direction: column; gap: 8px; poin
 /* Opening animation when a game is picked (see playIntro). Above everything, never takes taps. */
 .intro-layer { position: fixed; inset: 0; z-index: 1000; pointer-events: none; overflow: hidden; }
 .intro-black { position: absolute; inset: 0; background: #000; }
-.intro-shard { position: absolute; display: block; will-change: transform, opacity; }
+.intro-glass { position: absolute; inset: 0; transform-origin: 50% 50%; will-change: transform; }
+.intro-shard { position: absolute; display: block; will-change: transform, opacity; backface-visibility: visible; }
 .intro-whole { position: absolute; left: 0; top: 0; width: 100vw; height: 100vh; display: block; }
 .intro-flash { position: absolute; inset: 0; background: #fff; opacity: 0; }
