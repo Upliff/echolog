@@ -423,7 +423,7 @@
 
     // How thick each piece of glass is, and how many slices make up its edge.
     const THICK = vw > 700 ? 16 : 12;
-    const THICK_SLICES = 2;
+    const THICK_SLICES = 1;
     const layer = h('div', { class: 'intro-layer', 'aria-hidden': 'true' });
     const black = h('div', { class: 'intro-black' });
     // The pieces sit in one sheet so the whole break can slowly push in towards the viewer.
