@@ -307,6 +307,123 @@
     loadCover(game).then((img) => { if (img && songState && songState.game === game) label.style.backgroundImage = `url("${img.src}")`; });
   }
 
+  /* ---------- opening animation ----------
+     Picking a game can play a short animation and sound before its page shows.
+     A game turns it on with "intro": { "effect": "shatter", "sound": "<id from the game's sounds>" }.
+     For testing, ?intro in the link (before the #) turns the shatter on for every game,
+     and ?intro=<sound id> also plays that sound.
+     Shatter: the game's cover fills the screen, flashes, cracks into shards, and the shards
+     spin and fly off towards the viewer, showing the game page behind. Only transform and
+     opacity animate, and only for about a second and a half. */
+  const INTRO_TEST = new URLSearchParams(location.search).get('intro');
+  function introFor(game) {
+    if (!game) return null;
+    let intro = game.intro && game.intro.effect ? game.intro : null;
+    if (INTRO_TEST !== null) intro = { effect: 'shatter', sound: INTRO_TEST || (intro && intro.sound) };
+    if (!intro) return null;
+    const snd = intro.sound ? (game.sounds || []).find((x) => x.id === intro.sound || x.file === intro.sound) : null;
+    return { effect: intro.effect, file: snd ? snd.file : null };
+  }
+
+  // Called from the click (or Enter) itself, so phones let the sound play.
+  function playIntro(game, x, y) {
+    const intro = introFor(game);
+    if (!intro) return;
+    if (intro.file) {
+      const a = new Audio(intro.file);
+      a.volume = Math.max(0.05, clampVol(setting('volume')) / 100);
+      a.play().catch(() => {});
+    }
+    if (reduced || intro.effect !== 'shatter') return;
+    const ready = coverCache.has(game.id) ? loadCover(game) : null;
+    if (!ready) return;
+    // Only if the cover is already loaded (it is once the game has been hovered); never wait for it.
+    const t0 = performance.now();
+    ready.then((img) => { if (img && img.naturalWidth && performance.now() - t0 < 150) shatter(img, x, y); });
+  }
+
+  function shatter(img, x, y) {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const cx = x == null ? vw / 2 : x;
+    const cy = y == null ? vh / 2 : y;
+    // The cover laid out like a photo set to "cover".
+    const sc = Math.max(vw / img.naturalWidth, vh / img.naturalHeight);
+    const dw = img.naturalWidth * sc;
+    const dh = img.naturalHeight * sc;
+    const ox = (vw - dw) / 2;
+    const oy = (vh - dh) / 2;
+
+    // Points on a rough grid, nudged about, then each cell cut into two triangles.
+    const cols = vw > 700 ? 8 : 5;
+    const rows = vw > 700 ? 6 : 9;
+    const pts = [];
+    for (let r = 0; r <= rows; r++) {
+      pts.push([]);
+      for (let c = 0; c <= cols; c++) {
+        const edgeX = c === 0 || c === cols;
+        const edgeY = r === 0 || r === rows;
+        const jx = edgeX ? 0 : (Math.random() - 0.5) * (vw / cols) * 0.8;
+        const jy = edgeY ? 0 : (Math.random() - 0.5) * (vh / rows) * 0.8;
+        pts[r].push([(c / cols) * vw + jx, (r / rows) * vh + jy]);
+      }
+    }
+    const tris = [];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const a = pts[r][c]; const b = pts[r][c + 1]; const d = pts[r + 1][c]; const e = pts[r + 1][c + 1];
+        if (Math.random() < 0.5) tris.push([a, b, e], [a, e, d]);
+        else tris.push([a, b, d], [b, e, d]);
+      }
+    }
+
+    const layer = h('div', { class: 'intro-layer', 'aria-hidden': 'true' });
+    const flash = h('div', { class: 'intro-flash' });
+    const maxD = Math.hypot(Math.max(cx, vw - cx), Math.max(cy, vh - cy));
+    let longest = 0;
+    for (const t of tris) {
+      const minX = Math.floor(Math.min(t[0][0], t[1][0], t[2][0])) - 1;
+      const minY = Math.floor(Math.min(t[0][1], t[1][1], t[2][1])) - 1;
+      const maxX = Math.ceil(Math.max(t[0][0], t[1][0], t[2][0])) + 1;
+      const maxY = Math.ceil(Math.max(t[0][1], t[1][1], t[2][1])) + 1;
+      const mx = (t[0][0] + t[1][0] + t[2][0]) / 3;
+      const my = (t[0][1] + t[1][1] + t[2][1]) / 3;
+      const poly = t.map(([px, py]) => `${(px - minX).toFixed(1)}px ${(py - minY).toFixed(1)}px`).join(',');
+      const el = h('div', { class: 'intro-shard' });
+      el.style.cssText = `left:${minX}px;top:${minY}px;width:${maxX - minX}px;height:${maxY - minY}px;`
+        + `background-image:url("${img.src}");background-size:${dw}px ${dh}px;`
+        + `background-position:${ox - minX}px ${oy - minY}px;clip-path:polygon(${poly});`
+        + `transform-origin:${mx - minX}px ${my - minY}px;`;
+      layer.append(el);
+      // Shards near where it was clicked go first and fastest.
+      const dx = mx - cx;
+      const dy = my - cy;
+      const dist = Math.hypot(dx, dy);
+      const k = dist / maxD;
+      const len = dist || 1;
+      const push = (0.35 + Math.random() * 0.5) * Math.max(vw, vh);
+      const tx = (dx / len) * push;
+      const ty = (dy / len) * push + vh * (0.25 + Math.random() * 0.3);
+      const rot = (Math.random() - 0.5) * 240;
+      const tilt = (Math.random() - 0.5) * 70;
+      const grow = 1.25 + Math.random() * 0.8 - k * 0.3;
+      const delay = 260 + k * 280 + Math.random() * 60;
+      const dur = 760 + Math.random() * 260;
+      longest = Math.max(longest, delay + dur);
+      el.animate([
+        { transform: 'translate(0,0) rotate(0deg) scale(1)', opacity: 1 },
+        // cracks: each shard shrinks a hair, so thin gaps open between them
+        { transform: `translate(${(dx / len) * 3}px,${(dy / len) * 3}px) rotate(${rot * 0.02}deg) scale(0.985)`, opacity: 1, offset: 0.12 },
+        { transform: `perspective(900px) translate(${tx}px,${ty}px) rotate(${rot}deg) rotateX(${tilt}deg) scale(${grow})`, opacity: 0 },
+      ], { duration: dur, delay, easing: 'cubic-bezier(.55,0,.8,.3)', fill: 'both' });
+    }
+    layer.append(flash);
+    document.body.append(layer);
+    flash.animate([{ opacity: 0 }, { opacity: 0.9, offset: 0.25 }, { opacity: 0 }],
+      { duration: 380, delay: 60, easing: 'ease-out', fill: 'both' });
+    setTimeout(() => layer.remove(), longest + 80);
+  }
+
   /* ---------- home ---------- */
 
   function renderHome() {
@@ -320,7 +437,8 @@
     // A search box over a plain list. It matches game names and song names.
     const items = games.map((g, i) => {
       const li = h('li', { class: 'rise', style: `--i:${Math.min(i + 1, 12)}`, onmouseenter: () => setCover(g) },
-        h('a', { href: `#/${encodeURIComponent(g.id)}`, onfocus: () => setCover(g) }, g.title));
+        h('a', { href: `#/${encodeURIComponent(g.id)}`, onfocus: () => setCover(g),
+          onclick: (e) => { loadCover(g); playIntro(g, e.clientX || null, e.clientY || null); } }, g.title));
       const words = [g.title, ...(g.songs || []).map((s) => s.title)].join(' ').toLowerCase();
       return { g, li, words };
     });
@@ -347,7 +465,7 @@
     search.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter') return;
       const first = items.find((x) => !x.li.hidden);
-      if (first) location.hash = `#/${encodeURIComponent(first.g.id)}`;
+      if (first) { loadCover(first.g); playIntro(first.g); location.hash = `#/${encodeURIComponent(first.g.id)}`; }
     });
 
     app.append(h('section', { class: 'view home' },
