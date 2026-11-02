@@ -2,8 +2,13 @@ name: Collect stories
 
 on:
   schedule:
-    - cron: "17 16 * * *"   # daily, about 3am Sydney time
-  workflow_dispatch:        # lets you run it by hand from the Actions tab
+    - cron: "17 16 * * *"   # daily, about 3am Sydney time. Each game is checked once a week; a share of them each night.
+  workflow_dispatch:        # started by admin page saves, or by hand from the Actions tab
+    inputs:
+      mode:
+        description: "saves = only new videos (what a save does). weekly = also this run's share of weekly checks."
+        required: false
+        default: "saves"
 
 permissions:
   contents: write
@@ -15,7 +20,7 @@ concurrency:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
@@ -23,16 +28,44 @@ jobs:
         with:
           python-version: "3.12"
 
+      # The comment pool lives on the "pool" branch, replaced every run so it keeps no history.
+      - name: Get comment pool
+        env:
+          REPO_URL: https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
+        run: |
+          mkdir -p "$RUNNER_TEMP/pool"
+          cd "$RUNNER_TEMP/pool"
+          git init -q
+          git remote add origin "$REPO_URL"
+          if git fetch -q --depth 1 origin pool; then
+            git checkout -q FETCH_HEAD -- .
+            echo "Pool loaded"
+          else
+            echo "No pool branch yet, starting a new one"
+          fi
+
       - name: Run collector
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          POOL_DIR: ${{ runner.temp }}/pool
+          RUN_MODE: ${{ github.event_name == 'schedule' && 'weekly' || inputs.mode || 'saves' }}
         run: python collector/collect.py
+
+      - name: Save comment pool
+        run: |
+          cd "$RUNNER_TEMP/pool"
+          git config user.name "echolog-bot"
+          git config user.email "echolog-bot@users.noreply.github.com"
+          git checkout -q --orphan run
+          git add -A
+          git commit -qm "Comment pool" --allow-empty
+          git push -qf origin run:pool
 
       - name: Commit new data
         run: |
           git config user.name "echolog-bot"
           git config user.email "echolog-bot@users.noreply.github.com"
-          git add data/stories.json
+          git add data/stories.json data/index.json data/games
           if git diff --cached --quiet; then
             echo "No changes"
           else

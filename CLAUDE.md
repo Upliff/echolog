@@ -19,7 +19,8 @@ Owner: Mohad. Repo: https://github.com/Upliff/echolog (public).
 - **Name:** Echolog (echo + log).
 - **Sources:** YouTube comments on soundtrack videos. Reddit is out: Reddit stopped taking new API requests on 31 Oct 2026. Steam is off for now: Steam shut its public review endpoint in Oct 2026, and the replacement needs a publisher key. The Steam code stays in `collect.py` behind `STEAM_ENABLED = False`. People can also send their own comments (see below).
 - **No home server, no local AI model.** Everything runs on GitHub: a GitHub Actions job runs nightly, and the site will be hosted on GitHub Pages.
-- **Filtering:** a free keyword and score filter (`collector/collect.py`). There's no AI scoring for now; paid AI could be added later if needed. To remove a bad comment, add its id to `data/hidden.txt`.
+- **Collecting at 100 games (2 Nov 2026):** Mohad plans about 100 games (FFX alone could have 80 songs) before going live. Fetching everything every run would need about 37,000 units a day, so the collector now works from a queue: a deep pull once per new video, then a weekly check of each game for new comments only, and the comments on the site fetched again by id. Saves only fetch new videos. Mohad can choose which comments show (the filter chooses until he does). See "Collector" under How it works.
+- **Filtering:** a free keyword and score filter (`collector/collect.py`). There's no AI scoring for now; paid AI could be added later if needed. To remove a bad comment, add its id to `data/hidden.txt`. Mohad can also choose a song's comments himself (`data/picks.json`, planned in the admin page).
 - **Front end:** plain HTML/CSS/JS at the repo root (see "Front end" below). Reads `data/stories.json`.
 - **First game:** Final Fantasy X, with 5 songs (see `config/games.json`).
 - **Feel:** snappy and quiet. Only the video and the comments. No heavy effects.
@@ -45,11 +46,16 @@ Owner: Mohad. Repo: https://github.com/Upliff/echolog (public).
 
 ```
 config/games.json        games, songs, clip for each song, videos to pull comments from
-collector/collect.py     fetches comments and reviews, filters them, writes data/stories.json
-data/stories.json        output the site reads (rebuilt every run)
+collector/collect.py     fetches comments, filters them, writes the data below
+data/index.json          list of games and song names for the home page, plus the last run's status and log
+data/games/<id>.json     one game with its songs and comments (same shape as a game in stories.json)
+data/stories.json        everything in one file, the old format the site still reads (to be retired)
+data/picks.json          comments Mohad chose per song or scene (admin page writes, planned)
+data/repull.txt          videos to deep pull again (admin page writes, planned)
 data/sample-stories.json fake data so the design has something to show
 data/hidden.txt          ids of stories to never show
-.github/workflows/collect.yml   runs daily ~3am Sydney, or by hand from the Actions tab
+.github/workflows/collect.yml   runs daily ~3am Sydney, on every admin save, or by hand from the Actions tab
+pool branch              the comment pool: state.json and videos/<video id>.json.gz (replaced every run, no history)
 ```
 
 **Adding a game or song:** use the admin page (below), an import file (`docs/IMPORT.md`, for adding lots at once; a Claude chat can make one), or edit `config/games.json` by hand.
@@ -93,15 +99,35 @@ data/hidden.txt          ids of stories to never show
 
 Other chats add what they need from the admin page here. The admin chat builds it and then removes the line.
 
+- (collector chat, 2 Nov 2026) **Choosing comments.** In the song editor (and for each scene with its own comment videos), a way to see all the comments in the pool for that song's comment videos and tick the ones to show. Read each video's pool from the `pool` branch (`videos/<video id>.json.gz`, gzip JSON, see "Collector"; `DecompressionStream('gzip')` reads it), merge them, and show text exactly as written, likes, date, author and a link to the comment. Mark comments as new when `seen` is after the video's `deepAt` day, with a way to show only new ones. Show which ones are on the site now (`data/games/<id>.json`). Saving writes the ticked ids to `data/picks.json` under the key `game/song` or `game/song/<scene number>`, with the same load-latest-and-retry as other saves, then starts the collector. A "Let the filter choose" button removes the key. A video with no pool file yet: say its comments are still waiting to be fetched.
+- (collector chat, 2 Nov 2026) **Fetch a video again.** Next to each comment video, a button that adds `VIDEOID <today's date>` to `data/repull.txt` and starts the collector.
+- (collector chat, 2 Nov 2026) **Collector status.** Somewhere visible (top of the Games tab, or the Site tab): from `data/index.json` `status`, quota used today out of the budget, deep pulls waiting, and each problem video with its error and the songs that use it, so a broken video can be swapped.
 
 
-**Quota:** YouTube allows 10,000 units a day, and each page of 100 comments costs 1 unit. At 5 pages per video, that's roughly 5 units per video per run, so there's plenty of room.
+### Collector (rebuilt 2 Nov 2026)
+
+Built so the quota holds at about 100 games (about 2,500 songs and 7,500 comment videos). YouTube allows 10,000 units a day; each request costs 1 unit.
+
+- **Deep pull (once per video):** the first time a comment video is seen, the collector fetches its top 1,500 comments (`DEEP_PAGES` = 15 pages, most relevant first) plus the newest page: 16 units. Comments worth reading go into that video's pool: at least 40 characters, no links or "who's here in 2026", no timestamp lists, best 300 kept (`POOL_PER_VIDEO`). They're much looser than the filter for the site, so Mohad has plenty to choose from.
+- **Weekly check:** each game is checked once a week. The daily scheduled run does a seventh of the games (oldest first, `CHECK_EVERY_DAYS` = 7). A check fetches only comments posted since the last one (usually 1 unit per video; a video shared by several songs is fetched once), and fetches the comments shown on the site and Mohad's picks again by id (50 per unit), which updates likes and removes deleted ones.
+- **Saves:** runs started by an admin save (or "Fetch comments now") only do deep pulls for new videos and rebuild the data. A save never re-fetches the whole catalogue. Run it by hand with mode "weekly" from the Actions tab to also do that day's checks.
+- **Daily budget:** the collector stops at `DAILY_BUDGET` = 8,000 units per YouTube day (which resets at midnight Pacific, about 6 or 7pm Sydney). Anything left waits in the queue for the next run. It also stops starting new deep pulls after 40 minutes so a run always finishes and saves.
+- **Cost at 100 games:** about 1,500 units a day for the weekly checks. Loading 100 new games takes about 120,000 units at 16 per video, so roughly 15 days of queue; adding one game later (25 songs, 3 videos each) is about 1,200.
+- **What shows on the site:** if Mohad has chosen comments for a song or scene in `data/picks.json`, exactly those show (up to 200). If not, the filter picks the best 60 by score, as before, from the comments already shown plus the pool. The filter's list only changes when new comments come in or one is hidden.
+- **`data/picks.json`:** `{ "picks": { "ffx/to-zanarkand": ["yt:...", ...], "ffx/to-zanarkand/2": [...] } }`. Keys are the site's links: game/song for the song, game/song/n for scene n (from 1) when that scene has its own comment videos. A key that's there replaces the filter for that slot; take the key out to go back to the filter. Picked ids that no longer exist are skipped. Reordering scenes changes their numbers, so picks for a scene follow the number, not the scene.
+- **`data/repull.txt`:** one line per video to deep pull again, `VIDEOID 2026-11-03` (a date or full time). It's done once if the last deep pull was before that time. Lines can stay; they won't repeat.
+- **The pool** lives on the `pool` branch of the repo: `state.json` (when each video and game was last fetched, last error, the quota used today, cached video lengths) and `videos/<video id>.json.gz` (gzip JSON: `{ "videoId", "deepAt", "comments": [...] }`, same comment shape as the site's plus `seen`, the day it was first fetched, and `fetched`, the day it was last fetched). A comment is new if `seen` is after the video's `deepAt` day. The branch is replaced on every run (one commit, no history), so the repo doesn't grow week by week. It can be read from `https://raw.githubusercontent.com/Upliff/echolog/pool/videos/<id>.json.gz`. If it's ever lost, the collector just deep pulls everything again.
+- **30-day rule:** comments nobody picked are dropped from the pool 28 days after they were fetched (`KEEP_DAYS`). Shown and picked ones are fetched again weekly; nothing older than 30 days is shown or kept, even if YouTube can't be reached.
+- **Problems:** a video that fails (comments turned off, video removed) is listed in `data/index.json` under `status.problems` with the songs that use it. It isn't tried again on saves, only on the daily run. Swap it for another video.
+- **Status:** `data/index.json` has `status`: mode, quota used today and this run, deep pulls done and waiting, problems. Plus the run `log`.
+- A comment video taken off a song in `config/games.json` leaves the pool on the next run, and its comments leave the site.
+- Tested 2 Nov 2026 against a fake YouTube (31 checks: first pull, saves costing nothing, a new video costing 16, picks, hidden, weekly new-only check, deleted comments, comments turned off, the budget stopping and continuing next day, the 30-day drop). Not run against real YouTube from Claude's side yet.
 
 **Saves only show on the site after a collector run.** The site reads `data/stories.json`, not `config/games.json`, so a change made in the admin page appears once "Collect stories" has run (about 30 seconds) and GitHub Pages has republished (a minute or two). The collector's push now retries up to 5 times, pulling in anything saved meanwhile: on 1 Nov 2026 a run failed because an admin save landed while it was running, so Kingdom Hearts II changes didn't show until it was run again.
 
-**Run log:** each run writes a `log` list into `data/stories.json` showing how many comments each video gave, or why it failed. GitHub's own job logs can't be read from Claude's side, so check this instead. A video that gives `403` has comments turned off, so swap it for another.
+**Run log:** each run writes a `log` list into `data/index.json` (and `data/stories.json`) showing what each video gave, or why it failed. GitHub's own job logs can't be read from Claude's side, so check this instead. A video that gives `403` has comments turned off, so swap it for another.
 
-**YouTube rules:** show the author's name and link back to the comment, and don't keep comment data older than 30 days. The nightly rebuild covers this.
+**YouTube rules:** show the author's name and link back to the comment, and don't keep comment data older than 30 days. The weekly refresh and the 28-day pool drop cover this (see Collector).
 
 ## Data shape (data/stories.json)
 
@@ -143,7 +169,7 @@ A scene with its own `commentVideos` gets its own `stories` list in `moments` (s
 
 Other chats add what they need from the site here. The site chat builds it and then removes the line.
 
-- (none)
+- (collector chat, 2 Nov 2026) **Load one game at a time.** At 100 games `data/stories.json` would be about 50 MB. Load `data/index.json` for the home page (games with id, title, year, cover, intro, and songs with id, title and composer, plus `settings`), and `data/games/<id>.json` when a game or song page opens (same shape as one game in `stories.json`). Once that's live, tell the collector chat so it stops writing `stories.json` (`WRITE_STORIES_JSON` in `collect.py`).
 
 Plain HTML, CSS and JS, no build step. It lives at the repo root, so GitHub Pages serves it as-is:
 
@@ -290,3 +316,4 @@ Mohad asked for this on 31 Oct 2026: a song can have several scenes (it often pl
 4. Turn on GitHub Pages: Settings, then Pages, then Deploy from a branch, main, / (root). The site will be at https://upliff.github.io/echolog/.
 5. Own comments, requests and hide names: create the private inbox repo, write the Worker, add the site forms and the switch. (The admin Inbox tab and the collector merge are done.) Mohad: make a Cloudflare account and get a Turnstile site key.
 6. Give the scenes labels in the admin page (Otherworld's two scenes show as "Scene 1" and "Scene 2" for now).
+7. Collector at scale: take the comment chooser, "Fetch a video again" and collector status to the admin chat, and loading one game at a time to the site chat (see the requests). Then add games; the queue fills in their comments over the following days.
