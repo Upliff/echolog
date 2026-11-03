@@ -1,0 +1,59 @@
+{
+ "search": "Kingdom Hearts II original soundtrack",
+ "playlists": [
+  {
+   "playlist": "PLDD1C236CA6E094FC",
+   "title": "Kingdom Hearts 2 OST",
+   "channel": "Kaiyo",
+   "count": 89
+  },
+  {
+   "playlist": "PLuUSFdBe9Vn3cYYfsUGLhCPa3we2E5Ipy",
+   "title": "Kingdom Hearts Ⅱ OST",
+   "channel": "OST Centre",
+   "count": 95
+  },
+  {
+   "playlist": "PLnpIlrljTbXxrTmUdYMWerpqjUDPiOgYx",
+   "title": "KH2.5 OST",
+   "channel": "Oath",
+   "count": 103
+  },
+  {
+   "playlist": "PLWCkhGoFcFixsL_83TK9me4ZObAvNKJY7",
+   "title": "Kingdom Hearts 2.5 HD ReMIX Original Soundtrack [CD Quality]",
+   "channel": "Jenny McLesbian",
+   "count": 105
+  },
+  {
+   "playlist": "PLKOgquLeB256A_d7qTP6cLfKQHXXqfzMG",
+   "title": "Kingdom Hearts 2 (Final Mix) OST Extended [COMPLETE]",
+   "channel": "Music7",
+   "count": 97
+  },
+  {
+   "playlist": "PL6F3A3948DB91919F",
+   "title": "Kingdom Hearts II OST",
+   "channel": "SquidGamerGal",
+   "count": 102
+  },
+  {
+   "playlist": "PLdpcyIXaRTFWTO_hQW_PLjgVQcjTEk92G",
+   "title": "Kingdom Hearts II Extended Soundtrack",
+   "channel": "TameTonic Playz",
+   "count": 111
+  },
+  {
+   "playlist": "PLKOgquLeB2571Kn32MtyChd7szUGQz28o",
+   "title": "Kingdom Hearts HD 2.5 Remix OST Extended [COMPLETE]",
+   "channel": "Music7",
+   "count": 177
+  }
+ ],
+ "job": {
+  "name": "s-kh2",
+  "search": "Kingdom Hearts II original soundtrack",
+  "type": "playlist",
+  "max": 8
+ }
+}

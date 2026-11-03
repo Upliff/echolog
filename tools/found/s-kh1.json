@@ -1,0 +1,59 @@
+{
+ "search": "Kingdom Hearts 1 original soundtrack",
+ "playlists": [
+  {
+   "playlist": "PLYDdhHVGYrjKGZURwkooz8jAfChYBHmH6",
+   "title": "KINGDOM HEARTS OST",
+   "channel": "MusicKingdom",
+   "count": 59
+  },
+  {
+   "playlist": "PLuUSFdBe9Vn39kfZDsg-gfiXOcOOnPce7",
+   "title": "Kingdom Hearts OST",
+   "channel": "OST Centre",
+   "count": 75
+  },
+  {
+   "playlist": "PLLjVQB3Zw-Mstf6WRFYsq22VmswJr-iu3",
+   "title": "KINGDOM HEARTS OFFICIAL PLAYLIST",
+   "channel": "Iman Hall",
+   "count": 351
+  },
+  {
+   "playlist": "PLMx9nl9VYhtN3I9FglGRNINfdNVgtbJqn",
+   "title": "Kingdom Hearts Original Soundtrack",
+   "channel": "TheOSTLobby Youtube",
+   "count": 76
+  },
+  {
+   "playlist": "PLKOgquLeB257QR6r_g68fsKjbsJJLNyUS",
+   "title": "Kingdom Hearts (Final Mix) OST Extended [COMPLETE]",
+   "channel": "Music7",
+   "count": 85
+  },
+  {
+   "playlist": "PLnpIlrljTbXyqZE9NL--ByoGnqETPxQSX",
+   "title": "Kh1.5 OST",
+   "channel": "Oath",
+   "count": 84
+  },
+  {
+   "playlist": "PLKOgquLeB256jf-musnYes_7YmDHApCLj",
+   "title": "Kingdom Hearts HD 1.5 Remix OST Extended [COMPLETE]",
+   "channel": "Music7",
+   "count": 142
+  },
+  {
+   "playlist": "PLuUSFdBe9Vn2PUG1yqZsfvz4c11qfJyPC",
+   "title": "Kingdom Hearts HD 1.5 ReMIX OST",
+   "channel": "OST Centre",
+   "count": 86
+  }
+ ],
+ "job": {
+  "name": "s-kh1",
+  "search": "Kingdom Hearts 1 original soundtrack",
+  "type": "playlist",
+  "max": 8
+ }
+}
