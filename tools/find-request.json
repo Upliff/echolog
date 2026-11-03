@@ -1,13 +1,114 @@
-{ "jobs": [
-  { "name": "ffx-ost", "playlist": "PLOLBWlPQqPkt7eTc5XqXb5MQrR2XCUu6Q" },
-  { "name": "s-ffx-hd", "search": "Final Fantasy X HD Remaster soundtrack full", "type": "playlist", "max": 8 },
-  { "name": "s-kh2", "search": "Kingdom Hearts II original soundtrack", "type": "playlist", "max": 8 },
-  { "name": "s-kh2fm", "search": "Kingdom Hearts II Final Mix HD soundtrack", "type": "playlist", "max": 8 },
-  { "name": "s-kh1", "search": "Kingdom Hearts 1 original soundtrack", "type": "playlist", "max": 8 },
-  { "name": "s-kh1hd", "search": "Kingdom Hearts HD 1.5 Remix soundtrack", "type": "playlist", "max": 8 },
-  { "name": "s-kh3", "search": "Kingdom Hearts III original soundtrack", "type": "playlist", "max": 8 },
-  { "name": "s-dr", "search": "Deltarune soundtrack chapter 1 2 3 4", "type": "playlist", "max": 10 },
-  { "name": "s-ut", "search": "Undertale soundtrack full", "type": "playlist", "max": 8 },
-  { "name": "s-ffx2", "search": "Final Fantasy X-2 original soundtrack", "type": "playlist", "max": 8 },
-  { "name": "s-ffx2hd", "search": "Final Fantasy X-2 HD Remaster soundtrack", "type": "playlist", "max": 8 }
-] }
+{
+ "jobs": [
+  {
+   "name": "ffx-hd-agg",
+   "playlist": "PLnpxa8AqNfnkAiMtCFoBv6a0zHc0Q5h1p"
+  },
+  {
+   "name": "ffx-hd-sm",
+   "playlist": "PLfz_hJVX_SSJKLAF7rjXHo6uDTnOGOUYr"
+  },
+  {
+   "name": "ffx-hd-ffw",
+   "playlist": "PL7CLNgbSY2OuA3fAHprbX_4Mp7MotKXFO"
+  },
+  {
+   "name": "ffx-manny",
+   "playlist": "PLE5323E82433609D0"
+  },
+  {
+   "name": "ffx2-tuke",
+   "playlist": "PLVoerqML4MHhsWnDY_9ok4kV87Ug2V9_J"
+  },
+  {
+   "name": "ffx2-nine",
+   "playlist": "PL9DzJGj4zKvNvZ-SfE_vFFGkkqkkSCGYe"
+  },
+  {
+   "name": "ffx2-ghub",
+   "playlist": "PL3ABFCD5E86FD91EF"
+  },
+  {
+   "name": "ffx2-hd-julia",
+   "playlist": "PLYNu7HjdIDjDvPYCsBBy6pVlf711XzVDq"
+  },
+  {
+   "name": "kh1-mk",
+   "playlist": "PLYDdhHVGYrjKGZURwkooz8jAfChYBHmH6"
+  },
+  {
+   "name": "kh1-osc",
+   "playlist": "PLuUSFdBe9Vn39kfZDsg-gfiXOcOOnPce7"
+  },
+  {
+   "name": "kh1-lobby",
+   "playlist": "PLMx9nl9VYhtN3I9FglGRNINfdNVgtbJqn"
+  },
+  {
+   "name": "kh1-hd-osc",
+   "playlist": "PLuUSFdBe9Vn2PUG1yqZsfvz4c11qfJyPC"
+  },
+  {
+   "name": "kh1-hd-nb",
+   "playlist": "PLBO2h-GzDvIZMB9F7idWdpLsWnhJUyuzp"
+  },
+  {
+   "name": "kh2-kaiyo",
+   "playlist": "PLDD1C236CA6E094FC"
+  },
+  {
+   "name": "kh2-osc",
+   "playlist": "PLuUSFdBe9Vn3cYYfsUGLhCPa3we2E5Ipy"
+  },
+  {
+   "name": "kh2-squid",
+   "playlist": "PL6F3A3948DB91919F"
+  },
+  {
+   "name": "kh2-hd-osc",
+   "playlist": "PLuUSFdBe9Vn2EcCAcQ7oKJfeHLFja5HmD"
+  },
+  {
+   "name": "kh2-hd-oath",
+   "playlist": "PLnpIlrljTbXxrTmUdYMWerpqjUDPiOgYx"
+  },
+  {
+   "name": "kh3-omni",
+   "playlist": "PLtL13NyofAW5eV9iDg8YDxK2-6CJsq2NS"
+  },
+  {
+   "name": "kh3-osc",
+   "playlist": "PLuUSFdBe9Vn3MBDMhtFxZDxwLiCXzC0Yk"
+  },
+  {
+   "name": "dr-1",
+   "playlist": "PLKXdyINOQYsbroHtsNBW6OJaNZKLh8lf6"
+  },
+  {
+   "name": "dr-2",
+   "playlist": "PLKXdyINOQYsbMHB5JF-mqNQOb-8WD0iDq"
+  },
+  {
+   "name": "dr-34",
+   "playlist": "PLKXdyINOQYsaHwm4rJ0QDFzsaZQNQjF0U"
+  },
+  {
+   "name": "dr-all-pb",
+   "playlist": "PLwjEXrvFo-2B7iCX61eOThc_oGihi84l9"
+  },
+  {
+   "name": "ut-toby",
+   "playlist": "PLKXdyINOQYsb38jn5HGiF6w8X3rph4IIx"
+  },
+  {
+   "name": "ut-ingame",
+   "playlist": "PLbqwq4V80zDKqM26zEg0tak4qq2GsE2Er"
+  },
+  {
+   "name": "s-dr5",
+   "search": "DELTARUNE Chapter 5 Soundtrack Toby Fox",
+   "type": "playlist",
+   "max": 6
+  }
+ ]
+}
