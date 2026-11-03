@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-03T12:15:13Z",
+  "updated": "2026-11-03T17:10:46Z",
   "settings": {},
   "games": [
     {
@@ -4000,39 +4000,17 @@
     }
   ],
   "status": {
-    "mode": "saves",
+    "mode": "weekly",
     "quotaDay": "2026-11-03",
     "quotaUsedToday": 3980,
-    "quotaUsedThisRun": 42,
+    "quotaUsedThisRun": 0,
     "budget": 8000,
-    "deepPullsDone": 21,
+    "deepPullsDone": 0,
     "deepPullsWaiting": 0,
     "problems": []
   },
   "log": [
-    "mode: saves",
-    "deep pulls waiting: 21",
-    "WRsRrZarz7U: deep pull, 5 comments, 3 in pool",
-    "XthtlCg62L8: deep pull, 4 comments, 0 in pool",
-    "Of_cojuUlOw: deep pull, 2 comments, 0 in pool",
-    "HoPN8CpJiGo: deep pull, 4 comments, 1 in pool",
-    "5scTZYNYP4c: deep pull, 3 comments, 1 in pool",
-    "kmAVNl9rt6k: deep pull, 14 comments, 1 in pool",
-    "GEBWnte2oY4: deep pull, 3 comments, 2 in pool",
-    "f8SllNmYtLk: deep pull, 4 comments, 0 in pool",
-    "JALRmpKYHeY: deep pull, 12 comments, 4 in pool",
-    "rZKNsOTgD-4: deep pull, 4 comments, 0 in pool",
-    "X-zo8FS0ye0: deep pull, 14 comments, 5 in pool",
-    "_-KA-IvCkSY: deep pull, 2 comments, 1 in pool",
-    "6moL9BhSYWk: deep pull, 6 comments, 1 in pool",
-    "euRnnw2t2QY: deep pull, 12 comments, 3 in pool",
-    "ontCzfg0Ax4: deep pull, 8 comments, 3 in pool",
-    "UZ65UuopQH8: deep pull, 16 comments, 4 in pool",
-    "owCWD-rt3I8: deep pull, 8 comments, 2 in pool",
-    "T4HM7Yn8BVc: deep pull, 4 comments, 0 in pool",
-    "CmDjn2P-B2k: deep pull, 14 comments, 6 in pool",
-    "5daFOU9ENbY: deep pull, 18 comments, 2 in pool",
-    "soqz0SKVU7c: deep pull, 4 comments, 2 in pool",
-    "quota: 42 units this run, 3980 of 8000 today"
+    "mode: weekly",
+    "quota: 0 units this run, 3980 of 8000 today"
   ]
 }
