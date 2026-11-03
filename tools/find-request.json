@@ -1,0 +1,13 @@
+{ "jobs": [
+  { "name": "ffx-ost", "playlist": "PLOLBWlPQqPkt7eTc5XqXb5MQrR2XCUu6Q" },
+  { "name": "s-ffx-hd", "search": "Final Fantasy X HD Remaster soundtrack full", "type": "playlist", "max": 8 },
+  { "name": "s-kh2", "search": "Kingdom Hearts II original soundtrack", "type": "playlist", "max": 8 },
+  { "name": "s-kh2fm", "search": "Kingdom Hearts II Final Mix HD soundtrack", "type": "playlist", "max": 8 },
+  { "name": "s-kh1", "search": "Kingdom Hearts 1 original soundtrack", "type": "playlist", "max": 8 },
+  { "name": "s-kh1hd", "search": "Kingdom Hearts HD 1.5 Remix soundtrack", "type": "playlist", "max": 8 },
+  { "name": "s-kh3", "search": "Kingdom Hearts III original soundtrack", "type": "playlist", "max": 8 },
+  { "name": "s-dr", "search": "Deltarune soundtrack chapter 1 2 3 4", "type": "playlist", "max": 10 },
+  { "name": "s-ut", "search": "Undertale soundtrack full", "type": "playlist", "max": 8 },
+  { "name": "s-ffx2", "search": "Final Fantasy X-2 original soundtrack", "type": "playlist", "max": 8 },
+  { "name": "s-ffx2hd", "search": "Final Fantasy X-2 HD Remaster soundtrack", "type": "playlist", "max": 8 }
+] }
