@@ -1,1 +1,82 @@
-{"jobs":[{"name":"dr-5","playlist":"PLKXdyINOQYsbqGQp08A83PtAWNBrY1FXP"}]}
+{
+ "jobs": [
+  {
+   "name": "v-ffx-0",
+   "search": "Final Fantasy X OST",
+   "type": "video",
+   "max": 50
+  },
+  {
+   "name": "v-ffx-1",
+   "search": "Final Fantasy X music extended",
+   "type": "video",
+   "max": 50
+  },
+  {
+   "name": "v-kh2-0",
+   "search": "Kingdom Hearts 2 OST",
+   "type": "video",
+   "max": 50
+  },
+  {
+   "name": "v-kh2-1",
+   "search": "Kingdom Hearts II music extended",
+   "type": "video",
+   "max": 50
+  },
+  {
+   "name": "v-kh1-0",
+   "search": "Kingdom Hearts 1 OST",
+   "type": "video",
+   "max": 50
+  },
+  {
+   "name": "v-kh1-1",
+   "search": "Kingdom Hearts music extended",
+   "type": "video",
+   "max": 50
+  },
+  {
+   "name": "v-kh3-0",
+   "search": "Kingdom Hearts 3 OST",
+   "type": "video",
+   "max": 50
+  },
+  {
+   "name": "v-kh3-1",
+   "search": "Kingdom Hearts III music",
+   "type": "video",
+   "max": 50
+  },
+  {
+   "name": "v-ffx2-0",
+   "search": "Final Fantasy X-2 OST",
+   "type": "video",
+   "max": 50
+  },
+  {
+   "name": "v-ffx2-1",
+   "search": "Final Fantasy X-2 music",
+   "type": "video",
+   "max": 50
+  },
+  {
+   "name": "v-ut-0",
+   "search": "Undertale OST",
+   "type": "video",
+   "max": 50
+  },
+  {
+   "name": "v-dr-0",
+   "search": "Deltarune OST",
+   "type": "video",
+   "max": 50
+  },
+  {
+   "name": "v-dr-1",
+   "search": "Deltarune music",
+   "type": "video",
+   "max": 50
+  }
+ ]
+}
