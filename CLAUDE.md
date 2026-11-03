@@ -57,7 +57,7 @@ data/hidden.txt          ids of stories to never show
 pool branch              the comment pool: state.json and videos/<video id>.json.gz (replaced every run, no history)
 ```
 
-**Adding a game or song:** use the admin page (below), an import file (`docs/IMPORT.md`, for adding lots at once; a Claude chat can make one), or edit `config/games.json` by hand.
+**Adding a game or song:** use the admin page (below), an import file (`docs/IMPORT.md`, for adding lots at once; only the bulk chat makes these, see "Bulk create"), or edit `config/games.json` by hand.
 - `moment` sets the scene that plays: the YouTube `videoId` plus a `start` time in seconds (and `end` if the scene should stop or loop there). Use `null` if there's no clip yet.
 - `audio` (optional) is a separate music track: `{ "videoId": "...", "start": 0, "end": null }`. When it's set, the scene plays muted and loops until the music ends. The song ends when the music ends. If there's `audio` but no `moment`, the audio video itself is shown.
 - `commentVideos` lists the YouTube videos to pull comments from. Pick videos with lots of views and comments. A scene in `moments` can have its own `commentVideos`; then that scene shows its own comments, and scenes without any show the song's.
@@ -127,6 +127,26 @@ Built so the quota holds at about 100 games (about 2,500 songs and 7,500 comment
 **Run log:** each run writes a `log` list into `data/index.json` showing what each video gave, or why it failed. GitHub's own job logs can't be read from Claude's side, so check this instead. A video that gives `403` has comments turned off, so swap it for another.
 
 **YouTube rules:** show the author's name and link back to the comment, and don't keep comment data older than 30 days. The weekly refresh and the 28-day pool drop cover this (see Collector).
+
+## Bulk create
+
+**Only one chat creates in bulk: the bulk chat** (set up 1 Nov 2026). Bulk means making import files, adding several games or songs at once, or bulk changes to songs already there (music tracks, comment videos, scenes, removing songs). Every other chat must not do this. If another chat's work needs it, it adds a line to "Bulk requests" below and tells Mohad to take it to the bulk chat. Mohad adding or editing a song himself in the admin page is fine.
+
+- The bulk chat adds straight to `config/games.json` (data, so allowed) and starts "Collect stories", or makes an import file when Mohad wants to preview first. It reads the latest `config/games.json` before every change, never changes existing songs unless asked, and doesn't edit the admin page or the site.
+- **Rules for adding a game (Mohad, 3 Nov 2026):** add the whole soundtrack found on YouTube. If the game has a remaster, the music track is the original version. Comment videos can be the original upload, other uploads of the song, and the remaster versions.
+- **Finding videos:** Claude's workspace can't reach YouTube, so the "Find videos" workflow (`.github/workflows/find-videos.yml`, `tools/find_videos.py`) does it with the same API key. The bulk chat writes `tools/find-request.json` (playlists to list, or searches), starts the workflow, and reads the results from `tools/found/`. Listing a playlist costs 1 unit per 50 videos; a search costs 100 (at most 15 per run). This comes out of the same 10,000 a day as the collector, which doesn't count it, so keep searches few.
+- New songs get a music track (the soundtrack upload) and no scene (`moments: []`), so the soundtrack video itself shows until Mohad adds a scene. Tracks under 10 seconds are left out.
+- Uploads that list a comment count can still have comments turned off (the Omni Slash KH3 uploads did). Those show under `status.problems` after a run; swap them.
+
+### Bulk requests
+
+Other chats and Mohad add what they need here. The bulk chat does it and then removes the line.
+
+- **Done 3 Nov 2026:** FFX (82 songs, from the SQUARE ENIX playlist; left out Victory Fanfare, Game Over, Good Night, Twilight, The Void, The Temple Players, Gloom; the 4 existing songs got extra comment videos and Suteki da Ne got its music track), Kingdom Hearts II (93 more), Deltarune (chapters 1 to 5, 202), Undertale (99), Final Fantasy X-2 (66), Kingdom Hearts (75), Kingdom Hearts III (166). No scenes yet. No cover art yet for the 5 new games.
+- **Thin comments:** many songs show "Nothing here yet" because their uploads have few comments (KH3 worst: 114 songs have no comment video at all, FFX-2 and KH1/KH2 minor tracks next). Fix: a search per song for popular uploads (100 units each), a few dozen a day, biggest songs first.
+- **Games still to add (Mohad's list, in order):** Darkest Dungeon, Darkest Dungeon II, Inscryption, RuneScape, Warcraft III, Ratchet & Clank, Ratchet & Clank: Going Commando, Skyrim, Bayonetta, Stardew Valley, World of Warcraft, Pokémon Red / Blue / Yellow, Pokémon Gold / Silver / Crystal, Pokémon Ruby / Sapphire / Emerald, Pokémon FireRed / LeafGreen, Pokémon Diamond / Pearl / Platinum, Red Dead Redemption, GTA Vice City, GTA San Andreas, Persona 5, Super Mario Sunshine, Tekken 4, Sonic Adventure 2: Battle, Need for Speed: Underground, Devil May Cry, Minecraft, Terraria, Starbound, Mega Man Battle Network.
+- **Waiting on Mohad (which game in the series):** Crash Bandicoot, Street Fighter, Mario Kart.
+- **To ask Mohad when starting:** each Pokémon group as one game or one per version; which Devil May Cry and Mega Man Battle Network; Red Dead Redemption 1 (not 2).
 
 ## Data shape (data/games/<id>.json)
 
