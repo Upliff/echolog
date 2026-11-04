@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-04T17:08:48Z",
+  "updated": "2026-11-04T19:59:55Z",
   "settings": {},
   "games": [
     {
@@ -4000,17 +4000,18 @@
     }
   ],
   "status": {
-    "mode": "weekly",
+    "mode": "saves",
     "quotaDay": "2026-11-04",
-    "quotaUsedToday": 0,
-    "quotaUsedThisRun": 0,
+    "quotaUsedToday": 1,
+    "quotaUsedThisRun": 1,
     "budget": 8000,
     "deepPullsDone": 0,
     "deepPullsWaiting": 0,
     "problems": []
   },
   "log": [
-    "mode: weekly",
-    "quota: 0 units this run, 0 of 8000 today"
+    "mode: saves",
+    "lengths: 1 videos",
+    "quota: 1 units this run, 1 of 8000 today"
   ]
 }
