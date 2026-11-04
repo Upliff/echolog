@@ -1709,6 +1709,38 @@
     }, 4000);
   }
   // The label over the video while ads are on (or may be waiting for a tap).
+  /* Premium in other browsers: Firefox (Total Cookie Protection), every iPhone browser (WebKit's
+     tracking prevention) and Brave keep YouTube's sign-in away from players on other sites, so
+     Premium viewers get ads here. Opening youtube.com in a pop-up from this page, and clicking in it,
+     makes those browsers let YouTube see the sign-in here (Firefox for 30 days). The link shows with
+     the ads label in those browsers only; ?signin before the # shows it anywhere, for testing. */
+  const YT_WALLED = (() => {
+    const ua = navigator.userAgent;
+    const ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+    const firefox = /Firefox\/|FxiOS/.test(ua);
+    const safari = /Safari\//.test(ua) && !/Chrome\/|Chromium|CriOS|Edg|OPR\/|FxiOS|EdgiOS/.test(ua);
+    return /[?&]signin\b/.test(location.search) || ios || firefox || safari || !!navigator.brave;
+  })();
+  const ytSignin = $('ytSignin');
+  if (YT_WALLED) {
+    document.body.classList.add('yt-walled');
+    ytSignin.hidden = false;
+    ytSignin.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // Keep the opener (no "noopener"): the browsers only count a pop-up this page opened itself.
+      const w = window.open('https://www.youtube.com/', 'echolog-youtube', 'popup,width=520,height=680');
+      if (!w) { location.href = 'https://www.youtube.com/'; return; }
+      ytSignin.classList.add('waiting');
+      ytSignin.textContent = 'Click anywhere in the YouTube window, then close it.';
+      const t = setInterval(() => {
+        if (!w.closed) return;
+        clearInterval(t);
+        ytSignin.textContent = 'Reloading.';
+        location.reload(); // new players pick up the sign-in
+      }, 500);
+    });
+  }
+
   function adLabel(text) { const el = $('adLabel'); if (el.textContent !== text) el.textContent = text; }
   const ADS_TEXT = 'Ads playing. The song starts after them.';
 

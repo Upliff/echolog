@@ -513,6 +513,20 @@ body.mini .upnext { left: auto; right: 20px; transform: none; bottom: 300px; }
 .stage.scene-tap .stage-tap { display: none; }
 .stage.scene-tap:not(.mini) .ad-label { opacity: 1; }
 .stage.scene-tap .sound-pill { display: none; }
+/* Browsers that keep YouTube's sign-in away from players on other sites (Firefox, iPhones, Brave):
+   a small link under the ads label that opens YouTube in a pop-up, so Premium can apply here. */
+.yt-signin {
+  position: absolute; left: 12px; top: 50px; z-index: 7; max-width: calc(100% - 24px);
+  padding: 6px 12px; border: 0; border-radius: 8px; background: rgba(5, 7, 11, 0.85);
+  font: inherit; font-size: 12px; color: var(--muted); text-align: left; text-decoration: underline;
+  text-underline-offset: 3px; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+}
+.yt-signin:hover, .yt-signin:focus-visible { color: var(--acc); }
+body.yt-walled .stage.ad:not(.loading):not(.mini) .yt-signin,
+body.yt-walled .stage.music-tap:not(.loading):not(.mini) .yt-signin,
+body.yt-walled .stage.music-peek:not(.loading):not(.mini) .yt-signin,
+body.yt-walled .stage.scene-tap:not(.mini) .yt-signin,
+.yt-signin.waiting { opacity: 1; pointer-events: auto; }
 .stage.music-tap .sound-pill { display: none; }
 .stage.loading .stage-loading { opacity: 1; }
 .layer-scene { transition: opacity 0.6s ease; }
