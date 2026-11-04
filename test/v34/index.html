@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#05070b">
+<title>Echolog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://www.youtube.com">
+<!-- Fonts load without holding up the page. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Karla:wght@400;600&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div style="position:fixed;right:8px;bottom:8px;z-index:2000;font:12px sans-serif;color:#e8c27a;background:#000a;padding:2px 6px;border-radius:4px;pointer-events:none">Test copy v34</div>
+<div class="backdrop" aria-hidden="true">
+  <canvas class="bd-layer" width="32" height="32"></canvas>
+  <canvas class="bd-layer" width="32" height="32"></canvas>
+  <div class="bd-vignette"></div>
+</div>
+
+<header class="top" id="top">
+  <!-- Song pages: three small buttons instead of the top bar. -->
+  <nav class="song-nav" aria-label="Site">
+    <a class="nav-btn" id="navHome" href="#/" aria-label="Home" title="Home">
+      <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M4 11l8-7 8 7M6 9.5V20h4.5v-5.5h3V20H18V9.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <a class="nav-btn nav-vinyl" id="navGame" href="#/" aria-label="All songs" title="All songs">
+      <span class="vinyl" aria-hidden="true"><span class="vinyl-label" id="vinylLabel"></span></span>
+    </a>
+  </nav>
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a class="brand" href="#/">Echolog</a>
+    <span class="crumb" id="crumb"></span>
+  </nav>
+  <div class="top-right">
+    <button class="about-btn" type="button" id="aboutBtn">About</button>
+  </div>
+</header>
+
+<main id="app" tabindex="-1"></main>
+
+<!-- Sounds for the song playing: a panel of pads that opens from the right. -->
+<div class="fx-panel" id="soundsPanel" role="group" aria-label="Sounds" hidden>
+  <p class="fx-head">Sounds</p>
+  <div class="fx-pads" id="soundsPads"></div>
+</div>
+
+<div class="stage" id="stage" hidden>
+  <div class="layer-music" id="musicWrap"></div>
+  <div class="layer-scene" id="sceneWrap"></div>
+  <div class="stage-tap" id="stageTap"></div>
+  <div class="stage-loading" id="stageLoading" aria-live="polite">
+    <img class="sl-still" id="slStill" alt="">
+    <div class="sl-mid">
+      <p class="sl-title" id="slTitle"></p>
+      <span class="sl-line"><span></span></span>
+      <span class="sl-word">Loading</span>
+      <button class="sl-play" id="slPlay" type="button">Play</button>
+    </div>
+  </div>
+  <button class="sound-pill" id="soundPill" type="button">Tap for sound</button>
+  <p class="ad-label" id="adLabel" aria-live="polite">Ads playing. The song starts after them.</p>
+  <p class="stage-msg" id="stageMsg" hidden></p>
+</div>
+
+<nav class="scenebar" id="sceneBar" aria-label="Scenes" hidden></nav>
+<a class="side-btn prev" id="prevBtn" hidden></a>
+<a class="side-btn next" id="nextBtn" hidden></a>
+
+<div class="dock" id="dock" hidden>
+  <a class="ctl" id="dockPrev" aria-label="Previous song"></a>
+  <button class="ctl" type="button" id="dockPlay" aria-label="Pause"></button>
+  <a class="ctl" id="dockNext" aria-label="Next song"></a>
+  <span class="vol-wrap dock-vol">
+    <button class="ctl" type="button" id="dockSound" aria-label="Mute"></button>
+    <span class="vol-pop"><input class="vol" id="dockVol" type="range" min="0" max="100" step="1" aria-label="Volume"></span>
+  </span>
+</div>
+
+<div class="upnext" id="upnext" role="status" hidden>
+  <span id="upnextText"></span>
+  <button type="button" id="upnextGo">Play now</button>
+  <button type="button" id="upnextStay">Stay</button>
+</div>
+
+<div class="clouds" id="clouds" aria-hidden="true"></div>
+
+<dialog class="about" id="about">
+  <p>[ABOUT]</p>
+  <form method="dialog"><button type="submit">Close</button></form>
+</dialog>
+
+<script src="app.js" defer></script>
+</body>
+</html>
