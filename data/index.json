@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-04T10:45:00Z",
+  "updated": "2026-11-04T17:08:48Z",
   "settings": {},
   "games": [
     {
@@ -4000,7 +4000,7 @@
     }
   ],
   "status": {
-    "mode": "saves",
+    "mode": "weekly",
     "quotaDay": "2026-11-04",
     "quotaUsedToday": 0,
     "quotaUsedThisRun": 0,
@@ -4010,7 +4010,7 @@
     "problems": []
   },
   "log": [
-    "mode: saves",
+    "mode: weekly",
     "quota: 0 units this run, 0 of 8000 today"
   ]
 }
