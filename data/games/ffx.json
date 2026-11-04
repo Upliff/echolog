@@ -3386,7 +3386,7 @@
    "volume": null,
    "fadeIn": null,
    "fadeOut": null,
-   "length": 335,
+   "length": 523,
    "moment": {
     "videoId": "7qrOWpV7b68",
     "start": 0,
@@ -3401,11 +3401,7 @@
      "label": "Macalania, the spring"
     }
    ],
-   "audio": {
-    "videoId": "Ze6w1sLvymM",
-    "start": 0,
-    "end": null
-   },
+   "audio": null,
    "sounds": [],
    "stories": [
     {
