@@ -10,12 +10,6 @@
           "id": "to-zanarkand",
           "title": "To Zanarkand",
           "composer": "Nobuo Uematsu",
-          "moment": {
-            "videoId": "5oIjPHo0k5E",
-            "start": 27,
-            "end": 173,
-            "label": ""
-          },
           "commentVideos": [
             "sy-nrLiAwZI",
             "PSjTN8WSGNk",
@@ -50,7 +44,8 @@
             "QBfjQWkhwFE",
             "F8Rsmu7as1c",
             "wExA-JIxYG8"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "tidus-s-theme",
@@ -65,18 +60,13 @@
             "qk0MG4hdvME",
             "WqYqa36WXRU",
             "oTWQp40HlqI"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "otherworld",
           "title": "Otherworld",
           "composer": "Nobuo Uematsu",
-          "moment": {
-            "videoId": "4umidcc_8rU",
-            "start": 15,
-            "end": null,
-            "label": "Opening"
-          },
           "commentVideos": [
             "zhYW3dY1hgM",
             "4umidcc_8rU",
@@ -121,7 +111,8 @@
             "jumu2aOnbJc",
             "l0m47D_QIOg",
             "YLsUajTJRgQ"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "this-is-your-story",
@@ -136,7 +127,8 @@
             "u4ffC3p10lU",
             "NeahUiqCuFw",
             "MZSOSxnOOhk"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "creep",
@@ -151,7 +143,8 @@
             "3hwuOzk99Ig",
             "6KEpPuiBLzs",
             "FC3Sc4lQcTQ"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "battle-theme",
@@ -167,7 +160,8 @@
             "7AjXgK0NYTo",
             "-QRzZ9rsMxY",
             "Omt74U65eIo"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "out-of-the-frying-pan",
@@ -182,7 +176,8 @@
             "Ue1fRipeWBc",
             "aYP7K7Fer5w",
             "2Xt5SUlvT7M"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "leap-in-the-dark",
@@ -197,7 +192,8 @@
             "MID_Z9XyZqk",
             "jKyi8gXgicg",
             "ry5Hrwd4OEc"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "underwater-ruins",
@@ -212,7 +208,8 @@
             "YKJ8nCUjdRc",
             "8MMVyW5nvgw",
             "8DxUBDE-83o"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "oui-are-al-bhed",
@@ -227,7 +224,8 @@
             "QnnPwqOxc1Y",
             "sKp4_IVTGuI",
             "wMFgrvgDDns"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "enemy-attack",
@@ -243,7 +241,8 @@
             "sOJixyIhAx8",
             "VJ9zYVuIRsE",
             "RBEcPLdgcyg"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "the-blitzers",
@@ -258,18 +257,13 @@
             "b584gNLzfLM",
             "stIPs46hX4A",
             "uhTlknfbQA4"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "besaid-island",
           "title": "Besaid Island",
           "composer": "Nobuo Uematsu",
-          "moment": {
-            "videoId": "112PPC8JlJg",
-            "start": 418,
-            "end": 935,
-            "label": ""
-          },
           "commentVideos": [
             "RC1VmGXiEFw",
             "IKGc_wtQKC8",
@@ -303,7 +297,8 @@
             "dKZ7vVIbK7s",
             "YlUWa82i8ko",
             "wiw7U8iiQEg"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "hum-of-the-fayth",
@@ -319,7 +314,8 @@
             "9vUb80cL8mw",
             "spNjVBsMSHk",
             "JlwO2wqae3g"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "phantoms",
@@ -334,7 +330,8 @@
             "NhlbVwEv9-o",
             "SlBP_8dyURA",
             "ob04t9CjRNk"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "the-trials",
@@ -349,7 +346,8 @@
             "nXDizLvkL_c",
             "R0QlCIIuj84",
             "gWGvbXXSAp0"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "hymn-valefor",
@@ -364,7 +362,8 @@
             "42aOxDec5lE",
             "obdjnjqNZAM",
             "Jwxx1uT6cyc"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "the-summoning",
@@ -379,7 +378,8 @@
             "GpW7cTfqz04",
             "k2_up1w-si4",
             "uQpHg4PCMAY"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "braska-s-daughter",
@@ -394,7 +394,8 @@
             "TRvW8Pb0t44",
             "-OQZOYzEVg8",
             "h1v9tiFaiLs"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "yuna-s-theme",
@@ -409,7 +410,8 @@
             "h4RLvBSfz70",
             "P50Hme6psXA",
             "Hv7huAVQDo4"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "movement-in-green",
@@ -424,7 +426,8 @@
             "FUaEswxj-6o",
             "Vic5OwfmNwg",
             "gZo8rJEzQKU"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "the-sending",
@@ -439,7 +442,8 @@
             "guqV6l8tCOc",
             "cmz9tb6XdkQ",
             "B7z2FmvsmR8"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "calm-before-the-storm",
@@ -454,7 +458,8 @@
             "pxp3B3Ol6tE",
             "smgxJbgjYz0",
             "BSQzJeUglz8"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "hymn-ifrit",
@@ -468,7 +473,8 @@
           "commentVideos": [
             "4Q_d6I8cu40",
             "xqger6Qb4Kk"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "luca",
@@ -483,7 +489,8 @@
             "rHXc7IzzHLg",
             "_na76uQFrh0",
             "Z0RbB7myssI"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "grand-maester-mika",
@@ -498,7 +505,8 @@
             "AXpI5onZlZw",
             "VmnYi16eFRw",
             "7ThetsCbDic"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "decision-on-the-dock",
@@ -512,7 +520,8 @@
           "commentVideos": [
             "fRIXJoKYMuI",
             "1jRUhMwXfBQ"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "the-splendid-performance",
@@ -527,7 +536,8 @@
             "qZkSsrZnjSY",
             "SY6Ecg-9i20",
             "UJPLtHRrHn4"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "face-off",
@@ -541,7 +551,8 @@
           "commentVideos": [
             "kThd_h1Nzvw",
             "8gxLjRJRHi0"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "blitz-off",
@@ -556,7 +567,8 @@
             "q55PKZF62GY",
             "-C0V41lj_Vs",
             "5GUKJwdm9ts"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "auron-s-theme",
@@ -571,7 +583,8 @@
             "KwBv6cD9Z5U",
             "ObcZc1czX8o",
             "doKGVCe3_RY"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "mi-ihen-highroad",
@@ -586,7 +599,8 @@
             "Y7bCQbQ-tjA",
             "iAIuPqPqxGg",
             "XKXuiWPQdPk"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "chocobo-jam",
@@ -601,7 +615,8 @@
             "ZUcKCkyYV1o",
             "36e1qKtoU2g",
             "QOM_DHog_OI"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "the-travel-agency",
@@ -616,7 +631,8 @@
             "xBevRVNSNeE",
             "daq6Vxgpsvg",
             "r0EjI4mCtLU"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "they-may-pass",
@@ -630,7 +646,8 @@
           "commentVideos": [
             "52snYQ6i72Q",
             "9hyuyaeMxAE"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "seymour-s-theme",
@@ -645,7 +662,8 @@
             "U-_qCrxom9g",
             "ki6Wahi9ms8",
             "eitvenwyxRg"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "djose-temple",
@@ -660,7 +678,8 @@
             "4o05wBcsOCQ",
             "3XuJXLue5mU",
             "EzlqRvr2XfM"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "hymn-ixion",
@@ -674,7 +693,8 @@
           "commentVideos": [
             "suwqt4QLPUQ",
             "fFLYqPFb4Co"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "ridess-the-shoopuf",
@@ -688,7 +708,8 @@
           "commentVideos": [
             "Qckn-mew__w",
             "U8NfDBAGFXE"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "rikku-s-theme",
@@ -703,7 +724,8 @@
             "D8YV6i50gIw",
             "8Ip_lc_lw_Y",
             "A_SrJMaG1aE"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "guadosalam",
@@ -717,7 +739,8 @@
           "commentVideos": [
             "WDY16yK87mg",
             "jM6NOBU-kbk"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "thunder-plains",
@@ -732,7 +755,8 @@
             "dkugU4qqHKo",
             "3BfTHW0IJUs",
             "Ty2fvEFWBQY"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "jecht-s-theme",
@@ -747,7 +771,8 @@
             "IuHLaT_kAUM",
             "cyFtjWcngL8",
             "tYAMzTCcx1c"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "macalania-woods",
@@ -761,7 +786,8 @@
           "commentVideos": [
             "khfqA7F9gBA",
             "SZpEAbUEdlM"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "seymour-s-ambition",
@@ -776,7 +802,8 @@
             "xLnWGMCTGlY",
             "unBj8AQNlL0",
             "UHWD5Mm1q0Q"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "hymn-shiva",
@@ -791,7 +818,8 @@
             "O0nvvxOF-mM",
             "iK3NLGrJ9j4",
             "BgFnOq6BbgE"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "pursuit",
@@ -807,7 +835,8 @@
             "yvB3XK850yY",
             "v5BnownSC8U",
             "gFpTHoMLnUA"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "the-burning-sands",
@@ -822,7 +851,8 @@
             "oJNhCp8Mye0",
             "OG4ygA5nXWo",
             "WCX03zvg1XU"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "peril",
@@ -837,7 +867,8 @@
             "prTA77ZJNCI",
             "BE5eKldNTAc",
             "uuDb0cvcNgc"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "the-truth-revealed",
@@ -852,7 +883,8 @@
             "5c9Uue-NA8k",
             "IKAyXh9LwCk",
             "7Xhc2i1vdrQ"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "launch",
@@ -867,7 +899,8 @@
             "18uARerZeVg",
             "bq6if00t_qQ",
             "0lRqe_mgUvk"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "the-wedding",
@@ -882,7 +915,8 @@
             "QAR17f9TRP8",
             "G1mkHdjwzaE",
             "v1yAwgjpdOI"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "assault",
@@ -897,7 +931,8 @@
             "qR7jLqkmu4o",
             "a0WfW0R_REg",
             "_57wc4kBchQ"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "tragedy",
@@ -911,7 +946,8 @@
           "commentVideos": [
             "l2ftL8Zv7aQ",
             "BDpLVl-VcAw"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "believe",
@@ -925,7 +961,8 @@
           "commentVideos": [
             "ljhytogkRak",
             "70k3MpgzXos"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "via-purifico",
@@ -940,7 +977,8 @@
             "MSaF8VJwKmI",
             "Eeu3JZ_DPNc",
             "H9tFQ7b0mtY"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "hymn-bahamut",
@@ -955,7 +993,8 @@
             "0TUNElKM1rE",
             "Cz5uXvAByT4",
             "B5KKJ4gOhD0"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "moment-of-truth",
@@ -970,7 +1009,8 @@
             "pR4AEBcqdFw",
             "ms3ph6vKJ9Q",
             "4_B-l9wZWcs"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "patricide",
@@ -985,18 +1025,13 @@
             "gmETYgrzthE",
             "dRwFhnHRbpw",
             "Qp6sdcehAgQ"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "suteki-da-ne",
           "title": "Suteki da Ne",
           "composer": "Nobuo Uematsu",
-          "moment": {
-            "videoId": "7qrOWpV7b68",
-            "start": 0,
-            "end": null,
-            "label": "Macalania, the spring"
-          },
           "commentVideos": [
             "Vl20g-tBaKc",
             "zXpm8DPYuTc",
@@ -1004,11 +1039,7 @@
             "Ze6w1sLvymM",
             "yOspVDaEi30"
           ],
-          "audio": {
-            "videoId": "Ze6w1sLvymM",
-            "start": 0,
-            "end": null
-          },
+          "audio": null,
           "moments": [
             {
               "videoId": "7qrOWpV7b68",
@@ -1031,7 +1062,8 @@
             "b68JCouP2xs",
             "h36C9dSFrxA",
             "BCFi2qKB2GY"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "lulu-s-theme",
@@ -1046,7 +1078,8 @@
             "IUUT886SPWw",
             "QEutEEvkluc",
             "R3uoskfRasA"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "bravely-forward",
@@ -1061,7 +1094,8 @@
             "rY2-9hwAYUk",
             "jaU7XVOXYBA",
             "O1WLIE_71go"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "hymn-yojimbo",
@@ -1075,7 +1109,8 @@
           "commentVideos": [
             "UZJdKP47O5k",
             "Ymo9zswdAYg"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "servants-of-the-mountain",
@@ -1090,7 +1125,8 @@
             "NI9D6_I2_WY",
             "hsRDioy_pGc",
             "OseAIrBG8hE"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "hymn-the-ronso",
@@ -1104,7 +1140,8 @@
           "commentVideos": [
             "w0NeLAcSb2s",
             "6ecsQe9dAFM"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "wandering",
@@ -1120,7 +1157,8 @@
             "A1zcE9fzeZ4",
             "ZZLEyKGdtKM",
             "iobkbPDLPCk"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "a-fleeting-dream",
@@ -1136,7 +1174,8 @@
             "cdmvqKZpWJo",
             "fAR4tFAll7g",
             "O3RujoteBYQ"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "hymn-yunalesca",
@@ -1151,7 +1190,8 @@
             "E0VR-CbYd94",
             "G0UQKpUsl3k",
             "ttaQOgvWSfo"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "challenge",
@@ -1166,7 +1206,8 @@
             "6PKx_51pWYg",
             "FqXB6oJaADQ",
             "w4rEV1Kvxfs"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "beyond-the-darkness",
@@ -1180,7 +1221,8 @@
           "commentVideos": [
             "ePl26plerW8",
             "jTqu4chu_gU"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "hymn-spira",
@@ -1194,7 +1236,8 @@
           "commentVideos": [
             "N9y4gtx-SXo",
             "KxO21Nr7hvg"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "the-unsent-laugh",
@@ -1209,7 +1252,8 @@
             "NaESaEtUsrE",
             "xTiNiRIy2kQ",
             "tK1fpyB7H14"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "fight-with-seymour",
@@ -1224,7 +1268,8 @@
             "8nWHoYXIHeU",
             "zhLLWvkoa7U",
             "RJMTpvIF3mc"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "hymn-anima",
@@ -1237,7 +1282,8 @@
           },
           "commentVideos": [
             "A3QUoqeH5WY"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "a-contest-of-aeons",
@@ -1253,7 +1299,8 @@
             "UeizZVg5T8c",
             "Kv-2bQ0GiXA",
             "5XWV-zOF0pc"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "final-battle",
@@ -1268,7 +1315,8 @@
             "fm3QyFStsQw",
             "gDFHZZqXf8I",
             "KeAwDad6LXQ"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "ending-theme",
@@ -1283,7 +1331,8 @@
             "VQQcVluN0Dc",
             "z7wDnGDcU2Y",
             "n9dayvBXuq0"
-          ]
+          ],
+          "composer": ""
         },
         {
           "id": "suteki-da-ne-isn-t-it-wonderful-orchestra-version",
@@ -1299,7 +1348,8 @@
             "zXpm8DPYuTc",
             "yOspVDaEi30",
             "HCAAojiimm4"
-          ]
+          ],
+          "composer": ""
         }
       ],
       "cover": "covers/ffx.jpg",
