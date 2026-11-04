@@ -822,8 +822,9 @@
     const scenes = scenesOf(song);
     const m = scenes[index] || scenes[0] || null;
     let scene = m ? Object.assign({}, m) : null;
-    const ownAudio = m && m.audio && m.audio.videoId ? m.audio : null;
-    const songAudio = song.audio && song.audio.videoId ? song.audio : null;
+    const hasTrack = (a) => !!(a && (a.videoId || a.file));
+    const ownAudio = m && hasTrack(m.audio) ? m.audio : null;
+    const songAudio = hasTrack(song.audio) ? song.audio : null;
     let music = ownAudio || songAudio ? Object.assign({}, ownAudio || songAudio) : null;
     if (useTest) {
       const p = testParams();
@@ -1253,7 +1254,7 @@
   function fillLoading(plan, title) {
     const img = $('slStill');
     const vid = plan && (plan.scene || plan.music || {}).videoId;
-    const src = vid ? `https://i.ytimg.com/vi/${vid}/hqdefault.jpg` : '';
+    const src = vid ? `https://i.ytimg.com/vi/${vid}/hqdefault.jpg` : posterFor();
     if (img.dataset.src !== src) {
       img.dataset.src = src;
       img.classList.remove('ok');
@@ -1284,6 +1285,7 @@
     // Then the scene player itself is shown to tap, since that's usually ads waiting for a tap.
     if (touchScreen()) {
       if (safe(() => media.scene.getPlayerState()) === YT_STATE.PLAYING || (media.gate && media.gate.scene)) return;
+      if (media.scene && media.scene.isFile) { stage.classList.add('stuck'); return; }
       showSceneForTap(true);
       return;
     }
@@ -1419,8 +1421,9 @@
       media.at = { music: 0, scene: clipAt(plan.scene, elapsed) };
     }
     if (songState) { songState.ended = false; songState.stayed = false; }
-    let YT;
-    try { YT = await loadYT(); } catch (_) {
+    let YT = null;
+    const needYT = !plan.scene.file || (plan.music && !plan.music.file);
+    if (needYT) try { YT = await loadYT(); } catch (_) {
       if (token === media.token) showStageMsg("Couldn't load the video player.");
       return;
     }
@@ -1502,10 +1505,98 @@
     }).catch(() => {});
   }
 
+  /* Music from a file on the site (an mp3 Mohad has the rights to, in music/<game id>/) instead of a
+     YouTube video: audio: { "file": "music/ffx/to-zanarkand.mp3", "start": 0, "end": null }.
+     FilePlayer answers the same calls as a YouTube player (state, time, play, pause, seek, mute,
+     volume), so the scene lock, scrub bars, fades, repeat and auto next all work the same. A song
+     with a file track and no scene plays the file as its "scene", with the game's cover in the video area.
+     Files never have ads. */
+  const posterFor = () => (songState && songState.game && songState.game.cover) || '';
+  function FilePlayer(wrap, spec, o) {
+    const a = document.createElement('audio');
+    a.preload = 'auto';
+    a.setAttribute('playsinline', '');
+    a.muted = !!o.muted;
+    let st = -1;
+    let ready = false;
+    let want = !!o.autoplay;
+    let end = spec.end || null;
+    let startAt = o.at != null ? o.at : (spec.start || 0);
+    let file = spec.file;
+    const img = h('img', { class: 'file-still', alt: '', hidden: true });
+    wrap.replaceChildren(img, a);
+    const set = (s) => { if (st === s) return; st = s; o.onState(s); };
+    const tryPlay = () => { const r = a.play(); if (r && r.catch) r.catch(() => {}); };
+    const load = (f, at) => {
+      file = f; startAt = at; ready = false;
+      a.src = f;
+      a.load();
+    };
+    a.addEventListener('loadedmetadata', () => { try { a.currentTime = startAt; } catch (_) { /* ignore */ } });
+    a.addEventListener('canplay', () => {
+      if (ready) return;
+      ready = true;
+      o.onReady();
+      if (want) tryPlay();
+    });
+    a.addEventListener('playing', () => set(YT_STATE.PLAYING));
+    a.addEventListener('pause', () => { if (st !== YT_STATE.ENDED) set(YT_STATE.PAUSED); });
+    a.addEventListener('waiting', () => { if (!a.paused) set(YT_STATE.BUFFERING); });
+    a.addEventListener('ended', () => set(YT_STATE.ENDED));
+    a.addEventListener('timeupdate', () => {
+      if (end && a.currentTime >= end && st === YT_STATE.PLAYING) { a.pause(); set(YT_STATE.ENDED); }
+    });
+    a.addEventListener('error', () => { if (a.getAttribute('src')) o.onError(5); });
+    Object.assign(this, {
+      isFile: true,
+      setPoster(src) { if (src) { img.src = src; img.hidden = false; } else { img.removeAttribute('src'); img.hidden = true; } },
+      getPlayerState: () => st,
+      getCurrentTime: () => a.currentTime || 0,
+      getDuration: () => (Number.isFinite(a.duration) ? a.duration : 0),
+      getVideoData: () => ({ video_id: file }),
+      isMuted: () => a.muted,
+      mute() { a.muted = true; },
+      unMute() { a.muted = false; },
+      getVolume: () => Math.round(a.volume * 100),
+      setVolume(v) { a.volume = Math.max(0, Math.min(1, v / 100)); },
+      playVideo() { want = true; if (st === YT_STATE.ENDED) { st = YT_STATE.PAUSED; } tryPlay(); },
+      pauseVideo() { want = false; a.pause(); },
+      seekTo(t) { startAt = t; try { a.currentTime = t; } catch (_) { /* not loaded yet: done on loadedmetadata */ } },
+      loadVideoById(x) { end = x.endSeconds || null; want = true; st = -1; load(x.file, x.startSeconds || 0); tryPlay(); },
+      cueVideoById(x) { end = x.endSeconds || null; want = false; load(x.file, x.startSeconds || 0); set(YT_STATE.CUED); },
+      unloadModule() {},
+      destroy() { a.pause(); a.removeAttribute('src'); a.load(); wrap.replaceChildren(); },
+    });
+    this.setPoster(o.poster);
+    load(file, startAt);
+    if (want) tryPlay();
+  }
+
   function usePlayer(YT, role, spec, autoplay, at) {
-    const p = media[role];
+    let p = media[role];
     const from = at != null ? at : (spec.start || 0);
-    const opts = { videoId: spec.videoId, startSeconds: from, endSeconds: spec.end || undefined };
+    const opts = { videoId: spec.videoId, file: spec.file, startSeconds: from, endSeconds: spec.end || undefined };
+    const wrapFor = role === 'scene' ? sceneWrap : musicWrap;
+    // A YouTube player can't play a file and the other way round: swap the player when the kind changes.
+    if (p && !!p.isFile !== !!spec.file) { dropPlayer(role); p = null; }
+    if (spec.file) {
+      const poster = role === 'scene' ? posterFor() : '';
+      if (p && media.ready[role]) {
+        p.setPoster(poster);
+        safe(() => (autoplay ? p.loadVideoById(opts) : p.cueVideoById(opts)));
+        return;
+      }
+      dropPlayer(role);
+      media.ready[role] = false;
+      media[role] = new FilePlayer(wrapFor, spec, {
+        at: from, autoplay, poster,
+        muted: (role === 'scene' && media.plan && media.plan.music) || !!media.gate,
+        onReady: () => onReady(role),
+        onState: (st) => onState(role, st),
+        onError: (code) => onError(role, code),
+      });
+      return;
+    }
     if (p && media.ready[role]) {
       safe(() => (autoplay ? p.loadVideoById(opts) : p.cueVideoById(opts)));
       return;
@@ -1696,7 +1787,7 @@
       // itself so it can be tapped. Only if that doesn't work after a while, use the scene's sound.
       // It stays up until the music plays (no give-up timer: on iPhones an ad also reports
       // "not started", so the page can't tell an ad from a player waiting for a tap).
-      if (media.music && media.ready.music && !media.musicTapShown) {
+      if (media.music && media.ready.music && !media.musicTapShown && !media.music.isFile) {
         showMusicForTap(true);
         return;
       }
@@ -1936,6 +2027,7 @@
     for (const role of ['scene', 'music']) {
       const p = media[role];
       const a = adSeen[role];
+      if (p && p.isFile) { a.t = -1; a.since = 0; a.u = -1; a.moved = 0; continue; }
       const st = p && media.ready[role] ? safe(() => p.getPlayerState()) : null;
       // iPhones: during ads the player says "not started" while its time counts up (the ad's own
       // clock). Seen in Mohad's screen recording, 2 Nov 2026.
@@ -2010,7 +2102,7 @@
     adWatch();
     // Phones, music not started yet: show its player small in the top right instead of hiding it,
     // so any ads on it play where they can be seen (muted until "Tap for sound").
-    const peek = touchScreen() && sep() && !!media.musicWait && !media.musicTapShown && !media.musicAd;
+    const peek = touchScreen() && sep() && !!media.musicWait && !media.musicTapShown && !media.musicAd && !media.music.isFile;
     if (peek !== stage.classList.contains('music-peek')) {
       stage.classList.toggle('music-peek', peek);
       if (peek) adLabel('Music loading. Ads may play first.');

@@ -768,3 +768,8 @@ html.song-page .song-nav { display: flex; flex-direction: column; gap: 8px; poin
 .intro-edge { backface-visibility: visible; -webkit-backface-visibility: visible; }
 .intro-whole { position: absolute; left: 0; top: 0; width: 100vw; height: 100vh; display: block; }
 .intro-flash { position: absolute; inset: 0; background: #fff; opacity: 0; }
+
+/* Music from a file (see FilePlayer): the audio element is never shown; a song with no scene shows the game's cover. */
+.file-still { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.file-still[hidden] { display: none; }
+#musicWrap audio, #sceneWrap audio { display: none; }
