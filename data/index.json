@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-13T17:08:42Z",
+  "updated": "2026-11-14T16:53:47Z",
   "settings": {},
   "games": [
     {
@@ -4001,7 +4001,7 @@
   ],
   "status": {
     "mode": "weekly",
-    "quotaDay": "2026-11-13",
+    "quotaDay": "2026-11-14",
     "quotaUsedToday": 0,
     "quotaUsedThisRun": 0,
     "budget": 8000,
